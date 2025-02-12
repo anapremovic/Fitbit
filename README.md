@@ -27,6 +27,7 @@ This is a study of data from an Amazon survey from 2016 of 30 respondants. We pe
 
 ### Built With
 [![Python][Python.org]][Python-url]
+[![Streamlit][Streamlit.io]][Streamlit-url]
 
 
 ## Getting Started
@@ -55,4 +56,6 @@ This is a study of data from an Amazon survey from 2016 of 30 respondants. We pe
 * <a href="https://github.com/othneildrew/Best-README-Template">README Template</a>
 
 [Python-url]: https://www.python.org/
-[Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54&size=150
+[Streamlit-url]: https://streamlit.io/
+[Streamlit.io]: https://img.shields.io/badge/-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&size=150
