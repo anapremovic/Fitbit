@@ -1,1 +1,58 @@
-Welcome to our Fitbit project!
+# Fitbit Data Analysis
+
+
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+    </li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributors">Contributors</a></li>
+    <li>
+      <a href="#acknowledgments">Acknowledgments</a>
+    </li>
+  </ol>
+</details>
+
+## About The Project
+
+This is a study of data from an Amazon survey from 2016 of 30 respondants. We perform an analysis and visualize our results in a dashboard.
+
+### Built With
+[![Python][Python.org]][Python-url]
+
+
+## Getting Started
+
+#### Prerequisites
+
+* Python is installed
+
+## Usage
+
+* Visualize distance travelled by users.
+* Visualize calories burnt per user.
+* Visualize frequency of workout per day of week.
+* Visualize relationship between the amount of steps taken and the amount of calories burnt.
+
+## Contributors
+
+* Lucas Lee
+* Luke Olender
+* Ana Premovic
+* Alec Rothkowitz
+
+
+## Acknowledgments
+
+* <a href="https://github.com/othneildrew/Best-README-Template">README Template</a>
+
+[Python-url]: https://www.python.org/
+[Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
