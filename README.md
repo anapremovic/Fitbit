@@ -1,1 +1,1 @@
-# Fitbit
+Welcome to our Fitbit project!
