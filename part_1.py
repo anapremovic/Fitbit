@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 daily_activity = pd.read_csv("data/daily_activity.csv", index_col=0)
 
 def generate_day_of_week_frequency_plot(daily_activity: DataFrame):
-    daily_activity["ActivityDate"] = pd.to_datetime(daily_activity["ActivityDate"])
-    day_of_week_counts = daily_activity["ActivityDate"].dt.dayofweek.value_counts().sort_index()
+    daily_activity["ActivityDate"] = pd.to_datetime(daily_activity.loc[:, "ActivityDate"])
+    day_of_week_counts = daily_activity.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
 
     plt.figure(figsize=(8, 5))
     plt.bar(day_of_week_counts.index, day_of_week_counts.values, color="green")
