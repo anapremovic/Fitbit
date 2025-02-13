@@ -1,23 +1,19 @@
 # Fitbit Data Analysis
 
-
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
+        <a href="#about-the-project">About The Project</a>
+        <ul><li><a href="#built-with">Built With</a></li></ul>
     </li>
+    <li><a href="#getting-started">Getting Started</a></li>
     <li>
-      <a href="#getting-started">Getting Started</a>
+        <a href="#usage">Usage</a>
+        <ul><li><a href="#part-1">Part 1</a></li></ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#contributors">Contributors</a></li>
-    <li>
-      <a href="#acknowledgments">Acknowledgments</a>
-    </li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -35,9 +31,13 @@ This is a study of data from an Amazon survey from 2016 of 30 respondants. We pe
 #### Prerequisites
 
 * Python is installed
+* Run `main.py` to see visualizations from Part 1
+
+TODO: Fill getting started section to tell user how to run scripts + use dashboard
 
 ## Usage
 
+### Part 1
 * Visualize distance travelled by users.
 * Visualize calories burnt per user.
 * Visualize frequency of workout per day of week.
