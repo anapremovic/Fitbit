@@ -2,8 +2,6 @@ import pandas as pd
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 
-daily_activity = pd.read_csv("data/daily_activity.csv", index_col=0)
-
 def generate_day_of_week_frequency_plot(daily_activity: DataFrame):
     daily_activity["ActivityDate"] = pd.to_datetime(daily_activity.loc[:, "ActivityDate"])
     day_of_week_counts = daily_activity.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
@@ -14,5 +12,3 @@ def generate_day_of_week_frequency_plot(daily_activity: DataFrame):
     plt.ylabel("Frequency")
     plt.title("Total Number of Workouts Per Day of Week")
     plt.show()
-
-generate_day_of_week_frequency_plot(daily_activity)
