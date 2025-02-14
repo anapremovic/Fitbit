@@ -20,7 +20,7 @@ def show_calories_per_day(data: pd.DataFrame, id: int, start_date: datetime = No
   get_data_for_id = get_data_for_id[(get_data_for_id.loc[:, "datetime"] >= start_date) & (get_data_for_id.loc[:, "datetime"] <= end_date)]
 
   # Setup pyplot
-  plt.figure(figsize=(12, 6))
+  plt.figure(figsize=(12, 8))
   plt.plot(get_data_for_id["datetime"], get_data_for_id["Calories"], marker='o', linestyle="-")
   plt.xlabel("Date of Activity")
   plt.ylabel("Calories Burned")
