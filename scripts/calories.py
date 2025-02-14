@@ -3,15 +3,12 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as datetime
 
-def show_calories_per_day(id: int, start_date: datetime = None, end_date: datetime = None):
+def show_calories_per_day(data: pd.DataFrame, id: int, start_date: datetime = None, end_date: datetime = None):
   """
   Purpose: This function displays the calories burned for each day given a specific user's ID. Can also set a date range to see a snapshot of the results. Otherwise, the entire duration of calories burned is shown 
 
   Author: L.D. Lee
   """
-
-  # Read from CSV file
-  data = pd.read_csv("data/daily_activity.csv")
   get_data_for_id = data.loc[data.loc[:, "Id"] == id].copy()
   get_data_for_id["datetime"] = pd.to_datetime(get_data_for_id.loc[:, "ActivityDate"]) # Create datetime column
   
@@ -33,8 +30,3 @@ def show_calories_per_day(id: int, start_date: datetime = None, end_date: dateti
   
   plt.xticks(rotation = 30)
   plt.show()
-
-# Test function calls
-show_calories_per_day(6290855005)
-show_calories_per_day(6290855005, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7)) # only between 2016/4/3 and 2016/4/7
-show_calories_per_day(4020332650)
