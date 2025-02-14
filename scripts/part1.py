@@ -29,7 +29,7 @@ def generate_regression_line_for_user(daily_activity: DataFrame, user_id: str):
     y_intercept = (0, base_intercept + user_coef)
     plt.axline(y_intercept, slope=steps_coef, color="green", label='Regression line')
 
-    plt.title('Scatter plot of Steps Taken vs. Calories Burned')
+    plt.title(f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}')
     plt.xlabel('Total steps')
     plt.ylabel('Calories burned')
     plt.grid()
