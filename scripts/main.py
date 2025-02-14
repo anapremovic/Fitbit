@@ -1,12 +1,17 @@
 import pandas as pd
 import part1 as part1
+import calories as ca
+import datetime as datetime
 import os
 
 # PART 1
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/daily_activity.csv")
-
 daily_activity = pd.read_csv(file_location)
+
+ca.show_calories_per_day(daily_activity, 6290855005)
+ca.show_calories_per_day(daily_activity, 6290855005, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7)) # only between 2016/4/3 and 2016/4/7
+ca.show_calories_per_day(daily_activity, 4020332650)
 
 part1.generate_day_of_week_frequency_plot(daily_activity)
 
