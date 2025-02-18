@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from pandas import DataFrame
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import statsmodels.formula.api as smf
@@ -75,7 +74,7 @@ def show_calories_per_day(data: pd.DataFrame, id: int, start_date: datetime = No
     plt.show()
 
 
-def generate_day_of_week_frequency_plot(daily_activity: DataFrame):
+def generate_day_of_week_frequency_plot(daily_activity: pd.DataFrame):
     daily_activity["ActivityDate"] = pd.to_datetime(daily_activity.loc[:, "ActivityDate"])
     day_of_week_counts = daily_activity.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
 
@@ -86,7 +85,7 @@ def generate_day_of_week_frequency_plot(daily_activity: DataFrame):
     plt.title("Total Number of Workouts Per Day of Week")
     plt.show()
 
-def generate_regression_line_for_user(daily_activity: DataFrame, user_id: str):
+def generate_regression_line_for_user(daily_activity: pd.DataFrame, user_id: str):
     user_entries = daily_activity.loc[ daily_activity.loc[:, 'Id'] == user_id ]
     user_steps = user_entries.loc[:, 'TotalSteps']
     user_calories = user_entries.loc[:, 'Calories']
