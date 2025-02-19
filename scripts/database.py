@@ -8,13 +8,13 @@ connection = sqlite3.connect(file_location)
 cursor = connection.cursor()
 
 
-
 def get_sleep_data():
-    #query = f"SELECT Id, logId FROM minute_sleep"
-    query = f"SELECT logId, substr(date, 1, instr(date, ' ') - 1) AS date, Id, COUNT(*) AS minutes_slept FROM minute_sleep GROUP BY logId"
+    query = f"SELECT substr(date, 1, instr(date, ' ') - 1) AS date, Id, COUNT(*) AS minutesSlept FROM minute_sleep GROUP BY logId"
     cursor.execute(query)
     rows = cursor.fetchall()
     sleep_data = pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+    sleep_data.loc[:, 'Id'] = sleep_data.loc[:, 'Id'].astype(int)
+    sleep_data.loc[:, 'minutesSlept'] = sleep_data.loc[:, 'minutesSlept'].astype(int)
     return sleep_data
 
-get_sleep_data()
+print(get_sleep_data())
