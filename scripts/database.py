@@ -17,7 +17,7 @@ def get_all_sedentary_activity() -> pd.DataFrame:
     cursor.execute('SELECT Id, ActivityDate, SedentaryMinutes FROM daily_activity')
 
     sedentary_data = dataframe_from_cursor_contents()
-    sedentary_data.loc[:, 'Id'].astype(int)
+    sedentary_data.loc[:, 'Id'] = sedentary_data.loc[:, 'Id'].astype(int)
     sedentary_data.loc[:, 'ActivityDate'] = pd.to_datetime(sedentary_data.loc[:, 'ActivityDate'])
     return sedentary_data
 
