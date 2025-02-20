@@ -21,5 +21,6 @@ daily_activity = pd.read_csv(file_location)
 
 # part1.generate_regression_line_for_user(daily_activity, 5553957443)
 
-p3.heart_rate(2022484408)
+p3.heart_rate(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
+# p3.test()
 # p3.weather()
