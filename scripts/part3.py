@@ -46,7 +46,20 @@ regression_sedentary_vs_sleep()
 def generate_daily_step_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of steps
     taken per time block across all users. Visualize results in a bar plot."""
-    pass
+
+    step_data = db.get_hourly_step_activity()
+    bins = [0, 4, 8, 12, 16, 20, 24]
+    labels = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+    step_data['TimeBlock'] = pd.cut(step_data['Hour'], bins=bins, labels=labels, right=False)
+    steps_per_block = step_data.groupby('TimeBlock')['StepTotal'].mean().reset_index()
+    
+    plt.bar(steps_per_block.loc[:, 'TimeBlock'], steps_per_block.loc[:, 'StepTotal'])
+    plt.title('Average Number of Steps Taken pe;r 4-Hour Time Block \n Across All Users')
+    plt.xlabel('Time')
+    plt.ylabel('Average Steps')
+    plt.show()
+
+generate_daily_step_distribution_barplot()
 
 def generate_daily_calorie_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of calories
