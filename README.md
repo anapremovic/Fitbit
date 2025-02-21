@@ -7,7 +7,11 @@
         <a href="#about-the-project">About The Project</a>
         <ul><li><a href="#built-with">Built With</a></li></ul>
     </li>
-    <li><a href="#getting-started">Getting Started</a></li>
+    <li>
+        <a href="#getting-started">Getting Started</a>
+        <ul><li><a href="#prerequisites">Prerequisites</a></li></ul>
+        <ul><li><a href="#run">Run</a></li></ul>
+    </li>
     <li>
         <a href="#usage">Usage</a>
         <ul><li><a href="#part-1">Part 1</a></li></ul>
@@ -28,10 +32,12 @@ This is a study of data from an Amazon survey from 2016 of 30 respondants. We pe
 
 ## Getting Started
 
-#### Prerequisites
+### Prerequisites
 
 * Python is installed
-* Run `main.py` to see visualizations from Part 1
+
+### Run
+* Run `main.py` to see visualizations from Part 1 and 3
 
 TODO: Fill getting started section to tell user how to run scripts + use dashboard
 
@@ -42,6 +48,9 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 * Visualize calories burnt per user.
 * Visualize frequency of workout per day of week.
 * Visualize relationship between the amount of steps taken and the amount of calories burnt.
+
+### Part 3
+* Visualize relationship between minutes of sleep and active minutes the next day.
 
 ## Contributors
 
