@@ -7,7 +7,7 @@ file_location = os.path.join(project_root, "data/fitbit_database.db")
 connection = sqlite3.connect(file_location)
 cursor = connection.cursor()
 
-def fetch_total_active_minutes_per_user_and_date() -> pd.DataFrame:
+def get_active_min_data() -> pd.DataFrame:
     query = """
     SELECT Id AS UserId, 
             ActivityDate AS Date, 
