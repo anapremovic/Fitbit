@@ -51,26 +51,41 @@ def get_all_sleep_activity() -> pd.DataFrame:
     sleep_data['date'] = pd.to_datetime(sleep_data['date'])
     return sleep_data
 
-def get_hourly_step_activity() -> pd.DataFrame:
+def get_daily_step_distribution() -> pd.DataFrame:
+    """Requests to group the hourly_steps table into 4-hour blocks and return 
+    the average amount of steps for each"""
+    # SQLite query to extract just the hour from the ActivityHour column
     hour = "CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - instr(ActivityHour, ' ') - 1) AS INTEGER)"
+    # Returns a column containing the hour blocks (0-4, 4-8, ..., 20-24)
+    # for each entry in the table. Then groups table by said blocks and computes
+    # the average number of steps taken during each: 4 * [average steps per hour].
     query = f"""
         SELECT 
-            StepTotal,
-        CASE 
-            WHEN ActivityHour LIKE '%PM%' AND {hour} < 12 
-                THEN {hour} + 12
-            WHEN ActivityHour LIKE '%AM%' AND {hour} = 12 
-                THEN 0
-            ELSE {hour}
-        END AS Hour
-        FROM hourly_steps;
+            4 * AVG(StepTotal) AS AverageSteps
+            CASE 
+                WHEN ActivityHour LIKE '%AM%'
+                    THEN CASE 
+                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '0-4'
+                        WHEN {hour} BETWEEN 4 AND 7 THEN '4-8'
+                        WHEN {hour} BETWEEN 8 AND 11 THEN '8-12'
+                    END
+                WHEN ActivityHour LIKE '%PM%'
+                    THEN CASE
+                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '12-16'
+                        WHEN {hour} BETWEEN 4 AND 7 THEN '16-20'
+                        WHEN {hour} BETWEEN 8 AND 11 THEN '20-24'
+                    END
+                ELSE 'N/A'
+            END AS HourGroup,
+        FROM hourly_steps
+        GROUP BY HourGroup;
     """
     cursor.execute(query)
 
-    hourly_step_data = dataframe_from_cursor_contents()
-
-    print(hourly_step_data.dtypes)
-    return hourly_step_data
+    step_data = dataframe_from_cursor_contents()
+    sorted_hour_groups = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+    step_data['HourGroup'] = pd.Categorical(step_data['HourGroup'], sorted_hour_groups)
+    return step_data.sort_values('HourGroup')
 
 def get_sedentary_vs_sleep_activity() -> pd.DataFrame:
     cursor.execute('SELECT ActivityDate, Id, ')
