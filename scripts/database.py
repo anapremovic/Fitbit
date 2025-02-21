@@ -92,9 +92,3 @@ def get_daily_step_distribution() -> pd.DataFrame:
     df = dataframe_from_cursor_contents()
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
     return df.sort_values('HourGroup')
-
-def get_sedentary_vs_sleep_activity() -> pd.DataFrame:
-    cursor.execute('SELECT ActivityDate, Id, ')
-
-    df = dataframe_from_cursor_contents()
-
