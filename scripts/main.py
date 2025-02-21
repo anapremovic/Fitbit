@@ -1,7 +1,8 @@
 import pandas as pd
-import part1 as part1
 import datetime as datetime
 import os
+import part1 as part1
+import part3 as part3
 
 # PART 1
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,3 +21,5 @@ part1.generate_day_of_week_frequency_plot(daily_activity)
 
 part1.generate_regression_line_for_user(daily_activity, 5553957443)
 
+# PART 3
+part3.generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))

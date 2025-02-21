@@ -1,11 +1,34 @@
+import matplotlib.pyplot as plt
+import datetime as datetime
 import database as db
+import sklearn.linear_model as sk
 
-def generate_active_min_to_sleep_min_regression():
-    active_min_df = db.fetch_total_active_minutes_per_user_and_date()
-    sleep_min_df = db.get_sleep_data()
+def generate_active_min_to_sleep_min_regression(date: datetime):
+    active_min = db.get_active_min_data()
+    sleep_min = db.get_sleep_data()
 
-    active_min_and_sleep_min_df = active_min_df.merge(sleep_min_df, on=['UserId', 'Date'])
+    active_min = active_min[active_min['Date'].dt.date == date.date()]
+    sleep_min = sleep_min[sleep_min['Date'].dt.date == date.date()]
+    active_and_sleep_min_grouped_by_user = active_min.merge(sleep_min, on=['UserId', 'Date']).groupby('UserId').agg(
+        TotalActiveMin=('TotalActiveMin', 'sum'),
+        MinSlept=('MinSlept', 'sum')
+    ).reset_index()
+    if active_and_sleep_min_grouped_by_user.empty:
+        print(f"No sleep and/or activity data on {date.date()}.")
+        return
 
-    print(active_min_and_sleep_min_df)
+    x = active_and_sleep_min_grouped_by_user[['MinSlept']].values
+    y = active_and_sleep_min_grouped_by_user['TotalActiveMin'].values
+    model = sk.LinearRegression()
+    model.fit(x, y)
+    regression_line = model.predict(x)
 
-generate_active_min_to_sleep_min_regression()
+    plt.figure(figsize=(8, 5))
+    plt.scatter(x, y, color='green', label='Observations')
+    plt.plot(x, regression_line, color='green', label=f'Regression Line')
+    plt.xlabel("Sleep Minutes")
+    plt.ylabel("Active Minutes")
+    plt.title(f"Regression of Sleep Minutes to Active Minutes on {date.date()}")
+    plt.legend()
+    plt.grid()
+    plt.show()
