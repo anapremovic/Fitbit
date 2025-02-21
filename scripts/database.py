@@ -21,8 +21,6 @@ def get_active_min_data() -> pd.DataFrame:
     rows = cursor.fetchall()
     active_min_data = pd.DataFrame(rows, columns=[x[0] for x in cursor.description])
     active_min_data["Date"] = pd.to_datetime(active_min_data.loc[:, "Date"])
-    active_min_data.loc[:, 'UserId'] = active_min_data.loc[:, 'UserId'].astype(int)
-    active_min_data.loc[:, 'TotalActiveMin'] = active_min_data.loc[:, 'TotalActiveMin'].astype(int)
     return active_min_data
 
 def get_sleep_data():
@@ -39,6 +37,4 @@ def get_sleep_data():
     rows = cursor.fetchall()
     sleep_data = pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
     sleep_data["Date"] = pd.to_datetime(sleep_data.loc[:, "Date"])
-    sleep_data.loc[:, 'UserId'] = sleep_data.loc[:, 'UserId'].astype(int)
-    sleep_data.loc[:, 'MinSlept'] = sleep_data.loc[:, 'MinSlept'].astype(int)
     return sleep_data
