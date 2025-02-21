@@ -1,11 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-# import matplotlib.dates as mdates
+import matplotlib.dates as mdates
 import sqlite3
 import datetime
-import numpy as np
 
 def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
+    """
+    Purpose: This function gets a given user's heart rate and hourly intensity, and plots it on a graph. The average heart rate and intensity are also shown
+
+    Author: L.D. Lee
+    """
+    
     # Connect to database
     conn = sqlite3.connect("../data/fitbit_database.db")
     heart_rate_db = pd.read_sql(f"SELECT * FROM heart_rate WHERE Id={id}", conn)
@@ -24,7 +29,7 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     avg_intensity = hourly_intensity_db["TotalIntensity"].mean()  # Assuming intensity values are in "Intensity" column
 
     # Create subplots
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    _, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     # Plot Heart Rate over Time
     axes[0, 0].plot(heart_rate_db["Time"], heart_rate_db["Value"], color='red', label='Heart Rate')
@@ -54,14 +59,89 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     plt.tight_layout()
     plt.show()
 
-def weather():
-    conn = sqlite3.connect("../data/fitbit_database.db")
-    daily_activity_db = pd.read_sql("SELECT * FROM daily_activity", conn)
-    # daily_activity_db["ActivityDate"] = daily_activity_db["ActivityDate"].astype("time")
-
-    # print(daily_activity_db["ActivityDate"].max())
-    # print(daily_activity_db["ActivityDate"].min())
-    chicago_data = pd.read_csv("../data/chicago_data.csv")
+def weather(id: int):
+    """
+    Purpose:
     
-    print(chicago_data["temp"])
-    print(chicago_data["precip"])
+    Author: L.D. Lee
+    """
+    # conn = sqlite3.connect("../data/fitbit_database.db")
+    # daily_activity_db = pd.read_sql(f"SELECT * FROM daily_activity WHERE Id={id}", conn)
+    # # daily_activity_db["ActivityDate"] = daily_activity_db["ActivityDate"].astype("time")
+
+    # chicago_data = pd.read_csv("../data/chicago_data.csv")
+
+    # chicago_dates = pd.to_datetime(chicago_data["datetime"])
+    # daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
+
+    # # Create figure and axis
+    # fig, ax1 = plt.subplots()
+    # # plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Format as YYYY-MM-DD
+    # plt.xticks(rotation=45)  # Rotate for readability
+
+    # # First line (Precipitation)
+    # ax1.plot(chicago_dates, chicago_data["precip"], 'b-', label="Precipitation")
+    # ax1.set_xlabel("Date")
+    # ax1.set_ylabel("Precipitation (mm)")
+    # ax1.tick_params(axis='y')
+
+    # # Second Y-axis (Temperature)
+    # ax2 = ax1.twinx()  # Create twin axis
+    # ax2.plot(chicago_dates, chicago_data["temp"], 'r-', label="Temperature")
+    # ax2.set_ylabel("Temperature")
+    # ax2.tick_params(axis='y')
+    
+    # # ax2.yaxis.tick_left()
+    # # ax2.yaxis.set_label_position("left")
+    
+    # ax1.set_xticklabels(ax1.get_xticks(), rotation=45)  # Rotate labels
+
+    # # Show plot
+    # fig.tight_layout()
+    # plt.title(f"Comparing Weather with Activity of {id}")
+    # plt.show()
+    # Connect to database and load data for all users
+    conn = sqlite3.connect("../data/fitbit_database.db")
+    daily_activity_db = pd.read_sql("SELECT Id, ActivityDate, TotalDistance FROM daily_activity", conn)
+
+    # Convert 'ActivityDate' to datetime
+    daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
+
+    # Load Chicago weather data
+    chicago_data = pd.read_csv("../data/chicago_data.csv")
+    chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
+
+    # Create figure and axis
+    fig, ax1 = plt.subplots(figsize=(10, 5))
+    plt.xticks(rotation=45)  # Rotate x-axis labels for readability
+
+    # First line (Precipitation)
+    ax1.plot(chicago_data["datetime"], chicago_data["precip"], 'b-', label="Precipitation")
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Precipitation (mm)", color='blue')
+    ax1.tick_params(axis='y', labelcolor='blue')
+
+    # Second Y-axis (Temperature)
+    ax2 = ax1.twinx()
+    ax2.plot(chicago_data["datetime"], chicago_data["temp"], 'r-', label="Temperature")
+    ax2.set_ylabel("Temperature (°C)", color='red')
+    ax2.tick_params(axis='y', labelcolor='red')
+
+    # Third Y-axis (Total Distance for Multiple Users)
+    ax3 = ax1.twinx()
+    ax3.spines['right'].set_position(('outward', 60))  # Offset third y-axis
+    ax3.set_ylabel("Total Distance (km)", color='green')
+
+    # Plot totalDistance for each user
+    for user_id, user_data in daily_activity_db.groupby("Id"):
+        ax3.plot(user_data["ActivityDate"], user_data["TotalDistance"], label=f"User {user_id}", linestyle="--")
+
+    ax3.tick_params(axis='y', labelcolor='green')
+
+    # Formatting
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    fig.tight_layout()
+    plt.title("Weather and Total Distance Comparison for Multiple Users")
+    plt.legend(loc="upper left")
+
+    plt.show()
