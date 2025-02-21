@@ -26,7 +26,7 @@ def get_active_min_data() -> pd.DataFrame:
 def get_sleep_data():
     query = """
     SELECT logId AS LogId, 
-           MAX(date) AS Date, 
+           MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
            Id AS UserId, 
            COUNT(*) AS MinSlept
     FROM minute_sleep 
