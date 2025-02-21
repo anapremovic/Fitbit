@@ -12,17 +12,14 @@ def regression_sedentary_vs_sleep():
     data with the sleep duration as response variable and the the sedentary activity 
     as explanatory variables. """
 
-    sedentary_data = db.get_all_sedentary_activity()
-    sleep_data = db.get_all_sleep_activity()
-    sedentary_data = sedentary_data.rename(columns={'ActivityDate': 'date'})
-    combined_data = pd.merge(sedentary_data, sleep_data, on=['Id', 'date'])
-    least_squares_model = smf.ols(formula='minutesSlept ~ SedentaryMinutes', data=combined_data).fit()
+    sedentary_sleep_data = db.get_sedentary_sleep_activity()
+    least_squares_model = smf.ols(formula='MinutesSlept ~ SedentaryMinutes', data=sedentary_sleep_data).fit()
     intercept = least_squares_model.params['Intercept']
     slope = least_squares_model.params['SedentaryMinutes']
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), layout='tight')
     ax1.axline((0, intercept), slope=slope, label='Regression line')
-    ax1.scatter(combined_data.loc[:, 'SedentaryMinutes'], combined_data.loc[:, 'minutesSlept'], label='Observations')
+    ax1.scatter(sedentary_sleep_data.loc[:, 'SedentaryMinutes'], sedentary_sleep_data.loc[:, 'MinutesSlept'], label='Observations')
     ax1.set_title('Relation Daily Sedentary Time and Time Slept \n Across All Users')
     ax1.set_xlabel('Sedentary Minutes')
     ax1.set_ylabel('Minutes Slept')

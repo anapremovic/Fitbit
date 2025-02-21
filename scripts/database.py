@@ -13,21 +13,6 @@ def dataframe_from_cursor_contents():
     rows = cursor.fetchall()
     return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
 
-def get_all_sedentary_activity() -> pd.DataFrame:
-    query = """
-        SELECT 
-            Id, 
-            ActivityDate, 
-            SedentaryMinutes 
-        FROM daily_activity
-    """
-    cursor.execute('SELECT Id, ActivityDate, SedentaryMinutes FROM daily_activity')
-
-    sedentary_data = dataframe_from_cursor_contents()
-    sedentary_data['Id'] = sedentary_data['Id'].astype(int)
-    sedentary_data['ActivityDate'] = pd.to_datetime(sedentary_data['ActivityDate'])
-    return sedentary_data
-
 def get_all_sleep_activity() -> pd.DataFrame:
     query = """
         SELECT 
@@ -51,6 +36,27 @@ def get_all_sleep_activity() -> pd.DataFrame:
     sleep_data['date'] = pd.to_datetime(sleep_data['date'])
     return sleep_data
 
+def get_sedentary_sleep_activity():
+    query = f"""
+        SELECT 
+            minute_sleep.Id,
+            COUNT(*) AS MinutesSlept,
+            ActivityDate AS Date, 
+            SedentaryMinutes
+        FROM minute_sleep 
+        INNER JOIN daily_activity 
+            ON
+                daily_activity.Id = minute_sleep.Id AND
+                daily_activity.ActivityDate = substr(minute_sleep.date, 1, instr(minute_sleep.date, ' ') - 1)
+        GROUP BY logId
+    """
+    cursor.execute(query)
+
+    df = dataframe_from_cursor_contents()
+    df['Id'] = df['Id'].astype(int)
+    print(df)
+    return df
+
 def get_daily_step_distribution() -> pd.DataFrame:
     """Requests to group the hourly_steps table into 4-hour blocks and return 
     the average amount of steps for each"""
@@ -61,7 +67,7 @@ def get_daily_step_distribution() -> pd.DataFrame:
     # the average number of steps taken during each: 4 * [average steps per hour].
     query = f"""
         SELECT 
-            4 * AVG(StepTotal) AS AverageSteps
+            4 * AVG(StepTotal) AS AverageSteps,
             CASE 
                 WHEN ActivityHour LIKE '%AM%'
                     THEN CASE 
@@ -76,16 +82,16 @@ def get_daily_step_distribution() -> pd.DataFrame:
                         WHEN {hour} BETWEEN 8 AND 11 THEN '20-24'
                     END
                 ELSE 'N/A'
-            END AS HourGroup,
+            END AS HourGroup
         FROM hourly_steps
         GROUP BY HourGroup;
     """
     cursor.execute(query)
 
-    step_data = dataframe_from_cursor_contents()
-    sorted_hour_groups = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-    step_data['HourGroup'] = pd.Categorical(step_data['HourGroup'], sorted_hour_groups)
-    return step_data.sort_values('HourGroup')
+    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+    df = dataframe_from_cursor_contents()
+    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+    return df.sort_values('HourGroup')
 
 def get_sedentary_vs_sleep_activity() -> pd.DataFrame:
     cursor.execute('SELECT ActivityDate, Id, ')
