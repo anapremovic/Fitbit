@@ -56,7 +56,14 @@ generate_daily_step_distribution_barplot()
 def generate_daily_calorie_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of calories
     burnt per time block across all users. Visualize results in a bar plot."""
-    pass
+    calorie_data = db.get_daily_calorie_distribtion()
+    plt.bar(calorie_data.loc[:, 'HourGroup'], calorie_data.loc[:, 'AverageCalories'])
+    plt.title('Average Number of Calories Burnt pe;r 4-Hour Time Block \n Across All Users')
+    plt.xlabel('Time')
+    plt.ylabel('Average Calories')
+    plt.show()
+
+generate_daily_calorie_distribution_barplot()
 
 def generate_daily_sleep_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of minutes

@@ -92,3 +92,36 @@ def get_daily_step_distribution() -> pd.DataFrame:
     df = dataframe_from_cursor_contents()
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
     return df.sort_values('HourGroup')
+
+def get_daily_calorie_distribtion() -> pd.DataFrame:
+    hour = "CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - instr(ActivityHour, ' ') - 1) AS INTEGER)"
+    query = f"""
+        SELECT 
+            4 * AVG(Calories) AS AverageCalories,
+            CASE 
+                WHEN ActivityHour LIKE '%AM%'
+                    THEN CASE 
+                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '0-4'
+                        WHEN {hour} BETWEEN 4 AND 7 THEN '4-8'
+                        WHEN {hour} BETWEEN 8 AND 11 THEN '8-12'
+                    END
+                WHEN ActivityHour LIKE '%PM%'
+                    THEN CASE
+                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '12-16'
+                        WHEN {hour} BETWEEN 4 AND 7 THEN '16-20'
+                        WHEN {hour} BETWEEN 8 AND 11 THEN '20-24'
+                    END
+                ELSE 'N/A'
+            END AS HourGroup
+        FROM hourly_calories
+        GROUP BY HourGroup;
+    """
+    cursor.execute(query)
+
+    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+    df = dataframe_from_cursor_contents()
+    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+    return df.sort_values('HourGroup')
+
+def get_daily_sleep_distribution() -> pd.DataFrame:
+    pass
