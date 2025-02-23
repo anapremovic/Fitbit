@@ -15,6 +15,8 @@
     <li>
         <a href="#usage">Usage</a>
         <ul><li><a href="#part-1">Part 1</a></li></ul>
+        <ul><li><a href="#part-2">Part 2</a></li></ul>
+        <ul><li><a href="#part-3">Part 3</a></li></ul>
     </li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
@@ -23,7 +25,7 @@
 
 ## About The Project
 
-This is a study of data from an Amazon survey from 2016 of 30 respondants. We perform an analysis and visualize our results in a dashboard.
+This is a study of data from an Amazon survey from 2016 of 30 respondents. We perform an analysis and visualize our results in a dashboard.
 
 ### Built With
 [![Python][Python.org]][Python-url]
@@ -49,8 +51,11 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 * Visualize frequency of workout per day of week.
 * Visualize relationship between the amount of steps taken and the amount of calories burnt.
 
+### Part 2
+* View repository and README.
+
 ### Part 3
-* Visualize relationship between minutes of sleep and active minutes the next day.
+* Visualize relationship between the amount of sleep and the number of active minutes the next day.
 
 ## Contributors
 
