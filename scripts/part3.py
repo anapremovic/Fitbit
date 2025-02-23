@@ -22,8 +22,8 @@ def verify_correctness(daily_data: pd.DataFrame, hourly_data: pd.DataFrame):
     
     #Use conflict indexes to create a new conflicting_data DataFrame
     conflicting_data = df1_common_sorted.loc[differences.index, ['Id', 'ActivityDate']]
-    conflicting_data['HourlySteps'] = df1_common_sorted.loc[differences.index, ['TotalSteps']]
-    conflicting_data['DailySteps'] = df2_common_sorted.loc[differences.index, ['TotalSteps']]
+    conflicting_data.loc[:, 'HourlySteps'] = df1_common_sorted.loc[differences.index, ['TotalSteps']]
+    conflicting_data.loc[:, 'DailySteps'] = df2_common_sorted.loc[differences.index, ['TotalSteps']]
 
     # Print the specific users and dates where conflicts occur
     print('Conflicts found for the following users and dates:')
