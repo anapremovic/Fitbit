@@ -24,18 +24,22 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     heart_rate_db = heart_rate_db[(heart_rate_db["Time"] >= start_date) & (heart_rate_db["Time"] <= end_date)]
     hourly_intensity_db = hourly_intensity_db[(hourly_intensity_db["ActivityHour"] >= start_date) & (hourly_intensity_db["ActivityHour"] <= end_date)]
 
+    # Aggregate heart rate by hour (sum of all heart rate values per hour)
+    heart_rate_hourly = heart_rate_db.resample('H', on='Time').max()
+
     # Compute averages
-    avg_heart_rate = heart_rate_db["Value"].mean()  # Assuming heart rate values are in "Value" column
+    avg_heart_rate = heart_rate_hourly["Value"].mean()  # Assuming heart rate values are in "Value" column
     avg_intensity = hourly_intensity_db["TotalIntensity"].mean()  # Assuming intensity values are in "Intensity" column
 
     # Create subplots
     _, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     # Plot Heart Rate over Time
-    axes[0, 0].plot(heart_rate_db["Time"], heart_rate_db["Value"], color='red', label='Heart Rate')
+    axes[0, 0].plot(heart_rate_hourly.index, heart_rate_hourly["Value"], color='red', label='Heart Rate')
     axes[0, 0].set_title("Heart Rate Over Time")
     axes[0, 0].set_xlabel("Time")
     axes[0, 0].set_ylabel("Heart Rate (bpm)")
+    axes[0, 0].tick_params(labelrotation=45)
     axes[0, 0].legend()
 
     # Plot Hourly Intensity over Time
@@ -43,6 +47,7 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     axes[0, 1].set_title("Hourly Intensity Over Time")
     axes[0, 1].set_xlabel("Time")
     axes[0, 1].set_ylabel("Intensity")
+    axes[0, 1].tick_params(labelrotation=45)
     axes[0, 1].legend()
 
     # Display Average Heart Rate
@@ -61,45 +66,10 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
 
 def weather(id: int):
     """
-    Purpose:
+    Purpose: Displays weather data for the city of Chicago and creates a relationship between the variables
     
     Author: L.D. Lee
     """
-    # conn = sqlite3.connect("../data/fitbit_database.db")
-    # daily_activity_db = pd.read_sql(f"SELECT * FROM daily_activity WHERE Id={id}", conn)
-    # # daily_activity_db["ActivityDate"] = daily_activity_db["ActivityDate"].astype("time")
-
-    # chicago_data = pd.read_csv("../data/chicago_data.csv")
-
-    # chicago_dates = pd.to_datetime(chicago_data["datetime"])
-    # daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
-
-    # # Create figure and axis
-    # fig, ax1 = plt.subplots()
-    # # plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Format as YYYY-MM-DD
-    # plt.xticks(rotation=45)  # Rotate for readability
-
-    # # First line (Precipitation)
-    # ax1.plot(chicago_dates, chicago_data["precip"], 'b-', label="Precipitation")
-    # ax1.set_xlabel("Date")
-    # ax1.set_ylabel("Precipitation (mm)")
-    # ax1.tick_params(axis='y')
-
-    # # Second Y-axis (Temperature)
-    # ax2 = ax1.twinx()  # Create twin axis
-    # ax2.plot(chicago_dates, chicago_data["temp"], 'r-', label="Temperature")
-    # ax2.set_ylabel("Temperature")
-    # ax2.tick_params(axis='y')
-    
-    # # ax2.yaxis.tick_left()
-    # # ax2.yaxis.set_label_position("left")
-    
-    # ax1.set_xticklabels(ax1.get_xticks(), rotation=45)  # Rotate labels
-
-    # # Show plot
-    # fig.tight_layout()
-    # plt.title(f"Comparing Weather with Activity of {id}")
-    # plt.show()
     # Connect to database and load data for all users
     conn = sqlite3.connect("../data/fitbit_database.db")
     daily_activity_db = pd.read_sql("SELECT Id, ActivityDate, TotalDistance FROM daily_activity", conn)
@@ -121,7 +91,7 @@ def weather(id: int):
     ax1.set_ylabel("Precipitation (mm)", color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
 
-    # Second Y-axis (Temperature)
+    # Second Y-axis (Temperature)90
     ax2 = ax1.twinx()
     ax2.plot(chicago_data["datetime"], chicago_data["temp"], 'r-', label="Temperature")
     ax2.set_ylabel("Temperature (°C)", color='red')
