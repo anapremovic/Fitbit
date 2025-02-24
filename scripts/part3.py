@@ -20,6 +20,10 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"])
     hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"])
 
+    # Set default time ranges
+    if (start_date == None): start_date = heart_rate_db["Time"].min()
+    if (end_date == None): end_date = heart_rate_db["Time"].max()
+
     # Filter data within start and end date
     heart_rate_db = heart_rate_db[(heart_rate_db["Time"] >= start_date) & (heart_rate_db["Time"] <= end_date)]
     hourly_intensity_db = hourly_intensity_db[(hourly_intensity_db["ActivityHour"] >= start_date) & (hourly_intensity_db["ActivityHour"] <= end_date)]
