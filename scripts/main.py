@@ -1,6 +1,8 @@
 import pandas as pd
 import part1 as part1
+import part3 as part3
 import datetime as datetime
+import database as db
 import os
 
 # PART 1
@@ -20,3 +22,5 @@ part1.generate_day_of_week_frequency_plot(daily_activity)
 
 part1.generate_regression_line_for_user(daily_activity, 5553957443)
 
+
+part3.verify_correctness(db.get_daily_steps(), db.get_hourly_steps())

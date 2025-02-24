@@ -28,6 +28,3 @@ def verify_correctness(daily_data: pd.DataFrame, hourly_data: pd.DataFrame):
     # Print the specific users and dates where conflicts occur
     print('Conflicts found for the following users and dates:')
     print(conflicting_data)
- 
-
-verify_correctness(database.get_daily_steps(), database.get_hourly_steps())
