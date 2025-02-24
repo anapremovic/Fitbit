@@ -98,7 +98,6 @@ def get_sedentary_sleep_activity():
 
     df = dataframe_from_cursor_contents()
     df['Id'] = df['Id'].astype(int)
-    print(df)
     return df
 
 def get_daily_step_distribution() -> pd.DataFrame:
