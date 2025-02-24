@@ -30,11 +30,11 @@ def get_all_sleep_activity() -> pd.DataFrame:
     # original column. And in this case, the code actually breaks using .loc.
     # This is stupid but means [] type of indexing must be used here. According 
     # to ChatGPT, it is still recommended to use .loc in other scenarios. 
-    sleep_data = dataframe_from_cursor_contents()
-    sleep_data['Id'] = sleep_data['Id'].astype(int)
-    sleep_data['minutesSlept'] = sleep_data['minutesSlept'].astype(int)
-    sleep_data['date'] = pd.to_datetime(sleep_data['date'])
-    return sleep_data
+    df = dataframe_from_cursor_contents()
+    df['Id'] = df['Id'].astype(int)
+    df['minutesSlept'] = df['minutesSlept'].astype(int)
+    df['date'] = pd.to_datetime(df['date'])
+    return df
 
 def get_sedentary_sleep_activity():
     query = f"""
@@ -131,4 +131,50 @@ def get_daily_calorie_distribtion() -> pd.DataFrame:
     hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
     df = dataframe_from_cursor_contents()
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+    return df.sort_values('HourGroup')
+
+def get_daily_sleep_distribution() -> pd.DataFrame:
+    """Groups the minute_sleep table into 4-hour blocks and returns 
+    the average amount of minutes slept during each block. Here, we
+    take 'average' to mean the total number of minutes slept in an hour
+    block divided by the total number of distinct sleep sessions recorded.
+    """
+
+    query = f"""
+        WITH transformed AS (
+            SELECT
+                *,
+                CAST(substr(date, instr(date, ' ') + 1, instr(date, ':') - (instr(date, ' ') + 1)) AS INTEGER) AS Hour
+            FROM minute_sleep
+        )
+        SELECT 
+            COUNT(*) AS TotalMinutesSlept,
+            CASE 
+                WHEN date LIKE '%AM%'
+                    THEN CASE 
+                        WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '0-4'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                    END
+                WHEN date LIKE '%PM%'
+                    THEN CASE
+                        WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12-16'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                    END
+                ELSE 'N/A'
+            END AS HourGroup
+        FROM transformed
+        GROUP BY HourGroup;
+    """
+    cursor.execute(query)
+
+    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+    df = dataframe_from_cursor_contents()
+    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+
+    cursor.execute('SELECT COUNT(DISTINCT logId) AS NumDistinctSleepSessions FROM minute_sleep')
+    numDistinctSleepSessions = dataframe_from_cursor_contents().at[0, 'NumDistinctSleepSessions']
+
+    df['AverageMinutesSlept'] = df['TotalMinutesSlept'] / numDistinctSleepSessions
     return df.sort_values('HourGroup')

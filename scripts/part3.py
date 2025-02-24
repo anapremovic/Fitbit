@@ -13,6 +13,7 @@ def regression_sedentary_vs_sleep():
     as explanatory variables. """
 
     sedentary_sleep_data = db.get_sedentary_sleep_activity()
+
     least_squares_model = smf.ols(formula='MinutesSlept ~ SedentaryMinutes', data=sedentary_sleep_data).fit()
     intercept = least_squares_model.params['Intercept']
     slope = least_squares_model.params['SedentaryMinutes']
@@ -45,8 +46,9 @@ def generate_daily_step_distribution_barplot():
     taken per time block across all users. Visualize results in a bar plot."""
     
     step_data = db.get_daily_step_distribution()
+
     plt.bar(step_data.loc[:, 'HourGroup'], step_data.loc[:, 'AverageSteps'])
-    plt.title('Average Number of Steps Taken pe;r 4-Hour Time Block \n Across All Users')
+    plt.title('Average Number of Steps Taken per 4-Hour Time Block \n Across All Users')
     plt.xlabel('Time')
     plt.ylabel('Average Steps')
     plt.show()
@@ -56,9 +58,11 @@ generate_daily_step_distribution_barplot()
 def generate_daily_calorie_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of calories
     burnt per time block across all users. Visualize results in a bar plot."""
+
     calorie_data = db.get_daily_calorie_distribtion()
+
     plt.bar(calorie_data.loc[:, 'HourGroup'], calorie_data.loc[:, 'AverageCalories'])
-    plt.title('Average Number of Calories Burnt pe;r 4-Hour Time Block \n Across All Users')
+    plt.title('Average Number of Calories Burnt per 4-Hour Time Block \n Across All Users')
     plt.xlabel('Time')
     plt.ylabel('Average Calories')
     plt.show()
@@ -68,4 +72,13 @@ generate_daily_calorie_distribution_barplot()
 def generate_daily_sleep_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of minutes
     slept per time block across all users. Visualize results in a bar plot."""
-    pass
+
+    sleep_data = db.get_daily_sleep_distribution()
+
+    plt.bar(sleep_data.loc[:, 'HourGroup'], sleep_data.loc[:, 'AverageMinutesSlept'])
+    plt.title('Average Number of Minutes Slept per 4-Hour Time Block \n Across All Users')
+    plt.xlabel('Time')
+    plt.ylabel('Average Minutes Slept')
+    plt.show()
+
+generate_daily_sleep_distribution_barplot()
