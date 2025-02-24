@@ -7,7 +7,7 @@ import datetime as datetime
 import seaborn as sns
 import os
 
-def visualize_part_1():
+def execute_part_1():
     """Generate all visualizations for part 1 of the project."""
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     file_location = os.path.join(project_root, "data/daily_activity.csv")

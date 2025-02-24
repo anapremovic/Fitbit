@@ -1,3 +1,4 @@
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as datetime
@@ -9,8 +10,10 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/chicago_data.csv")
 
-def visualize_part_3():
+
+def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
+    verify_correctness(db.get_daily_steps(), db.get_hourly_steps())
     generate_sleep_data_over_time_line_plot(6962181067)
     generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
     display_heart_rate_and_intensity(2022484408)
@@ -34,6 +37,34 @@ def generate_sleep_data_over_time_line_plot(user_id: float):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+def verify_correctness(daily_data: pd.DataFrame, hourly_data: pd.DataFrame):
+    daily_data_2 = hourly_data.groupby(['Id', 'ActivityDate'], as_index=False).sum()
+
+    # Find common (Id, Date) pairs in both DataFrames
+    common_keys = daily_data.loc[:, ['Id', 'ActivityDate']].merge(daily_data_2.loc[:, ['Id', 'ActivityDate']], how='inner')
+
+    # Filter both DataFrames to keep only rows with common (Id, Date) pairs
+    df1_common = daily_data.merge(common_keys, on=['Id', 'ActivityDate'])
+    df2_common = daily_data_2.merge(common_keys, on=['Id', 'ActivityDate'])
+
+    # Sort by Id and Date
+    df1_common_sorted = df1_common.sort_values(by=['Id', 'ActivityDate']).reset_index(drop=True)
+    df2_common_sorted = df2_common.sort_values(by=['Id', 'ActivityDate']).reset_index(drop=True)
+
+    print('Is the data correct? ' + str(df1_common_sorted.equals(df2_common_sorted)))
+
+    #Identify for rows with differences
+    differences = df1_common_sorted.compare(df2_common_sorted)
+    
+    #Use conflict indexes to create a new conflicting_data DataFrame
+    conflicting_data = df1_common_sorted.loc[differences.index, ['Id', 'ActivityDate']]
+    conflicting_data.loc[:, 'HourlySteps'] = df1_common_sorted.loc[differences.index, ['TotalSteps']]
+    conflicting_data.loc[:, 'DailySteps'] = df2_common_sorted.loc[differences.index, ['TotalSteps']]
+
+    # Print the specific users and dates where conflicts occur
+    print('Conflicts found for the following users and dates:')
+    print(conflicting_data)
 
 def generate_active_min_to_sleep_min_regression(date: datetime):
     """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day."""
