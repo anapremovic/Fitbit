@@ -176,5 +176,5 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
     cursor.execute('SELECT COUNT(DISTINCT logId) AS NumDistinctSleepSessions FROM minute_sleep')
     numDistinctSleepSessions = dataframe_from_cursor_contents().at[0, 'NumDistinctSleepSessions']
 
-    df['AverageMinutesSlept'] = df['TotalMinutesSlept'] / numDistinctSleepSessions
+    df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / numDistinctSleepSessions
     return df.sort_values('HourGroup')
