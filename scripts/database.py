@@ -58,32 +58,34 @@ def get_sedentary_sleep_activity():
     return df
 
 def get_daily_step_distribution() -> pd.DataFrame:
-    """Requests to group the hourly_steps table into 4-hour blocks and return 
-    the average amount of steps for each"""
-    # SQLite query to extract just the hour from the ActivityHour column
-    hour = "CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - instr(ActivityHour, ' ') - 1) AS INTEGER)"
-    # Returns a column containing the hour blocks (0-4, 4-8, ..., 20-24)
-    # for each entry in the table. Then groups table by said blocks and computes
-    # the average number of steps taken during each: 4 * [average steps per hour].
-    query = f"""
+    """Groups the hourly_steps table into 4-hour blocks and returns 
+    the average amount of steps taken during each block"""
+
+    query = """
+        WITH transformed AS (
+            SELECT
+                *,
+                CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
+            FROM hourly_steps
+        )
         SELECT 
             4 * AVG(StepTotal) AS AverageSteps,
             CASE 
                 WHEN ActivityHour LIKE '%AM%'
                     THEN CASE 
-                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '0-4'
-                        WHEN {hour} BETWEEN 4 AND 7 THEN '4-8'
-                        WHEN {hour} BETWEEN 8 AND 11 THEN '8-12'
+                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
                     END
                 WHEN ActivityHour LIKE '%PM%'
                     THEN CASE
-                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '12-16'
-                        WHEN {hour} BETWEEN 4 AND 7 THEN '16-20'
-                        WHEN {hour} BETWEEN 8 AND 11 THEN '20-24'
+                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
                     END
                 ELSE 'N/A'
             END AS HourGroup
-        FROM hourly_steps
+        FROM transformed
         GROUP BY HourGroup;
     """
     cursor.execute(query)
@@ -94,26 +96,34 @@ def get_daily_step_distribution() -> pd.DataFrame:
     return df.sort_values('HourGroup')
 
 def get_daily_calorie_distribtion() -> pd.DataFrame:
-    hour = "CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - instr(ActivityHour, ' ') - 1) AS INTEGER)"
+    """Groups the hourly_calories table into 4-hour blocks and returns 
+    the average amount of calories burnt during each block"""
+
     query = f"""
+        WITH transformed AS (
+            SELECT
+                *,
+                CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
+            FROM hourly_calories
+        )
         SELECT 
             4 * AVG(Calories) AS AverageCalories,
             CASE 
                 WHEN ActivityHour LIKE '%AM%'
                     THEN CASE 
-                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '0-4'
-                        WHEN {hour} BETWEEN 4 AND 7 THEN '4-8'
-                        WHEN {hour} BETWEEN 8 AND 11 THEN '8-12'
+                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
                     END
                 WHEN ActivityHour LIKE '%PM%'
                     THEN CASE
-                        WHEN ({hour} BETWEEN 1 AND 3 OR {hour} = 12) THEN '12-16'
-                        WHEN {hour} BETWEEN 4 AND 7 THEN '16-20'
-                        WHEN {hour} BETWEEN 8 AND 11 THEN '20-24'
+                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
+                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
                     END
                 ELSE 'N/A'
             END AS HourGroup
-        FROM hourly_calories
+        FROM transformed
         GROUP BY HourGroup;
     """
     cursor.execute(query)
@@ -122,6 +132,3 @@ def get_daily_calorie_distribtion() -> pd.DataFrame:
     df = dataframe_from_cursor_contents()
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
     return df.sort_values('HourGroup')
-
-def get_daily_sleep_distribution() -> pd.DataFrame:
-    pass
