@@ -11,15 +11,17 @@ import sklearn.linear_model as sk
 
 def visualize_part_3():
     """Generate all visualizations for part 3 of the project."""
+
     generate_sleep_data_over_time_line_plot(6962181067)
     generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
-    regression_sedentary_vs_sleep()
+    generate_sedentary_min_to_sleep_min_regression()
     generate_daily_step_distribution_barplot()
     generate_daily_calorie_distribution_barplot()
     generate_daily_sleep_distribution_barplot()
 
 def generate_sleep_data_over_time_line_plot(user_id: float):
     """Generates a line plot which visualizes sleep data over time for a given user."""
+
     sleep_moments_for_user = db.get_sleep_moments(user_id)
     if sleep_moments_for_user.empty:
         print(f"No sleep data found for User {user_id}.")
@@ -38,6 +40,7 @@ def generate_sleep_data_over_time_line_plot(user_id: float):
 
 def generate_active_min_to_sleep_min_regression(date: datetime):
     """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day."""
+
     active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min_grouped_by_user(date)
     if active_and_sleep_min_grouped_by_user.empty:
         print(f"No activity and/or sleep data on {date.date()}.")
@@ -59,7 +62,7 @@ def generate_active_min_to_sleep_min_regression(date: datetime):
     plt.grid()
     plt.show()
 
-def regression_sedentary_vs_sleep():
+def generate_sedentary_min_to_sleep_min_regression():
     """Analyses the relationship between the amount of sedentary activity and the
     sleep duration for all individuals by performing a linear regression on all
     data with the sleep duration as response variable and the the sedentary activity 
@@ -94,18 +97,17 @@ def regression_sedentary_vs_sleep():
     ax2.legend()
     plt.show()
 
-regression_sedentary_vs_sleep()
-
 def generate_daily_step_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of steps
     taken per time block across all users. Visualize results in a bar plot."""
     
     step_data = db.get_daily_step_distribution()
 
-    plt.bar(step_data.loc[:, 'HourGroup'], step_data.loc[:, 'AverageSteps'])
+    plt.bar(step_data.loc[:, 'HourGroup'], step_data.loc[:, 'AverageSteps'],
+            color='C2')
     plt.title('Average Number of Steps Taken per 4-Hour Time Block \n Across All Users')
     plt.xlabel('Time')
-    plt.ylabel('Average Steps')
+    plt.ylabel('Steps Taken')
     plt.show()
 
 def generate_daily_calorie_distribution_barplot():
@@ -114,10 +116,11 @@ def generate_daily_calorie_distribution_barplot():
 
     calorie_data = db.get_daily_calorie_distribtion()
 
-    plt.bar(calorie_data.loc[:, 'HourGroup'], calorie_data.loc[:, 'AverageCalories'])
+    plt.bar(calorie_data.loc[:, 'HourGroup'], calorie_data.loc[:, 'AverageCalories'],
+            color='C3')
     plt.title('Average Number of Calories Burnt per 4-Hour Time Block \n Across All Users')
     plt.xlabel('Time')
-    plt.ylabel('Average Calories')
+    plt.ylabel('Calories Burnt')
     plt.show()
 
 def generate_daily_sleep_distribution_barplot():
@@ -126,8 +129,14 @@ def generate_daily_sleep_distribution_barplot():
 
     sleep_data = db.get_daily_sleep_distribution()
 
-    plt.bar(sleep_data.loc[:, 'HourGroup'], sleep_data.loc[:, 'AverageMinutesSlept'])
+    plt.bar(sleep_data.loc[:, 'HourGroup'], sleep_data.loc[:, 'AverageMinutesSlept'],
+            color='C4')
     plt.title('Average Number of Minutes Slept per 4-Hour Time Block \n Across All Users')
     plt.xlabel('Time')
-    plt.ylabel('Average Minutes Slept')
+    plt.ylabel('Minutes Slept')
     plt.show()
+
+generate_sedentary_min_to_sleep_min_regression()
+generate_daily_step_distribution_barplot()
+generate_daily_calorie_distribution_barplot()
+generate_daily_sleep_distribution_barplot()
