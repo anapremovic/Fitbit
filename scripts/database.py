@@ -17,14 +17,14 @@ def dataframe_from_cursor_contents():
 
 def get_sleep_moments(user_id: float) -> pd.DataFrame:
     query = """
-    SELECT 
-        Id AS UserId, 
-        MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
-        COUNT(*) AS SleepMin 
-    FROM minute_sleep 
-    WHERE Id = ?
-    GROUP BY logId
-    ORDER BY Date;
+        SELECT 
+            Id AS UserId, 
+            MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
+            COUNT(*) AS SleepMin 
+        FROM minute_sleep 
+        WHERE Id = ?
+        GROUP BY logId
+        ORDER BY Date;
     """
 
     cursor.execute(query, (user_id,))
@@ -34,23 +34,24 @@ def get_sleep_moments(user_id: float) -> pd.DataFrame:
 
 def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
     query = """
-    SELECT 
-        daily_activity.Id AS UserId,
-        ActivityDate AS Date,
-        SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
-        SUM(sleep_moments.SleepMin) AS TotalSleepMin
-    FROM daily_activity
-    INNER JOIN (SELECT
-                    Id AS UserId, 
-                    MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
-                    COUNT(*) AS SleepMin
-                FROM minute_sleep 
-                GROUP BY logId) sleep_moments
-        ON
-            daily_activity.Id = sleep_moments.UserId AND
-            daily_activity.ActivityDate = sleep_moments.Date
-    WHERE daily_activity.ActivityDate = ?
-    GROUP BY daily_activity.Id;"""
+        SELECT 
+            daily_activity.Id AS UserId,
+            ActivityDate AS Date,
+            SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
+            SUM(sleep_moments.SleepMin) AS TotalSleepMin
+        FROM daily_activity
+        INNER JOIN (SELECT
+                        Id AS UserId, 
+                        MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
+                        COUNT(*) AS SleepMin
+                    FROM minute_sleep 
+                    GROUP BY logId) sleep_moments
+            ON
+                daily_activity.Id = sleep_moments.UserId AND
+                daily_activity.ActivityDate = sleep_moments.Date
+        WHERE daily_activity.ActivityDate = ?
+        GROUP BY daily_activity.Id;
+    """
     date_str = convert_datetime_to_string(date)
     cursor.execute(query, (date_str,))
 
@@ -81,7 +82,7 @@ def get_all_sleep_activity() -> pd.DataFrame:
     return df
 
 def get_sedentary_sleep_activity():
-    query = f"""
+    query = """
         SELECT 
             minute_sleep.Id,
             COUNT(*) AS MinutesSlept,
@@ -142,7 +143,7 @@ def get_daily_calorie_distribtion() -> pd.DataFrame:
     """Groups the hourly_calories table into 4-hour blocks and returns 
     the average amount of calories burnt during each block"""
 
-    query = f"""
+    query = """
         WITH transformed AS (
             SELECT
                 *,
@@ -183,7 +184,7 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
     block divided by the total number of distinct sleep sessions recorded.
     """
 
-    query = f"""
+    query = """
         WITH transformed AS (
             SELECT
                 *,
@@ -227,3 +228,29 @@ def convert_datetime_to_string(date: datetime) -> str:
         return date.strftime("%#m/%#d/%Y")
     else:  # macOS/Linux
         return date.strftime("%-m/%-d/%Y")
+    
+def get_daily_steps():
+    query = """
+        SELECT 
+            Id, 
+            ActivityDate, 
+            TotalSteps 
+        FROM daily_activity
+    """
+    cursor.execute(query)
+
+    df = dataframe_from_cursor_contents()
+    return df
+
+def get_hourly_steps():
+    query = """
+        SELECT 
+            Id, 
+            substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS ActivityDate, 
+            StepTotal AS TotalSteps 
+        FROM hourly_steps
+    """
+    cursor.execute(query)
+
+    df = dataframe_from_cursor_contents()
+    return df
