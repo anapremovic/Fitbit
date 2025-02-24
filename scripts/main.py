@@ -23,3 +23,4 @@ part1.generate_steps_to_calories_regression(daily_activity, 5553957443)
 
 # PART 3
 part3.generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
+part3.generate_sleep_data_over_time_line_plot(6962181067)

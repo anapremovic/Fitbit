@@ -8,19 +8,23 @@ file_location = os.path.join(project_root, "data/fitbit_database.db")
 connection = sqlite3.connect(file_location)
 cursor = connection.cursor()
 
-def get_sleep_data() -> pd.DataFrame:
+def get_sleep_moments(user_id: float) -> pd.DataFrame:
     query = """
     SELECT 
         Id AS UserId, 
-        GROUP_CONCAT(DISTINCT substr(date, 1, instr(date, ' ') - 1)) AS Date, 
+        MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
         COUNT(*) AS SleepMin 
     FROM minute_sleep 
-    GROUP BY logId;
+    WHERE Id = ?
+    GROUP BY logId
+    ORDER BY Date;
     """
 
-    cursor.execute(query)
+    cursor.execute(query, (user_id,))
     rows = cursor.fetchall()
-    return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+    sleep_moments = pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+    sleep_moments["Date"] = pd.to_datetime(sleep_moments.loc[:, "Date"])
+    return sleep_moments
 
 def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
     query = """
