@@ -19,8 +19,9 @@ def regression_sedentary_vs_sleep():
     slope = least_squares_model.params['SedentaryMinutes']
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), layout='tight')
-    ax1.axline((0, intercept), slope=slope, label='Regression line')
-    ax1.scatter(sedentary_sleep_data.loc[:, 'SedentaryMinutes'], sedentary_sleep_data.loc[:, 'MinutesSlept'], label='Observations')
+    ax1.scatter(sedentary_sleep_data.loc[:, 'SedentaryMinutes'], sedentary_sleep_data.loc[:, 'MinutesSlept'], 
+                label='Observations')
+    ax1.axline((0, intercept), slope=slope, color='red', label='Regression line')
     ax1.set_title('Relation Daily Sedentary Time and Time Slept \n Across All Users')
     ax1.set_xlabel('Sedentary Minutes')
     ax1.set_ylabel('Minutes Slept')
@@ -31,8 +32,9 @@ def regression_sedentary_vs_sleep():
     root_mse = np.sqrt(np.mean(residuals ** 2))
     range = np.arange(-600, 600, 5)
     norm_pdf = sp.norm.pdf(range, loc=0, scale=root_mse)
-    ax2.hist(residuals, bins=20, range=(-600, 600), density=True, label='Residuals')
-    ax2.plot(range, norm_pdf, label=r'$\mathcal{N}(0, \sqrt{MSE})$')
+    ax2.hist(residuals, bins=20, range=(-600, 600), 
+             density=True, label='Residuals')
+    ax2.plot(range, norm_pdf, color='red', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
     ax2.set_title('Distribution of Residuals')
     ax2.set_xlabel('Residual')
     ax2.set_ylabel('Density')
