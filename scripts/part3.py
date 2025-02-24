@@ -135,8 +135,3 @@ def generate_daily_sleep_distribution_barplot():
     plt.xlabel('Time')
     plt.ylabel('Minutes Slept')
     plt.show()
-
-generate_sedentary_min_to_sleep_min_regression()
-generate_daily_step_distribution_barplot()
-generate_daily_calorie_distribution_barplot()
-generate_daily_sleep_distribution_barplot()
