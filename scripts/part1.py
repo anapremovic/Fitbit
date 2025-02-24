@@ -5,6 +5,23 @@ import matplotlib.dates as mdates
 import statsmodels.formula.api as smf
 import datetime as datetime
 import seaborn as sns
+import os
+
+def visualize_part_1():
+    """Generate all visualizations for part 1 of the project."""
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    file_location = os.path.join(project_root, "data/daily_activity.csv")
+    daily_activity = pd.read_csv(file_location)
+
+    print("The total number of users is: " + str(calc_num_users(daily_activity)))
+    generate_distance_walked_density_plot(daily_activity)
+    generate_distance_histogram(daily_activity)
+    generate_calories_burned_line_graph(daily_activity, 6290855005)
+    generate_calories_burned_line_graph(daily_activity, 6290855005, datetime.datetime(2016, 4, 3),
+                                              datetime.datetime(2016, 4, 7))  # only between 2016/4/3 and 2016/4/7
+    generate_calories_burned_line_graph(daily_activity, 4020332650)
+    generate_day_of_week_frequency_plot(daily_activity)
+    generate_steps_to_calories_regression(daily_activity, 5553957443)
 
 def calc_num_users(data: pd.DataFrame,):
     """Calculates the total number of unique users in the dataset"""

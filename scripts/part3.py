@@ -4,6 +4,11 @@ import datetime as datetime
 import database as db
 import sklearn.linear_model as sk
 
+def visualize_part_3():
+    """Generate all visualizations for part 3 of the project."""
+    generate_sleep_data_over_time_line_plot(6962181067)
+    generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
+
 def generate_sleep_data_over_time_line_plot(user_id: float):
     """Generates a line plot which visualizes sleep data over time for a given user."""
     sleep_moments_for_user = db.get_sleep_moments(user_id)
@@ -21,7 +26,6 @@ def generate_sleep_data_over_time_line_plot(user_id: float):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-
 
 def generate_active_min_to_sleep_min_regression(date: datetime):
     """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day."""
