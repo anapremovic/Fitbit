@@ -57,6 +57,8 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 ### Part 3
 * Visualize sleep data over time for a user.
 * Visualize relationship between the amount of sleep and the number of active minutes the next day.
+* Displays 2 graphs to show a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity
+* Builds 4 graphs to display a correlation of the rate of activity between temperature, precipitation, total distance and calories burned
 
 ## Contributors
 
