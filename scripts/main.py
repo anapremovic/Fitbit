@@ -23,4 +23,4 @@ daily_activity = pd.read_csv(file_location)
 
 p3.heart_rate(2022484408)
 p3.heart_rate(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
-# p3.weather(id = 4020332650)
+p3.weather()

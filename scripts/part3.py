@@ -1,8 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import sqlite3
 import datetime
+import seaborn as sns
+import database as db
 
 def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     """
@@ -12,9 +12,8 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     """
     
     # Connect to database
-    conn = sqlite3.connect("../data/fitbit_database.db")
-    heart_rate_db = pd.read_sql(f"SELECT * FROM heart_rate WHERE Id={id}", conn)
-    hourly_intensity_db = pd.read_sql(f"SELECT * FROM hourly_intensity WHERE Id={id}", conn)
+    heart_rate_db = db.query_database(f"SELECT * FROM heart_rate WHERE Id={id}")
+    hourly_intensity_db = db.query_database(f"SELECT * FROM hourly_intensity WHERE Id={id}")
     
     # Convert columns to datetime
     heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"])
@@ -68,54 +67,61 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     plt.tight_layout()
     plt.show()
 
-def weather(id: int):
+def weather():
     """
     Purpose: Displays weather data for the city of Chicago and creates a relationship between the variables
     
     Author: L.D. Lee
     """
-    # Connect to database and load data for all users
-    conn = sqlite3.connect("../data/fitbit_database.db")
-    daily_activity_db = pd.read_sql("SELECT Id, ActivityDate, TotalDistance FROM daily_activity", conn)
-
-    # Convert 'ActivityDate' to datetime
+    # Connect to database and load Fitbit data
+    daily_activity_db = db.query_database("SELECT Id, ActivityDate, TotalDistance, Calories FROM daily_activity")
     daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
+
+    # Aggregate TotalDistance and Calories per day
+    activity_agg = daily_activity_db.groupby("ActivityDate").agg(
+        TotalDistance=("TotalDistance", "sum"),
+        Calories=("Calories", "sum")
+    ).reset_index()
 
     # Load Chicago weather data
     chicago_data = pd.read_csv("../data/chicago_data.csv")
     chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
 
-    # Create figure and axis
-    fig, ax1 = plt.subplots(figsize=(10, 5))
-    plt.xticks(rotation=45)  # Rotate x-axis labels for readability
+    # Merge Fitbit and weather data
+    merged_data = activity_agg.merge(chicago_data, left_on="ActivityDate", right_on="datetime")
 
-    # First line (Precipitation)
-    ax1.plot(chicago_data["datetime"], chicago_data["precip"], 'b-', label="Precipitation")
-    ax1.set_xlabel("Date")
-    ax1.set_ylabel("Precipitation (mm)", color='blue')
-    ax1.tick_params(axis='y', labelcolor='blue')
+    # Compute Correlations
+    corr_temp_distance = merged_data["TotalDistance"].corr(merged_data["temp"])
+    corr_precip_distance = merged_data["TotalDistance"].corr(merged_data["precip"])
+    corr_temp_calories = merged_data["Calories"].corr(merged_data["temp"])
+    corr_precip_calories = merged_data["Calories"].corr(merged_data["precip"])
 
-    # Second Y-axis (Temperature)90
-    ax2 = ax1.twinx()
-    ax2.plot(chicago_data["datetime"], chicago_data["temp"], 'r-', label="Temperature")
-    ax2.set_ylabel("Temperature (°C)", color='red')
-    ax2.tick_params(axis='y', labelcolor='red')
+    # Create subplots for visualizations
+    _, axes = plt.subplots(2, 2, figsize=(12, 12))
 
-    # Third Y-axis (Total Distance for Multiple Users)
-    ax3 = ax1.twinx()
-    ax3.spines['right'].set_position(('outward', 60))  # Offset third y-axis
-    ax3.set_ylabel("Total Distance (km)", color='green')
+    # Scatter Plot: Temperature vs. Total Distance
+    sns.regplot(x=merged_data["temp"], y=merged_data["TotalDistance"], ax=axes[0, 0], color="red")
+    axes[0, 0].set_title(f"Temperature vs. Total Distance (Corr: {corr_temp_distance:.3f})")
+    axes[0, 0].set_xlabel("Temperature (°C)")
+    axes[0, 0].set_ylabel("Total Distance (km)")
 
-    # Plot totalDistance for each user
-    for user_id, user_data in daily_activity_db.groupby("Id"):
-        ax3.plot(user_data["ActivityDate"], user_data["TotalDistance"], label=f"User {user_id}", linestyle="--")
+    # Scatter Plot: Precipitation vs. Total Distance
+    sns.regplot(x=merged_data["precip"], y=merged_data["TotalDistance"], ax=axes[0, 1], color="blue")
+    axes[0, 1].set_title(f"Precipitation vs. Total Distance (Corr: {corr_precip_distance:.3f})")
+    axes[0, 1].set_xlabel("Precipitation (mm)")
+    axes[0, 1].set_ylabel("Total Distance (km)")
 
-    ax3.tick_params(axis='y', labelcolor='green')
+    # Scatter Plot: Temperature vs. Calories Burned
+    sns.regplot(x=merged_data["temp"], y=merged_data["Calories"], ax=axes[1, 0], color="orange")
+    axes[1, 0].set_title(f"Temperature vs. Calories Burned (Corr: {corr_temp_calories:.3f})")
+    axes[1, 0].set_xlabel("Temperature (°C)")
+    axes[1, 0].set_ylabel("Calories Burned")
 
-    # Formatting
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    fig.tight_layout()
-    plt.title("Weather and Total Distance Comparison for Multiple Users")
-    plt.legend(loc="upper left")
+    # Scatter Plot: Precipitation vs. Calories Burned
+    sns.regplot(x=merged_data["precip"], y=merged_data["Calories"], ax=axes[1, 1], color="green")
+    axes[1, 1].set_title(f"Precipitation vs. Calories Burned (Corr: {corr_precip_calories:.3f})")
+    axes[1, 1].set_xlabel("Precipitation (mm)")
+    axes[1, 1].set_ylabel("Calories Burned")
 
+    plt.tight_layout()
     plt.show()
