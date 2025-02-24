@@ -17,13 +17,13 @@ def get_sleep_data():
     sleep_data.loc[:, 'minutesSlept'] = sleep_data.loc[:, 'minutesSlept'].astype(int)
     return sleep_data
 
-def query_database(query: str):
+def query_database(query: str, params=()):
     """
     Purpose: Read a string input in SQL format to retrieve specific data from the database
     
     Author: L.D. Lee
     """
-    
-    return pd.read_sql(query, connection)
+    cursor.execute(query, params)
+    return pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
 
 print(get_sleep_data())

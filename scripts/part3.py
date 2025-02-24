@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import datetime
 import seaborn as sns
 import database as db
+import os
+
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+file_location = os.path.join(project_root, "data/chicago_data.csv")
 
 def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     """
@@ -12,23 +16,25 @@ def heart_rate(id: int, start_date: datetime = None, end_date: datetime = None):
     """
     
     # Connect to database
-    heart_rate_db = db.query_database(f"SELECT * FROM heart_rate WHERE Id={id}")
-    hourly_intensity_db = db.query_database(f"SELECT * FROM hourly_intensity WHERE Id={id}")
+    heart_rate_db = db.query_database("SELECT * FROM heart_rate WHERE Id = ?", (id,))
+    hourly_intensity_db = db.query_database("SELECT * FROM hourly_intensity WHERE Id = ?", (id,))
     
-    # Convert columns to datetime
-    heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"])
-    hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"])
+    # Convert Time to datetime with the correct format
+    heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
+    hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
 
-    # Set default time ranges
-    if (start_date == None): start_date = heart_rate_db["Time"].min()
-    if (end_date == None): end_date = heart_rate_db["Time"].max()
+    # Set default time ranges if None
+    if start_date is None: start_date = heart_rate_db["Time"].min()
+    if end_date is None: end_date = heart_rate_db["Time"].max()
 
     # Filter data within start and end date
     heart_rate_db = heart_rate_db[(heart_rate_db["Time"] >= start_date) & (heart_rate_db["Time"] <= end_date)]
-    hourly_intensity_db = hourly_intensity_db[(hourly_intensity_db["ActivityHour"] >= start_date) & (hourly_intensity_db["ActivityHour"] <= end_date)]
 
-    # Aggregate heart rate by hour (sum of all heart rate values per hour)
-    heart_rate_hourly = heart_rate_db.resample('H', on='Time').max()
+    # Ensure Time is set as index before resampling
+    heart_rate_db.set_index("Time", inplace=True)
+
+    # Resample heart rate data by hour
+    heart_rate_hourly = heart_rate_db.resample('h').max()
 
     # Compute averages
     avg_heart_rate = heart_rate_hourly["Value"].mean()  # Assuming heart rate values are in "Value" column
@@ -84,7 +90,7 @@ def weather():
     ).reset_index()
 
     # Load Chicago weather data
-    chicago_data = pd.read_csv("../data/chicago_data.csv")
+    chicago_data = pd.read_csv(file_location)
     chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
 
     # Merge Fitbit and weather data
