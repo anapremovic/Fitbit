@@ -73,8 +73,8 @@ def regression_sedentary_vs_sleep():
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), layout='tight')
     ax1.scatter(sedentary_sleep_data.loc[:, 'SedentaryMinutes'], sedentary_sleep_data.loc[:, 'MinutesSlept'], 
-                label='Observations')
-    ax1.axline((0, intercept), slope=slope, color='red', label='Regression line')
+                color='C0', label='Observations')
+    ax1.axline((0, intercept), slope=slope, color='C0', label='Regression line')
     ax1.set_title('Relation Daily Sedentary Time and Time Slept \n Across All Users')
     ax1.set_xlabel('Sedentary Minutes')
     ax1.set_ylabel('Minutes Slept')
@@ -86,13 +86,15 @@ def regression_sedentary_vs_sleep():
     range = np.arange(-600, 600, 5)
     norm_pdf = sp.norm.pdf(range, loc=0, scale=root_mse)
     ax2.hist(residuals, bins=20, range=(-600, 600), 
-             density=True, label='Residuals')
-    ax2.plot(range, norm_pdf, color='red', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
+             color='C0', density=True, label='Residuals')
+    ax2.plot(range, norm_pdf, color='C1', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
     ax2.set_title('Distribution of Residuals')
     ax2.set_xlabel('Residual')
     ax2.set_ylabel('Density')
     ax2.legend()
     plt.show()
+
+regression_sedentary_vs_sleep()
 
 def generate_daily_step_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of steps

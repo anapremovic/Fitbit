@@ -11,6 +11,10 @@ cursor = connection.cursor()
 def dataframe_from_cursor_contents():
     """After a query has been executed, this function may be called to obtain a
     DataFrame with named columns from the current contents of the cursor."""
+
+    rows = cursor.fetchall()
+    return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+
 def get_sleep_moments(user_id: float) -> pd.DataFrame:
     query = """
     SELECT 
@@ -24,10 +28,9 @@ def get_sleep_moments(user_id: float) -> pd.DataFrame:
     """
 
     cursor.execute(query, (user_id,))
-    rows = cursor.fetchall()
-    sleep_moments = pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
-    sleep_moments["Date"] = pd.to_datetime(sleep_moments.loc[:, "Date"])
-    return sleep_moments
+    df = dataframe_from_cursor_contents()
+    df["Date"] = pd.to_datetime(df["Date"])
+    return df
 
 def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
     query = """
@@ -48,11 +51,11 @@ def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
             daily_activity.ActivityDate = sleep_moments.Date
     WHERE daily_activity.ActivityDate = ?
     GROUP BY daily_activity.Id;"""
-
     date_str = convert_datetime_to_string(date)
     cursor.execute(query, (date_str,))
-    rows = cursor.fetchall()
-    return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+
+    df = dataframe_from_cursor_contents()
+    return df
 
 def get_all_sleep_activity() -> pd.DataFrame:
     query = """
@@ -219,8 +222,6 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
 
     df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / numDistinctSleepSessions
     return df.sort_values('HourGroup')
-
-    return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
 
 def convert_datetime_to_string(date: datetime) -> str:
     if os.name == "nt":  # Windows
