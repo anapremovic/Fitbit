@@ -110,17 +110,17 @@ def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_d
     if end_date is None: end_date = heart_rate_db["Time"].max()
 
     # Filter data within start and end date
-    heart_rate_db = heart_rate_db[(heart_rate_db["Time"] >= start_date) & (heart_rate_db["Time"] <= end_date)]
+    heart_rate_db = heart_rate_db.loc[(heart_rate_db["Time"] >= start_date) & (heart_rate_db["Time"] <= end_date)]
 
     # Ensure Time is set as index before resampling
     heart_rate_db.set_index("Time", inplace=True)
 
     # Resample heart rate data by hour
-    heart_rate_hourly = heart_rate_db.resample('h').max()
+    heart_rate_hourly = heart_rate_db.resample('h').max().loc[:, ["Value"]]
 
     # Compute averages
-    avg_heart_rate = heart_rate_hourly["Value"].mean()  # Assuming heart rate values are in "Value" column
-    avg_intensity = hourly_intensity_db["TotalIntensity"].mean()  # Assuming intensity values are in "Intensity" column
+    avg_heart_rate = heart_rate_hourly.loc[:, "Value"].mean()
+    avg_intensity = hourly_intensity_db.loc[:, "TotalIntensity"].mean()
 
     # Create subplots
     _, axes = plt.subplots(2, 2, figsize=(12, 8))
@@ -176,7 +176,7 @@ def display_weather_correlation_for_chicago():
     chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
 
     # Merge Fitbit and weather data
-    merged_data = activity_agg.merge(chicago_data, left_on="ActivityDate", right_on="datetime")
+    merged_data = activity_agg.merge(chicago_data, left_on="ActivityDate", right_on="datetime").loc[:, ["TotalDistance", "Calories", "temp", "precip"]]
 
     # Compute Correlations
     corr_temp_distance = merged_data["TotalDistance"].corr(merged_data["temp"])
