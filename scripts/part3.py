@@ -5,20 +5,12 @@ import sklearn.linear_model as sk
 
 def generate_active_min_to_sleep_min_regression(date: datetime):
     """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day"""
-    active_min = db.get_active_min_data()
-    sleep_min = db.get_sleep_data()
-
-    active_min = active_min[active_min.loc[:, 'Date'].dt.date == date.date()]
-    sleep_min = sleep_min[sleep_min.loc[:, 'Date'].dt.date == date.date()]
-    active_and_sleep_min_grouped_by_user = active_min.merge(sleep_min, on=['UserId', 'Date']).groupby('UserId').agg(
-        TotalActiveMin=('TotalActiveMin', 'sum'),
-        MinSlept=('MinSlept', 'sum')
-    ).reset_index()
+    active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min_grouped_by_user(date)
     if active_and_sleep_min_grouped_by_user.empty:
-        print(f"No sleep and/or activity data on {date.date()}.")
+        print(f"No activity and/or sleep data on {date.date()}.")
         return
 
-    x = active_and_sleep_min_grouped_by_user.loc[:, ['MinSlept']].values
+    x = active_and_sleep_min_grouped_by_user.loc[:, ['TotalSleepMin']].values
     y = active_and_sleep_min_grouped_by_user.loc[:, 'TotalActiveMin'].values
     model = sk.LinearRegression()
     model.fit(x, y)
