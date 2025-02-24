@@ -55,6 +55,7 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 * View repository and README.
 
 ### Part 3
+* Visualize sleep data over time for a user.
 * Visualize relationship between the amount of sleep and the number of active minutes the next day.
 
 ## Contributors
