@@ -5,13 +5,30 @@ import matplotlib.dates as mdates
 import statsmodels.formula.api as smf
 import datetime as datetime
 import seaborn as sns
+import os
+
+def execute_part_1():
+    """Generate all visualizations for part 1 of the project."""
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    file_location = os.path.join(project_root, "data/daily_activity.csv")
+    daily_activity = pd.read_csv(file_location)
+
+    print("The total number of users is: " + str(calc_num_users(daily_activity)))
+    generate_distance_walked_density_plot(daily_activity)
+    generate_distance_histogram(daily_activity)
+    generate_calories_burned_line_graph(daily_activity, 6290855005)
+    generate_calories_burned_line_graph(daily_activity, 6290855005, datetime.datetime(2016, 4, 3),
+                                              datetime.datetime(2016, 4, 7))  # only between 2016/4/3 and 2016/4/7
+    generate_calories_burned_line_graph(daily_activity, 4020332650)
+    generate_day_of_week_frequency_plot(daily_activity)
+    generate_steps_to_calories_regression(daily_activity, 5553957443)
 
 def calc_num_users(data: pd.DataFrame,):
-  """Calculates the total number of unique users in the dataset"""
-  users = pd.unique(data.loc[:,'Id'])
-  return len(users)
+    """Calculates the total number of unique users in the dataset"""
+    users = pd.unique(data.loc[:,'Id'])
+    return len(users)
 
-def generate_density_plot(data: pd.DataFrame,):
+def generate_distance_walked_density_plot(data: pd.DataFrame, ):
     """Create a density plot of the total distance walked by individuals"""
     users = pd.unique(data.loc[:,'Id'])
     distances = []
@@ -45,18 +62,20 @@ def generate_distance_histogram(data: pd.DataFrame,):
 
     plt.show()
 
-def show_calories_per_day(data: pd.DataFrame, id: int, start_date: datetime = None, end_date: datetime = None):
+def generate_calories_burned_line_graph(data: pd.DataFrame, user_id: int, start_date: datetime = None, end_date: datetime = None):
     """
     Purpose: This function displays the calories burned for each day given a specific user's ID. Can also set a date range to see a snapshot of the results. Otherwise, the entire duration of calories burned is shown 
 
     Author: L.D. Lee
     """
-    get_data_for_id = data.loc[data.loc[:, "Id"] == id].copy()
+    get_data_for_id = data.loc[data.loc[:, "Id"] == user_id].copy()
     get_data_for_id["datetime"] = pd.to_datetime(get_data_for_id.loc[:, "ActivityDate"]) # Create datetime column
 
     # Set default time ranges
-    if (start_date == None): start_date = get_data_for_id["datetime"].min()
-    if (end_date == None): end_date = get_data_for_id["datetime"].max()
+    if start_date is None:
+        start_date = get_data_for_id["datetime"].min()
+    if end_date is None:
+        end_date = get_data_for_id["datetime"].max()
 
     # Ensure data is in between start and end dates
     get_data_for_id = get_data_for_id[(get_data_for_id.loc[:, "datetime"] >= start_date) & (get_data_for_id.loc[:, "datetime"] <= end_date)]
@@ -66,15 +85,14 @@ def show_calories_per_day(data: pd.DataFrame, id: int, start_date: datetime = No
     plt.plot(get_data_for_id["datetime"], get_data_for_id["Calories"], marker='o', linestyle="-")
     plt.xlabel("Date of Activity")
     plt.ylabel("Calories Burned")
-    plt.title(f"Calories Burned per Day for ID: {id}")
+    plt.title(f"Calories Burned per Day for ID: {user_id}")
     plt.gca().xaxis.set_major_locator(mdates.DayLocator())  # set ticks for each day
-    # plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # Format as YYYY-MM-DD
 
     plt.xticks(rotation = 30)
     plt.show()
 
-
 def generate_day_of_week_frequency_plot(daily_activity: pd.DataFrame):
+    """Create bar plot that displays the frequency of workouts per day of week"""
     daily_activity["ActivityDate"] = pd.to_datetime(daily_activity.loc[:, "ActivityDate"])
     day_of_week_counts = daily_activity.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
 
@@ -85,8 +103,10 @@ def generate_day_of_week_frequency_plot(daily_activity: pd.DataFrame):
     plt.title("Total Number of Workouts Per Day of Week")
     plt.show()
 
-def generate_regression_line_for_user(daily_activity: pd.DataFrame, user_id: str):
-    user_entries = daily_activity.loc[ daily_activity.loc[:, 'Id'] == user_id ]
+def generate_steps_to_calories_regression(daily_activity: pd.DataFrame, user_id: int):
+    """Create a regression to visualize the relationship between
+    the steps taken and the calories burned for a given user"""
+    user_entries = daily_activity.loc[daily_activity.loc[:, 'Id'] == user_id]
     user_steps = user_entries.loc[:, 'TotalSteps']
     user_calories = user_entries.loc[:, 'Calories']
 
