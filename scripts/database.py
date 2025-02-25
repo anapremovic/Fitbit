@@ -58,29 +58,6 @@ def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
     df = dataframe_from_cursor_contents()
     return df
 
-def get_all_sleep_activity() -> pd.DataFrame:
-    query = """
-        SELECT 
-            logId, 
-            substr(date, 1, instr(date, ' ') - 1) AS date, 
-            Id,
-            COUNT(*) AS minutesSlept 
-        FROM minute_sleep 
-        GROUP BY logId
-    """
-    cursor.execute(query)
-    
-    # For reassigning a column to an altered version of itself, using .loc is apparently 
-    # unreliable since pandas might update a copied version of the column instead of the 
-    # original column. And in this case, the code actually breaks using .loc.
-    # This is stupid but means [] type of indexing must be used here. According 
-    # to ChatGPT, it is still recommended to use .loc in other scenarios. 
-    df = dataframe_from_cursor_contents()
-    df['Id'] = df['Id'].astype(int)
-    df['minutesSlept'] = df['minutesSlept'].astype(int)
-    df['date'] = pd.to_datetime(df['date'])
-    return df
-
 def get_sedentary_sleep_activity():
     query = """
         SELECT 
