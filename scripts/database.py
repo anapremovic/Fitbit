@@ -32,6 +32,28 @@ def get_sleep_moments(user_id: float) -> pd.DataFrame:
     df["Date"] = pd.to_datetime(df["Date"])
     return df
 
+def get_heart_rate(user_id: int):
+    query = "SELECT * FROM heart_rate WHERE Id = ?"
+    cursor.execute(query, (user_id,))
+    return dataframe_from_cursor_contents()
+
+def get_intensity(user_id: int):
+    query = "SELECT * FROM hourly_intensity WHERE Id = ?"
+    cursor.execute(query, (user_id,))
+    return dataframe_from_cursor_contents()
+
+def get_daily_activity_for_chicago_comparison():
+    query = """
+        SELECT
+            Id,
+            ActivityDate,
+            TotalDistance,
+            Calories
+        FROM daily_activity
+    """
+    cursor.execute(query)
+    return dataframe_from_cursor_contents()
+
 def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
     query = """
         SELECT 
