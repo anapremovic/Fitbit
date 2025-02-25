@@ -139,7 +139,7 @@ def get_daily_step_distribution() -> pd.DataFrame:
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
     return df.sort_values('HourGroup')
 
-def get_daily_calorie_distribtion() -> pd.DataFrame:
+def get_daily_calorie_distribution() -> pd.DataFrame:
     """Groups the hourly_calories table into 4-hour blocks and returns 
     the average amount of calories burnt during each block"""
 
@@ -218,9 +218,9 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
     df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
 
     cursor.execute('SELECT COUNT(DISTINCT logId) AS NumDistinctSleepSessions FROM minute_sleep')
-    numDistinctSleepSessions = dataframe_from_cursor_contents().at[0, 'NumDistinctSleepSessions']
+    num_distinct_sleep_sessions = dataframe_from_cursor_contents().at[0, 'NumDistinctSleepSessions']
 
-    df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / numDistinctSleepSessions
+    df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
     return df.sort_values('HourGroup')
 
 def convert_datetime_to_string(date: datetime) -> str:

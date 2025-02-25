@@ -143,7 +143,7 @@ def generate_daily_calorie_distribution_barplot():
     """Divide a day into 6 4-hour blocks and compute the average amount of calories
     burnt per time block across all users. Visualize results in a bar plot."""
 
-    calorie_data = db.get_daily_calorie_distribtion()
+    calorie_data = db.get_daily_calorie_distribution()
 
     plt.bar(calorie_data.loc[:, 'HourGroup'], calorie_data.loc[:, 'AverageCalories'],
             color='C3')
