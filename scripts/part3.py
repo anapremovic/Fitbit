@@ -124,8 +124,8 @@ def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_d
     """
     
     # Connect to database
-    heart_rate_db = db.query_database("SELECT * FROM heart_rate WHERE Id = ?", (id,))
-    hourly_intensity_db = db.query_database("SELECT * FROM hourly_intensity WHERE Id = ?", (id,))
+    heart_rate_db = db.get_heart_rate(id)
+    hourly_intensity_db = db.get_intensity(id)
     
     # Convert Time to datetime with the correct format
     heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
@@ -188,7 +188,7 @@ def display_weather_correlation_for_chicago():
     Author: L.D. Lee
     """
     # Connect to database and load Fitbit data
-    daily_activity_db = db.query_database("SELECT Id, ActivityDate, TotalDistance, Calories FROM daily_activity")
+    daily_activity_db = db.get_daily_activity_for_chicago_comparison()
     daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
 
     # Aggregate TotalDistance and Calories per day
@@ -239,6 +239,7 @@ def display_weather_correlation_for_chicago():
 
     plt.tight_layout()
     plt.show()
+
 def generate_sedentary_min_to_sleep_min_regression():
     """Analyses the relationship between the amount of sedentary activity and the
     sleep duration for all individuals by performing a linear regression on all
