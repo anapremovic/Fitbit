@@ -1,6 +1,5 @@
 import database as db
 import numpy as np
-import pandas as pd
 import datetime as datetime
 import seaborn as sns
 import scipy.stats as sp
@@ -12,7 +11,6 @@ import os
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/chicago_data.csv")
-
 
 def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
@@ -26,24 +24,6 @@ def execute_part_3():
     generate_daily_step_distribution_barplot()
     generate_daily_calorie_distribution_barplot()
     generate_daily_sleep_distribution_barplot()
-
-def generate_sleep_data_over_time_line_plot(user_id: float):
-    """Generates a line plot which visualizes sleep data over time for a given user."""
-    sleep_moments_for_user = db.get_sleep_moments(user_id)
-    if sleep_moments_for_user.empty:
-        print(f"No sleep data found for User {user_id}.")
-        return
-
-    plt.figure(figsize=(10, 5))
-    sns.lineplot(x=sleep_moments_for_user["Date"], y=sleep_moments_for_user["SleepMin"], marker="o", color="b")
-    plt.title(f"Sleep Over Time for User {user_id}", fontsize=14)
-    plt.xlabel("Date", fontsize=12)
-    plt.ylabel("Minutes Slept", fontsize=12)
-    plt.xticks(rotation=45, ha='right')
-    plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both', nbins=6))
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
 
 def verify_correctness(daily_data: pd.DataFrame, hourly_data: pd.DataFrame):
     daily_data_2 = hourly_data.groupby(['Id', 'ActivityDate'], as_index=False).sum()
