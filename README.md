@@ -61,6 +61,9 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 * Visualize a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity.
 * Visualize the correlation of the rate of activity between temperature, precipitation, total distance and calories burned.
 
+### Part 4
+* Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
+
 ## Contributors
 
 * Lucas Lee
