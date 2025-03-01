@@ -16,7 +16,7 @@ def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
     verify_correctness(db.get_daily_steps(), db.get_hourly_steps())
     generate_sleep_data_over_time_line_plot(6962181067)
-    generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
+    generate_sleep_min_to_active_min_regression(datetime.datetime(2016, 4, 1))
     display_heart_rate_and_intensity(2022484408)
     display_heart_rate_and_intensity(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
     display_weather_correlation_for_chicago()
@@ -72,12 +72,12 @@ def generate_sleep_data_over_time_line_plot(user_id: float):
     plt.tight_layout()
     plt.show()
 
-def generate_active_min_to_sleep_min_regression(date: datetime):
-    """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day."""
+def generate_sleep_min_to_active_min_regression():
+    """Generates a regression that shows how sleep minutes relate to active minutes for all users and days."""
 
-    active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min_grouped_by_user(date)
+    active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min()
     if active_and_sleep_min_grouped_by_user.empty:
-        print(f"No activity and/or sleep data on {date.date()}.")
+        print(f"No activity and/or sleep data available.")
         return
 
     x = active_and_sleep_min_grouped_by_user.loc[:, ['TotalSleepMin']].values
@@ -91,7 +91,7 @@ def generate_active_min_to_sleep_min_regression(date: datetime):
     plt.plot(x, regression_line, color='green', label=f'Regression Line')
     plt.xlabel("Sleep Minutes")
     plt.ylabel("Active Minutes")
-    plt.title(f"Regression of Sleep Minutes to Active Minutes on {date.date()}")
+    plt.title(f"Regression of Sleep Minutes to Active Minutes")
     plt.legend()
     plt.grid()
     plt.show()

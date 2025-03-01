@@ -1,7 +1,6 @@
 import sqlite3
 import os
 import pandas as pd
-import datetime as datetime
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/fitbit_database.db")
@@ -54,28 +53,28 @@ def get_daily_activity_for_chicago_comparison():
     cursor.execute(query)
     return dataframe_from_cursor_contents()
 
-def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
+def get_active_and_sleep_min() -> pd.DataFrame:
     query = """
         SELECT 
             daily_activity.Id AS UserId,
-            ActivityDate AS Date,
+            daily_activity.ActivityDate AS Date,
             SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
             SUM(sleep_moments.SleepMin) AS TotalSleepMin
         FROM daily_activity
-        INNER JOIN (SELECT
-                        Id AS UserId, 
-                        MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
-                        COUNT(*) AS SleepMin
-                    FROM minute_sleep 
-                    GROUP BY logId) sleep_moments
-            ON
-                daily_activity.Id = sleep_moments.UserId AND
-                daily_activity.ActivityDate = sleep_moments.Date
-        WHERE daily_activity.ActivityDate = ?
-        GROUP BY daily_activity.Id;
+        INNER JOIN (
+            SELECT
+                Id AS UserId, 
+                MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
+                COUNT(*) AS SleepMin
+            FROM minute_sleep 
+            GROUP BY logId
+        ) sleep_moments
+        ON
+            daily_activity.Id = sleep_moments.UserId 
+            AND daily_activity.ActivityDate = sleep_moments.Date
+        GROUP BY daily_activity.Id, daily_activity.ActivityDate
     """
-    date_str = convert_datetime_to_string(date)
-    cursor.execute(query, (date_str,))
+    cursor.execute(query)
 
     df = dataframe_from_cursor_contents()
     return df
@@ -221,12 +220,6 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
 
     df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
     return df.sort_values('HourGroup')
-
-def convert_datetime_to_string(date: datetime) -> str:
-    if os.name == "nt":  # Windows
-        return date.strftime("%#m/%#d/%Y")
-    else:  # macOS/Linux
-        return date.strftime("%-m/%-d/%Y")
     
 def get_daily_steps():
     query = """
