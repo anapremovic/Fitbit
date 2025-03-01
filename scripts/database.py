@@ -53,7 +53,7 @@ def get_daily_activity_for_chicago_comparison():
     cursor.execute(query)
     return dataframe_from_cursor_contents()
 
-def get_active_and_sleep_min() -> pd.DataFrame:
+def get_active_and_sleep_min(day_filter: str = "") -> pd.DataFrame:
     query = """
         SELECT 
             daily_activity.Id AS UserId,
@@ -66,17 +66,24 @@ def get_active_and_sleep_min() -> pd.DataFrame:
                 Id AS UserId, 
                 MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
                 COUNT(*) AS SleepMin
-            FROM minute_sleep 
+            FROM minute_sleep
             GROUP BY logId
         ) sleep_moments
         ON
             daily_activity.Id = sleep_moments.UserId 
             AND daily_activity.ActivityDate = sleep_moments.Date
         GROUP BY daily_activity.Id, daily_activity.ActivityDate
-    """
-    cursor.execute(query)
+        """
 
+    cursor.execute(query)
     df = dataframe_from_cursor_contents()
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    if day_filter == "weekdays":
+        return df[df["Date"].dt.weekday < 5]
+    elif day_filter == "weekends":
+        return df[df["Date"].dt.weekday >= 5]
+
     return df
 
 def get_sedentary_sleep_activity():
