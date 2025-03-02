@@ -44,7 +44,7 @@ def plot_steps_to_heart_rate_and_avg_heart_rate(min_steps: int, max_steps: int):
         axes[1].set_title("Average Daily Heart Rate", fontsize=16, fontweight="bold", pad=20)
         axes[1].text(
             0.5, 0.6, f"{avg_heart_rate:.1f} bpm",
-            fontsize=36, ha="center", va="center", fontweight="bold", color="red"
+            fontsize=36, ha="center", va="center", fontweight="bold", color="green"
         )
         axes[1].text(
             0.5, 0.4, f"for {min_steps} to {max_steps} steps",
