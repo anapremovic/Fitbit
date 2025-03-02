@@ -80,15 +80,15 @@ def generate_sleep_min_to_active_min_regression():
         print(f"No activity and/or sleep data available.")
         return
 
-    x = active_and_sleep_min_grouped_by_user.loc[:, ['TotalSleepMin']].values
-    y = active_and_sleep_min_grouped_by_user.loc[:, 'TotalActiveMin'].values
+    x = active_and_sleep_min_grouped_by_user.loc[:, ["TotalSleepMin"]].values
+    y = active_and_sleep_min_grouped_by_user.loc[:, "TotalActiveMin"].values
     model = sk.LinearRegression()
     model.fit(x, y)
     regression_line = model.predict(x)
 
     plt.figure(figsize=(8, 5))
-    plt.scatter(x, y, color='green', label='Observations')
-    plt.plot(x, regression_line, color='green', label=f'Regression Line')
+    plt.scatter(x, y, color="green", label="Observations")
+    plt.plot(x, regression_line, color="green", label="Regression Line")
     plt.xlabel("Sleep Minutes")
     plt.ylabel("Active Minutes")
     plt.title(f"Regression of Sleep Minutes to Active Minutes")
