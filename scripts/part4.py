@@ -16,54 +16,20 @@ def compare_sleep_to_active_min_relationship_for_week_periods():
     weekends = db.get_active_and_sleep_min("weekends")
 
     fig, axs = plt.subplots(1, 3, figsize=(24, 5))
-    _plot_sleep_min_to_active_min(all_days, axs[0], "All Days")
-    _plot_sleep_min_to_active_min(weekdays, axs[1], "Weekdays")
-    _plot_sleep_min_to_active_min(weekends, axs[2], "Weekends")
+    plot_sleep_min_to_active_min(all_days, axs[0], "All Days")
+    plot_sleep_min_to_active_min(weekdays, axs[1], "Weekdays")
+    plot_sleep_min_to_active_min(weekends, axs[2], "Weekends")
 
     plt.tight_layout()
     plt.show()
 
-def _plot_sleep_min_to_active_min(data: pd.DataFrame, axs: plt.Axes, week_period: str):
-    """Helper function to plot one of the regressions in compare_sleep_to_active_min_relationship_for_week_periods()."""
-    x = data.loc[:, ["TotalSleepMin"]].values
-    y = data.loc[:, "TotalActiveMin"].values
-    model = sk.LinearRegression()
-    model.fit(x, y)
-    regression_line = model.predict(x)
-
-    axs.scatter(x, y, color="green", label="Observations")
-    axs.plot(x, regression_line, color="green", label="Regression Line")
-    axs.set_xlabel("Sleep Minutes")
-    axs.set_ylabel("Active Minutes")
-    axs.set_title(f"Regression of Sleep Minutes to Active Minutes on {week_period}")
-    axs.legend()
-    axs.grid(True)
-
-def fit_steps_to_heart_rate_regression(data: pd.DataFrame):
-    """Helper function to fit a regression of daily steps vs average heart rate for all users."""
-    x = data.loc[:, ["TotalSteps"]].values
-    y = data.loc[:, "AverageHeartRate"].values
-    model = sk.LinearRegression()
-    model.fit(x, y)
-    regression_line = model.predict(x)
-
-    return x, y, regression_line
-
-def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
-    """Helper function to compute the average heart rate for users for given step range."""
-    filtered_data = data[
-        (data["TotalSteps"] >= min_steps) &
-        (data["TotalSteps"] <= max_steps)
-    ]
-    return filtered_data["AverageHeartRate"].mean()
-
 def plot_steps_to_heart_rate_and_avg_heart_rate(min_steps: int, max_steps: int):
     """Plots daily steps vs heart rate regression and computes average heart rate for given step range."""
     daily_steps_and_average_heart_rate_by_user = db.get_daily_steps_and_average_heart_rate()
-    x, y, regression_line = fit_steps_to_heart_rate_regression(daily_steps_and_average_heart_rate_by_user)
+    x, y, regression_line = fit_regression(daily_steps_and_average_heart_rate_by_user, "TotalSteps", "AverageHeartRate")
     avg_heart_rate = compute_avg_heart_rate(daily_steps_and_average_heart_rate_by_user, min_steps, max_steps)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))  # 1 row, 2 columns
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
     axes[0].scatter(x, y, color="green", label="Observations")
     axes[0].plot(x, regression_line, color="green", label="Regression Line")
@@ -87,3 +53,33 @@ def plot_steps_to_heart_rate_and_avg_heart_rate(min_steps: int, max_steps: int):
 
     plt.tight_layout()
     plt.show()
+
+def plot_sleep_min_to_active_min(data: pd.DataFrame, axs: plt.Axes, week_period: str):
+    """Helper function to plot one of the regressions in compare_sleep_to_active_min_relationship_for_week_periods()."""
+    x, y, regression_line = fit_regression(data, "TotalSleepMin", "TotalActiveMin")
+
+    axs.scatter(x, y, color="green", label="Observations")
+    axs.plot(x, regression_line, color="green", label="Regression Line")
+    axs.set_xlabel("Sleep Minutes")
+    axs.set_ylabel("Active Minutes")
+    axs.set_title(f"Regression of Sleep Minutes to Active Minutes on {week_period}")
+    axs.legend()
+    axs.grid(True)
+
+def fit_regression(data: pd.DataFrame, x_col: str, y_col: str):
+    """Helper function to fit a regression to plot."""
+    x = data.loc[:, [x_col]].values
+    y = data.loc[:, y_col].values
+    model = sk.LinearRegression()
+    model.fit(x, y)
+    regression_line = model.predict(x)
+
+    return x, y, regression_line
+
+def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
+    """Helper function to compute the average heart rate for users for given step range."""
+    filtered_data = data[
+        (data["TotalSteps"] >= min_steps) &
+        (data["TotalSteps"] <= max_steps)
+    ]
+    return filtered_data["AverageHeartRate"].mean()
