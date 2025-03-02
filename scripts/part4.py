@@ -2,11 +2,12 @@ import database as db
 import matplotlib.pyplot as plt
 import sklearn.linear_model as sk
 import pandas as pd
+import numpy as np
 
 def execute_part_4():
     """Generate all visualizations for part 4 of the project."""
     compare_sleep_to_active_min_relationship_for_week_periods()
-    plot_daily_steps_to_average_heart_rate()
+    plot_steps_to_heart_rate_and_avg_heart_rate(10000, 15000)
 
 def compare_sleep_to_active_min_relationship_for_week_periods():
     """Generate three regressions to compare how sleep minutes affect active minutes on all days, weekdays only, and weekends only."""
@@ -38,20 +39,51 @@ def _plot_sleep_min_to_active_min(data: pd.DataFrame, axs: plt.Axes, week_period
     axs.legend()
     axs.grid(True)
 
-def plot_daily_steps_to_average_heart_rate():
-    daily_steps_and_average_heart_rate_by_user = db.get_daily_steps_and_average_heart_rate()
-
-    x = daily_steps_and_average_heart_rate_by_user.loc[:, ["TotalSteps"]].values
-    y = daily_steps_and_average_heart_rate_by_user.loc[:, "AverageHeartRate"].values
+def fit_steps_to_heart_rate_regression(data: pd.DataFrame):
+    """Helper function to fit a regression of daily steps vs average heart rate for all users."""
+    x = data.loc[:, ["TotalSteps"]].values
+    y = data.loc[:, "AverageHeartRate"].values
     model = sk.LinearRegression()
     model.fit(x, y)
     regression_line = model.predict(x)
 
-    plt.scatter(x, y, color="green", label="Observations")
-    plt.plot(x, regression_line, color="green", label="Regression Line")
-    plt.xlabel("Daily Steps")
-    plt.ylabel("Average Heart Rate")
-    plt.title("Regression of Daily Steps to Average Heart Rate")
-    plt.legend()
-    plt.grid()
+    return x, y, regression_line
+
+def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
+    """Helper function to compute the average heart rate for users for given step range."""
+    filtered_data = data[
+        (data["TotalSteps"] >= min_steps) &
+        (data["TotalSteps"] <= max_steps)
+    ]
+    return filtered_data["AverageHeartRate"].mean()
+
+def plot_steps_to_heart_rate_and_avg_heart_rate(min_steps: int, max_steps: int):
+    """Plots daily steps vs heart rate regression and computes average heart rate for given step range."""
+    daily_steps_and_average_heart_rate_by_user = db.get_daily_steps_and_average_heart_rate()
+    x, y, regression_line = fit_steps_to_heart_rate_regression(daily_steps_and_average_heart_rate_by_user)
+    avg_heart_rate = compute_avg_heart_rate(daily_steps_and_average_heart_rate_by_user, min_steps, max_steps)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))  # 1 row, 2 columns
+
+    axes[0].scatter(x, y, color="green", label="Observations")
+    axes[0].plot(x, regression_line, color="green", label="Regression Line")
+    axes[0].set_xlabel("Daily Steps")
+    axes[0].set_ylabel("Average Daily Heart Rate (bpm)")
+    axes[0].set_title("Daily Steps vs. Average Heart Rate")
+    axes[0].legend()
+    axes[0].grid()
+
+    axes[1].axis("off")
+    if not np.isnan(avg_heart_rate):
+        axes[1].set_title("Average Daily Heart Rate", fontsize=16, fontweight="bold", pad=20)
+        axes[1].text(
+            0.5, 0.6, f"{avg_heart_rate:.1f} bpm",
+            fontsize=36, ha="center", va="center", fontweight="bold", color="red"
+        )
+        axes[1].text(
+            0.5, 0.4, f"for {min_steps} to {max_steps} steps",
+            fontsize=14, ha="center", va="center", fontweight="medium", color="black"
+        )
+
+    plt.tight_layout()
     plt.show()
