@@ -253,3 +253,20 @@ def get_hourly_steps():
 
     df = dataframe_from_cursor_contents()
     return df
+
+def get_daily_steps_and_average_heart_rate() -> pd.DataFrame:
+    query = """
+        SELECT average_heart_rate.UserId, average_heart_rate.Date, average_heart_rate.AverageHeartRate, daily_activity.TotalSteps
+        FROM daily_activity
+        INNER JOIN (
+            SELECT Id AS UserId, substr(Time, 1, instr(Time, ' ') - 1) AS Date, AVG(value) AS AverageHeartRate
+            FROM heart_rate
+            GROUP BY Id, substr(Time, 1, instr(Time, ' ') - 1)
+        ) average_heart_rate
+        ON
+            daily_activity.Id = average_heart_rate.UserId AND
+            daily_activity.ActivityDate = average_heart_rate.Date
+    """
+    cursor.execute(query)
+
+    return dataframe_from_cursor_contents()
