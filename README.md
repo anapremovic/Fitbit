@@ -63,6 +63,8 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 
 ### Part 4
 * Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
+* Visualize relationship between the number of steps in a day and the average daily heart rate.
+* Numerically see the average daily heart rate for a given step range.
 
 ## Contributors
 
