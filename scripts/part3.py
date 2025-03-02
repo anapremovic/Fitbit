@@ -16,7 +16,7 @@ def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
     verify_correctness(db.get_daily_steps(), db.get_hourly_steps())
     generate_sleep_data_over_time_line_plot(6962181067)
-    generate_sleep_min_to_active_min_regression(datetime.datetime(2016, 4, 1))
+    generate_sleep_min_to_active_min_regression()
     display_heart_rate_and_intensity(2022484408)
     display_heart_rate_and_intensity(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
     display_weather_correlation_for_chicago()
@@ -96,7 +96,7 @@ def generate_sleep_min_to_active_min_regression():
     plt.grid()
     plt.show()
 
-def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_date: datetime = None):
+def display_heart_rate_and_intensity(user_id: int, start_date: datetime = None, end_date: datetime = None):
     """
     Purpose: This function gets a given user's heart rate and hourly intensity, and plots it on a graph. The average heart rate and intensity are also shown
 
@@ -104,8 +104,8 @@ def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_d
     """
     
     # Connect to database
-    heart_rate_db = db.get_heart_rate(id)
-    hourly_intensity_db = db.get_intensity(id)
+    heart_rate_db = db.get_heart_rate(user_id)
+    hourly_intensity_db = db.get_intensity(user_id)
     
     # Convert Time to datetime with the correct format
     heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
@@ -223,7 +223,7 @@ def display_weather_correlation_for_chicago():
 def generate_sedentary_min_to_sleep_min_regression():
     """Analyses the relationship between the amount of sedentary activity and the
     sleep duration for all individuals by performing a linear regression on all
-    data with the sleep duration as response variable and the the sedentary activity 
+    data with the sleep duration as response variable and the sedentary activity
     as explanatory variables. """
 
     sedentary_sleep_data = db.get_sedentary_sleep_activity()
@@ -241,14 +241,14 @@ def generate_sedentary_min_to_sleep_min_regression():
     ax1.set_ylabel('Minutes Slept')
     ax1.legend()
 
-    # Visually verifty errors are normally distributed
+    # Visually verify errors are normally distributed
     residuals = least_squares_model.resid
     root_mse = np.sqrt(np.mean(residuals ** 2))
-    range = np.arange(-600, 600, 5)
-    norm_pdf = sp.norm.pdf(range, loc=0, scale=root_mse)
+    residual_range = np.arange(-600, 600, 5)
+    norm_pdf = sp.norm.pdf(residual_range, loc=0, scale=root_mse)
     ax2.hist(residuals, bins=20, range=(-600, 600), 
              color='C0', density=True, label='Residuals')
-    ax2.plot(range, norm_pdf, color='C1', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
+    ax2.plot(residual_range, norm_pdf, color='C1', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
     ax2.set_title('Distribution of Residuals')
     ax2.set_xlabel('Residual')
     ax2.set_ylabel('Density')
