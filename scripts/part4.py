@@ -15,10 +15,10 @@ def compare_sleep_to_active_min_relationship_for_week_periods():
     weekdays = db.get_active_and_sleep_min("weekdays")
     weekends = db.get_active_and_sleep_min("weekends")
 
-    fig, axs = plt.subplots(1, 3, figsize=(24, 5))
-    plot_sleep_min_to_active_min(all_days, axs[0], "All Days")
-    plot_sleep_min_to_active_min(weekdays, axs[1], "Weekdays")
-    plot_sleep_min_to_active_min(weekends, axs[2], "Weekends")
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(24, 5))
+    plot_sleep_min_to_active_min(all_days, ax1, "All Days")
+    plot_sleep_min_to_active_min(weekdays, ax2, "Weekdays")
+    plot_sleep_min_to_active_min(weekends, ax3, "Weekends")
 
     plt.tight_layout()
     plt.show()
@@ -29,24 +29,24 @@ def plot_steps_to_heart_rate_and_avg_heart_rate(min_steps: int, max_steps: int):
     x, y, regression_line = fit_regression(daily_steps_and_average_heart_rate_by_user, "TotalSteps", "AverageHeartRate")
     avg_heart_rate = compute_avg_heart_rate(daily_steps_and_average_heart_rate_by_user, min_steps, max_steps)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-    axes[0].scatter(x, y, color="green", label="Observations")
-    axes[0].plot(x, regression_line, color="green", label="Regression Line")
-    axes[0].set_xlabel("Daily Steps")
-    axes[0].set_ylabel("Average Daily Heart Rate (bpm)")
-    axes[0].set_title("Daily Steps vs. Average Heart Rate")
-    axes[0].legend()
-    axes[0].grid()
+    ax1.scatter(x, y, color="green", label="Observations")
+    ax1.plot(x, regression_line, color="green", label="Regression Line")
+    ax1.set_xlabel("Daily Steps")
+    ax1.set_ylabel("Average Daily Heart Rate (bpm)")
+    ax1.set_title("Daily Steps vs. Average Heart Rate")
+    ax1.legend()
+    ax1.grid()
 
-    axes[1].axis("off")
+    ax2.axis("off")
     if not np.isnan(avg_heart_rate):
-        axes[1].set_title("Average Daily Heart Rate", fontsize=16, fontweight="bold", pad=20)
-        axes[1].text(
+        ax2.set_title("Average Daily Heart Rate", fontsize=16, fontweight="bold", pad=20)
+        ax2.text(
             0.5, 0.6, f"{avg_heart_rate:.1f} bpm",
             fontsize=36, ha="center", va="center", fontweight="bold", color="green"
         )
-        axes[1].text(
+        ax2.text(
             0.5, 0.4, f"for {min_steps} to {max_steps} steps",
             fontsize=14, ha="center", va="center", fontweight="medium", color="black"
         )
