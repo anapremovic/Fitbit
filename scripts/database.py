@@ -256,10 +256,17 @@ def get_hourly_steps():
 
 def get_daily_steps_and_average_heart_rate() -> pd.DataFrame:
     query = """
-        SELECT average_heart_rate.UserId, average_heart_rate.Date, average_heart_rate.AverageHeartRate, daily_activity.TotalSteps
+        SELECT 
+            average_heart_rate.UserId, 
+            average_heart_rate.Date, 
+            average_heart_rate.AverageHeartRate, 
+            daily_activity.TotalSteps
         FROM daily_activity
         INNER JOIN (
-            SELECT Id AS UserId, substr(Time, 1, instr(Time, ' ') - 1) AS Date, AVG(value) AS AverageHeartRate
+            SELECT 
+                Id AS UserId, 
+                substr(Time, 1, instr(Time, ' ') - 1) AS Date, 
+                AVG(value) AS AverageHeartRate
             FROM heart_rate
             GROUP BY Id, substr(Time, 1, instr(Time, ' ') - 1)
         ) average_heart_rate
