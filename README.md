@@ -55,10 +55,16 @@ TODO: Fill getting started section to tell user how to run scripts + use dashboa
 * View repository and README.
 
 ### Part 3
+* Verify correctness of hourly steps vs daily steps data.
 * Visualize sleep data over time for a user.
 * Visualize relationship between the amount of sleep and the number of active minutes the next day.
-* Displays 2 graphs to show a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity
-* Builds 4 graphs to display a correlation of the rate of activity between temperature, precipitation, total distance and calories burned
+* Visualize a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity.
+* Visualize the correlation of the rate of activity between temperature, precipitation, total distance and calories burned.
+
+### Part 4
+* Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
+* Visualize relationship between the number of steps in a day and the average daily heart rate.
+* Numerically see the average daily heart rate for a given step range.
 
 ## Contributors
 

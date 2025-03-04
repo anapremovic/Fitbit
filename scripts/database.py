@@ -1,7 +1,6 @@
 import sqlite3
 import os
 import pandas as pd
-import datetime as datetime
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/fitbit_database.db")
@@ -54,30 +53,37 @@ def get_daily_activity_for_chicago_comparison():
     cursor.execute(query)
     return dataframe_from_cursor_contents()
 
-def get_active_and_sleep_min_grouped_by_user(date: datetime) -> pd.DataFrame:
+def get_active_and_sleep_min(day_filter: str = "") -> pd.DataFrame:
     query = """
         SELECT 
             daily_activity.Id AS UserId,
-            ActivityDate AS Date,
+            daily_activity.ActivityDate AS Date,
             SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
             SUM(sleep_moments.SleepMin) AS TotalSleepMin
         FROM daily_activity
-        INNER JOIN (SELECT
-                        Id AS UserId, 
-                        MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
-                        COUNT(*) AS SleepMin
-                    FROM minute_sleep 
-                    GROUP BY logId) sleep_moments
-            ON
-                daily_activity.Id = sleep_moments.UserId AND
-                daily_activity.ActivityDate = sleep_moments.Date
-        WHERE daily_activity.ActivityDate = ?
-        GROUP BY daily_activity.Id;
-    """
-    date_str = convert_datetime_to_string(date)
-    cursor.execute(query, (date_str,))
+        INNER JOIN (
+            SELECT
+                Id AS UserId, 
+                MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
+                COUNT(*) AS SleepMin
+            FROM minute_sleep
+            GROUP BY logId
+        ) sleep_moments
+        ON
+            daily_activity.Id = sleep_moments.UserId 
+            AND daily_activity.ActivityDate = sleep_moments.Date
+        GROUP BY daily_activity.Id, daily_activity.ActivityDate
+        """
 
+    cursor.execute(query)
     df = dataframe_from_cursor_contents()
+    df["Date"] = pd.to_datetime(df["Date"])
+
+    if day_filter == "weekdays":
+        return df[df["Date"].dt.weekday < 5]
+    elif day_filter == "weekends":
+        return df[df["Date"].dt.weekday >= 5]
+
     return df
 
 def get_sedentary_sleep_activity():
@@ -221,12 +227,6 @@ def get_daily_sleep_distribution() -> pd.DataFrame:
 
     df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
     return df.sort_values('HourGroup')
-
-def convert_datetime_to_string(date: datetime) -> str:
-    if os.name == "nt":  # Windows
-        return date.strftime("%#m/%#d/%Y")
-    else:  # macOS/Linux
-        return date.strftime("%-m/%-d/%Y")
     
 def get_daily_steps():
     query = """
@@ -253,3 +253,27 @@ def get_hourly_steps():
 
     df = dataframe_from_cursor_contents()
     return df
+
+def get_daily_steps_and_average_heart_rate() -> pd.DataFrame:
+    query = """
+        SELECT 
+            average_heart_rate.UserId, 
+            average_heart_rate.Date, 
+            average_heart_rate.AverageHeartRate, 
+            daily_activity.TotalSteps
+        FROM daily_activity
+        INNER JOIN (
+            SELECT 
+                Id AS UserId, 
+                substr(Time, 1, instr(Time, ' ') - 1) AS Date, 
+                AVG(value) AS AverageHeartRate
+            FROM heart_rate
+            GROUP BY Id, substr(Time, 1, instr(Time, ' ') - 1)
+        ) average_heart_rate
+        ON
+            daily_activity.Id = average_heart_rate.UserId AND
+            daily_activity.ActivityDate = average_heart_rate.Date
+    """
+    cursor.execute(query)
+
+    return dataframe_from_cursor_contents()

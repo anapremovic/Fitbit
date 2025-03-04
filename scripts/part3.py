@@ -1,6 +1,5 @@
 import database as db
 import numpy as np
-import pandas as pd
 import datetime as datetime
 import seaborn as sns
 import scipy.stats as sp
@@ -13,12 +12,11 @@ import os
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 file_location = os.path.join(project_root, "data/chicago_data.csv")
 
-
 def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
     verify_correctness(db.get_daily_steps(), db.get_hourly_steps())
     generate_sleep_data_over_time_line_plot(6962181067)
-    generate_active_min_to_sleep_min_regression(datetime.datetime(2016, 4, 1))
+    generate_sleep_min_to_active_min_regression()
     display_heart_rate_and_intensity(2022484408)
     display_heart_rate_and_intensity(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
     display_weather_correlation_for_chicago()
@@ -26,24 +24,6 @@ def execute_part_3():
     generate_daily_step_distribution_barplot()
     generate_daily_calorie_distribution_barplot()
     generate_daily_sleep_distribution_barplot()
-
-def generate_sleep_data_over_time_line_plot(user_id: float):
-    """Generates a line plot which visualizes sleep data over time for a given user."""
-    sleep_moments_for_user = db.get_sleep_moments(user_id)
-    if sleep_moments_for_user.empty:
-        print(f"No sleep data found for User {user_id}.")
-        return
-
-    plt.figure(figsize=(10, 5))
-    sns.lineplot(x=sleep_moments_for_user["Date"], y=sleep_moments_for_user["SleepMin"], marker="o", color="b")
-    plt.title(f"Sleep Over Time for User {user_id}", fontsize=14)
-    plt.xlabel("Date", fontsize=12)
-    plt.ylabel("Minutes Slept", fontsize=12)
-    plt.xticks(rotation=45, ha='right')
-    plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both', nbins=6))
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
 
 def verify_correctness(daily_data: pd.DataFrame, hourly_data: pd.DataFrame):
     daily_data_2 = hourly_data.groupby(['Id', 'ActivityDate'], as_index=False).sum()
@@ -92,31 +72,31 @@ def generate_sleep_data_over_time_line_plot(user_id: float):
     plt.tight_layout()
     plt.show()
 
-def generate_active_min_to_sleep_min_regression(date: datetime):
-    """Generates a regression that shows how sleep minutes relate to active minutes for all users on a given day."""
+def generate_sleep_min_to_active_min_regression():
+    """Generates a regression that shows how sleep minutes relate to active minutes for all users and days."""
 
-    active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min_grouped_by_user(date)
+    active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min()
     if active_and_sleep_min_grouped_by_user.empty:
-        print(f"No activity and/or sleep data on {date.date()}.")
+        print("No activity and/or sleep data available.")
         return
 
-    x = active_and_sleep_min_grouped_by_user.loc[:, ['TotalSleepMin']].values
-    y = active_and_sleep_min_grouped_by_user.loc[:, 'TotalActiveMin'].values
+    x = active_and_sleep_min_grouped_by_user.loc[:, ["TotalSleepMin"]].values
+    y = active_and_sleep_min_grouped_by_user.loc[:, "TotalActiveMin"].values
     model = sk.LinearRegression()
     model.fit(x, y)
     regression_line = model.predict(x)
 
     plt.figure(figsize=(8, 5))
-    plt.scatter(x, y, color='green', label='Observations')
-    plt.plot(x, regression_line, color='green', label=f'Regression Line')
+    plt.scatter(x, y, color="green", label="Observations")
+    plt.plot(x, regression_line, color="green", label="Regression Line")
     plt.xlabel("Sleep Minutes")
     plt.ylabel("Active Minutes")
-    plt.title(f"Regression of Sleep Minutes to Active Minutes on {date.date()}")
+    plt.title("Regression of Sleep Minutes to Active Minutes")
     plt.legend()
     plt.grid()
     plt.show()
 
-def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_date: datetime = None):
+def display_heart_rate_and_intensity(user_id: int, start_date: datetime = None, end_date: datetime = None):
     """
     Purpose: This function gets a given user's heart rate and hourly intensity, and plots it on a graph. The average heart rate and intensity are also shown
 
@@ -124,8 +104,8 @@ def display_heart_rate_and_intensity(id: int, start_date: datetime = None, end_d
     """
     
     # Connect to database
-    heart_rate_db = db.get_heart_rate(id)
-    hourly_intensity_db = db.get_intensity(id)
+    heart_rate_db = db.get_heart_rate(user_id)
+    hourly_intensity_db = db.get_intensity(user_id)
     
     # Convert Time to datetime with the correct format
     heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
@@ -243,7 +223,7 @@ def display_weather_correlation_for_chicago():
 def generate_sedentary_min_to_sleep_min_regression():
     """Analyses the relationship between the amount of sedentary activity and the
     sleep duration for all individuals by performing a linear regression on all
-    data with the sleep duration as response variable and the the sedentary activity 
+    data with the sleep duration as response variable and the sedentary activity
     as explanatory variables. """
 
     sedentary_sleep_data = db.get_sedentary_sleep_activity()
@@ -261,14 +241,14 @@ def generate_sedentary_min_to_sleep_min_regression():
     ax1.set_ylabel('Minutes Slept')
     ax1.legend()
 
-    # Visually verifty errors are normally distributed
+    # Visually verify errors are normally distributed
     residuals = least_squares_model.resid
     root_mse = np.sqrt(np.mean(residuals ** 2))
-    range = np.arange(-600, 600, 5)
-    norm_pdf = sp.norm.pdf(range, loc=0, scale=root_mse)
+    residual_range = np.arange(-600, 600, 5)
+    norm_pdf = sp.norm.pdf(residual_range, loc=0, scale=root_mse)
     ax2.hist(residuals, bins=20, range=(-600, 600), 
              color='C0', density=True, label='Residuals')
-    ax2.plot(range, norm_pdf, color='C1', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
+    ax2.plot(residual_range, norm_pdf, color='C1', label=r'$\mathcal{N}(0, \sqrt{MSE})$')
     ax2.set_title('Distribution of Residuals')
     ax2.set_xlabel('Residual')
     ax2.set_ylabel('Density')
