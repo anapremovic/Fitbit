@@ -77,7 +77,7 @@ def generate_sleep_min_to_active_min_regression():
 
     active_and_sleep_min_grouped_by_user = db.get_active_and_sleep_min()
     if active_and_sleep_min_grouped_by_user.empty:
-        print(f"No activity and/or sleep data available.")
+        print("No activity and/or sleep data available.")
         return
 
     x = active_and_sleep_min_grouped_by_user.loc[:, ["TotalSleepMin"]].values
@@ -91,7 +91,7 @@ def generate_sleep_min_to_active_min_regression():
     plt.plot(x, regression_line, color="green", label="Regression Line")
     plt.xlabel("Sleep Minutes")
     plt.ylabel("Active Minutes")
-    plt.title(f"Regression of Sleep Minutes to Active Minutes")
+    plt.title("Regression of Sleep Minutes to Active Minutes")
     plt.legend()
     plt.grid()
     plt.show()
