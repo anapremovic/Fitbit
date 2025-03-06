@@ -7,10 +7,6 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 import sklearn.linear_model as sk
 import pandas as pd
-import os
-
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-file_location = os.path.join(project_root, "data/chicago_data.csv")
 
 def execute_part_3():
     """Generate all visualizations for part 3 of the project."""
