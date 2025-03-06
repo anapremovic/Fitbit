@@ -1,4 +1,5 @@
-import database as db
+from scripts import database as db
+
 import matplotlib.pyplot as plt
 import sklearn.linear_model as sk
 import pandas as pd
