@@ -10,9 +10,10 @@ import pandas as pd
 from scripts.database import FitbitDatabase
 
 class Part3:
-    def __init__(self, db: FitbitDatabase, project_root: str):
+    def __init__(self, db: FitbitDatabase, weather_csv: str):
         self.db = db
-        self.project_root = project_root # Temporary, until we make csv database file
+        self.chicago_data = pd.read_csv(weather_csv)
+        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
     def execute_part_3(self):
         """Generate all visualizations for part 3 of the project."""
@@ -182,14 +183,8 @@ class Part3:
             Calories=("Calories", "sum")
         ).reset_index()
 
-        # Load Chicago weather data
-        # If we reuse this code it might be better to put these lines in database.py (along with the other merging and grouping)
-        weather_file = f"{self.project_root}/data/chicago_data.csv"
-        chicago_data = pd.read_csv(weather_file)
-        chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
-
         # Merge Fitbit and weather data
-        merged_data = activity_agg.merge(chicago_data, left_on="ActivityDate", right_on="datetime").loc[:, ["TotalDistance", "Calories", "temp", "precip"]]
+        merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime").loc[:, ["TotalDistance", "Calories", "temp", "precip"]]
 
         # Compute Correlations
         corr_temp_distance = merged_data["TotalDistance"].corr(merged_data["temp"])

@@ -8,9 +8,8 @@ import seaborn as sns
 import os
 
 class Part1:
-    def __init__(self, project_root: str):
-        csv_location = os.path.join(project_root, "data/daily_activity.csv")
-        self.data = pd.read_csv(csv_location)
+    def __init__(self, activity_csv: str):
+        self.data = pd.read_csv(activity_csv)
 
     def execute_part_1(self):
         """Generate all visualizations for part 1 of the project."""
