@@ -17,6 +17,9 @@ fitbit_database = FitbitDatabase(db_location)
 
 part1 = p1.Part1(project_root)
 part1.execute_part_1()
+
 part3 = p3.Part3(fitbit_database, project_root=project_root)
 part3.execute_part_3()
-#p4.execute_part_4()
+
+part4 = p4.Part4(fitbit_database)
+part4.execute_part_4()
