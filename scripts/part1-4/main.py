@@ -10,7 +10,12 @@ sys.path.append(project_root)
 import part1 as p1
 import part3 as p3
 import part4 as p4
+from scripts.database import FitbitDatabase
+
+db_location = os.path.join(project_root, "data/fitbit_database.db")
+fitbit_database = FitbitDatabase(db_location)
 
 #p1.execute_part_1()
-#p3.execute_part_3()
+part3 = p3.Part3(fitbit_database, project_root=project_root)
+part3.execute_part_3()
 #p4.execute_part_4()
