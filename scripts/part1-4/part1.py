@@ -9,7 +9,7 @@ import os
 
 def execute_part_1():
     """Generate all visualizations for part 1 of the project."""
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     file_location = os.path.join(project_root, "data/daily_activity.csv")
     daily_activity = pd.read_csv(file_location)
 
