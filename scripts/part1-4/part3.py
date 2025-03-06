@@ -1,4 +1,5 @@
-import database as db
+from scripts import database as db
+
 import numpy as np
 import datetime as datetime
 import seaborn as sns
@@ -174,7 +175,9 @@ def display_weather_correlation_for_chicago():
     ).reset_index()
 
     # Load Chicago weather data
-    chicago_data = pd.read_csv(file_location)
+    # If we reuse this code it might be better to put these lines in database.py (along with the other merging and grouping)
+    weather_file = "data/chicago_data.csv"
+    chicago_data = pd.read_csv(weather_file)
     chicago_data["datetime"] = pd.to_datetime(chicago_data["datetime"])
 
     # Merge Fitbit and weather data
