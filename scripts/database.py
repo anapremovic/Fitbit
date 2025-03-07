@@ -2,277 +2,283 @@ import sqlite3
 import os
 import pandas as pd
 
-db_location = "data/fitbit_database.db"
-connection = sqlite3.connect(db_location)
-cursor = connection.cursor()
+class FitbitDatabase:
+    def __init__(self, db_location):
+        self.connection = sqlite3.connect(db_location)
+        self.cursor = self.connection.cursor()
 
-def dataframe_from_cursor_contents():
-    """After a query has been executed, this function may be called to obtain a
-    DataFrame with named columns from the current contents of the cursor."""
+    def dataframe_from_query(self, query, parameters = ()):
+        """Executes query and returns DataFrame with named columns"""
 
-    rows = cursor.fetchall()
-    return pd.DataFrame(rows, columns = [x[0] for x in cursor.description])
+        self.cursor.execute(query, parameters)
+        rows = self.cursor.fetchall()
+        return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
 
-def get_sleep_moments(user_id: float) -> pd.DataFrame:
-    query = """
-        SELECT 
-            Id AS UserId, 
-            MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
-            COUNT(*) AS SleepMin 
-        FROM minute_sleep 
-        WHERE Id = ?
-        GROUP BY logId
-        ORDER BY Date;
-    """
-
-    cursor.execute(query, (user_id,))
-    df = dataframe_from_cursor_contents()
-    df["Date"] = pd.to_datetime(df["Date"])
-    return df
-
-def get_heart_rate(user_id: int):
-    query = "SELECT * FROM heart_rate WHERE Id = ?"
-    cursor.execute(query, (user_id,))
-    return dataframe_from_cursor_contents()
-
-def get_intensity(user_id: int):
-    query = "SELECT * FROM hourly_intensity WHERE Id = ?"
-    cursor.execute(query, (user_id,))
-    return dataframe_from_cursor_contents()
-
-def get_daily_activity_for_chicago_comparison():
-    query = """
-        SELECT
-            Id,
-            ActivityDate,
-            TotalDistance,
-            Calories
-        FROM daily_activity
-    """
-    cursor.execute(query)
-    return dataframe_from_cursor_contents()
-
-def get_active_and_sleep_min(day_filter: str = "") -> pd.DataFrame:
-    query = """
-        SELECT 
-            daily_activity.Id AS UserId,
-            daily_activity.ActivityDate AS Date,
-            SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
-            SUM(sleep_moments.SleepMin) AS TotalSleepMin
-        FROM daily_activity
-        INNER JOIN (
-            SELECT
-                Id AS UserId, 
-                MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
-                COUNT(*) AS SleepMin
-            FROM minute_sleep
-            GROUP BY logId
-        ) sleep_moments
-        ON
-            daily_activity.Id = sleep_moments.UserId 
-            AND daily_activity.ActivityDate = sleep_moments.Date
-        GROUP BY daily_activity.Id, daily_activity.ActivityDate
-        """
-
-    cursor.execute(query)
-    df = dataframe_from_cursor_contents()
-    df["Date"] = pd.to_datetime(df["Date"])
-
-    if day_filter == "weekdays":
-        return df[df["Date"].dt.weekday < 5]
-    elif day_filter == "weekends":
-        return df[df["Date"].dt.weekday >= 5]
-
-    return df
-
-def get_sedentary_sleep_activity():
-    query = """
-        SELECT 
-            minute_sleep.Id,
-            COUNT(*) AS MinutesSlept,
-            ActivityDate AS Date, 
-            SedentaryMinutes
-        FROM minute_sleep 
-        INNER JOIN daily_activity 
-            ON
-                daily_activity.Id = minute_sleep.Id AND
-                daily_activity.ActivityDate = substr(minute_sleep.date, 1, instr(minute_sleep.date, ' ') - 1)
-        GROUP BY logId
-    """
-    cursor.execute(query)
-
-    df = dataframe_from_cursor_contents()
-    df['Id'] = df['Id'].astype(int)
-    return df
-
-def get_daily_step_distribution() -> pd.DataFrame:
-    """Groups the hourly_steps table into 4-hour blocks and returns 
-    the average amount of steps taken during each block"""
-
-    query = """
-        WITH transformed AS (
-            SELECT
-                *,
-                CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
-            FROM hourly_steps
-        )
-        SELECT 
-            4 * AVG(StepTotal) AS AverageSteps,
-            CASE 
-                WHEN ActivityHour LIKE '%AM%'
-                    THEN CASE 
-                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
-                    END
-                WHEN ActivityHour LIKE '%PM%'
-                    THEN CASE
-                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
-                    END
-                ELSE 'N/A'
-            END AS HourGroup
-        FROM transformed
-        GROUP BY HourGroup;
-    """
-    cursor.execute(query)
-
-    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-    df = dataframe_from_cursor_contents()
-    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-    return df.sort_values('HourGroup')
-
-def get_daily_calorie_distribution() -> pd.DataFrame:
-    """Groups the hourly_calories table into 4-hour blocks and returns 
-    the average amount of calories burnt during each block"""
-
-    query = """
-        WITH transformed AS (
-            SELECT
-                *,
-                CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
-            FROM hourly_calories
-        )
-        SELECT 
-            4 * AVG(Calories) AS AverageCalories,
-            CASE 
-                WHEN ActivityHour LIKE '%AM%'
-                    THEN CASE 
-                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
-                    END
-                WHEN ActivityHour LIKE '%PM%'
-                    THEN CASE
-                        WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
-                    END
-                ELSE 'N/A'
-            END AS HourGroup
-        FROM transformed
-        GROUP BY HourGroup;
-    """
-    cursor.execute(query)
-
-    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-    df = dataframe_from_cursor_contents()
-    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-    return df.sort_values('HourGroup')
-
-def get_daily_sleep_distribution() -> pd.DataFrame:
-    """Groups the minute_sleep table into 4-hour blocks and returns 
-    the average amount of minutes slept during each block. Here, we
-    take 'average' to mean the total number of minutes slept in an hour
-    block divided by the total number of distinct sleep sessions recorded.
-    """
-
-    query = """
-        WITH transformed AS (
-            SELECT
-                *,
-                CAST(substr(date, instr(date, ' ') + 1, instr(date, ':') - (instr(date, ' ') + 1)) AS INTEGER) AS Hour
-            FROM minute_sleep
-        )
-        SELECT 
-            COUNT(*) AS TotalMinutesSlept,
-            CASE 
-                WHEN date LIKE '%AM%'
-                    THEN CASE 
-                        WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '0-4'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
-                    END
-                WHEN date LIKE '%PM%'
-                    THEN CASE
-                        WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12-16'
-                        WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                        WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
-                    END
-                ELSE 'N/A'
-            END AS HourGroup
-        FROM transformed
-        GROUP BY HourGroup;
-    """
-    cursor.execute(query)
-
-    hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-    df = dataframe_from_cursor_contents()
-    df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-
-    cursor.execute('SELECT COUNT(DISTINCT logId) AS NumDistinctSleepSessions FROM minute_sleep')
-    num_distinct_sleep_sessions = dataframe_from_cursor_contents().at[0, 'NumDistinctSleepSessions']
-
-    df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
-    return df.sort_values('HourGroup')
-    
-def get_daily_steps():
-    query = """
-        SELECT 
-            Id, 
-            ActivityDate, 
-            TotalSteps 
-        FROM daily_activity
-    """
-    cursor.execute(query)
-
-    df = dataframe_from_cursor_contents()
-    return df
-
-def get_hourly_steps():
-    query = """
-        SELECT 
-            Id, 
-            substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS ActivityDate, 
-            StepTotal AS TotalSteps 
-        FROM hourly_steps
-    """
-    cursor.execute(query)
-
-    df = dataframe_from_cursor_contents()
-    return df
-
-def get_daily_steps_and_average_heart_rate() -> pd.DataFrame:
-    query = """
-        SELECT 
-            average_heart_rate.UserId, 
-            average_heart_rate.Date, 
-            average_heart_rate.AverageHeartRate, 
-            daily_activity.TotalSteps
-        FROM daily_activity
-        INNER JOIN (
+    def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
+        query = """
             SELECT 
                 Id AS UserId, 
-                substr(Time, 1, instr(Time, ' ') - 1) AS Date, 
-                AVG(value) AS AverageHeartRate
-            FROM heart_rate
-            GROUP BY Id, substr(Time, 1, instr(Time, ' ') - 1)
-        ) average_heart_rate
-        ON
-            daily_activity.Id = average_heart_rate.UserId AND
-            daily_activity.ActivityDate = average_heart_rate.Date
-    """
-    cursor.execute(query)
+                MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
+                COUNT(*) AS SleepMin 
+            FROM minute_sleep 
+            WHERE Id = ?
+            GROUP BY logId
+            ORDER BY Date;
+        """
 
-    return dataframe_from_cursor_contents()
+        df = self.dataframe_from_query(query, (user_id,))
+        df["Date"] = pd.to_datetime(df["Date"])
+        return df
+
+    def get_heart_rate(self, user_id: int):
+        query = """
+            SELECT 
+                * 
+            FROM heart_rate 
+            WHERE Id = ?
+        """
+
+        return self.dataframe_from_query(query, (user_id,))
+
+    def get_intensity(self, user_id: int):
+        query = """
+            SELECT 
+                * 
+            FROM hourly_intensity 
+            WHERE Id = ?
+        """
+
+        return self.dataframe_from_query(query, (user_id,))
+
+    def get_daily_activity_for_chicago_comparison(self):
+        query = """
+            SELECT
+                Id,
+                ActivityDate,
+                TotalDistance,
+                Calories
+            FROM daily_activity
+        """
+
+        return self.dataframe_from_query(query)
+
+    def get_active_and_sleep_min(self, day_filter: str = "") -> pd.DataFrame:
+        query = """
+            SELECT 
+                daily_activity.Id AS UserId,
+                daily_activity.ActivityDate AS Date,
+                SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
+                SUM(sleep_moments.SleepMin) AS TotalSleepMin
+            FROM daily_activity
+            INNER JOIN (
+                SELECT
+                    Id AS UserId, 
+                    MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date,
+                    COUNT(*) AS SleepMin
+                FROM minute_sleep
+                GROUP BY logId
+            ) sleep_moments
+            ON
+                daily_activity.Id = sleep_moments.UserId 
+                AND daily_activity.ActivityDate = sleep_moments.Date
+            GROUP BY daily_activity.Id, daily_activity.ActivityDate
+        """
+
+        df = self.dataframe_from_query(query)
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        if day_filter == "weekdays":
+            return df[df["Date"].dt.weekday < 5]
+        elif day_filter == "weekends":
+            return df[df["Date"].dt.weekday >= 5]
+
+        return df
+
+    def get_sedentary_sleep_activity(self):
+        query = """
+            SELECT 
+                minute_sleep.Id,
+                COUNT(*) AS MinutesSlept,
+                ActivityDate AS Date, 
+                SedentaryMinutes
+            FROM minute_sleep 
+            INNER JOIN daily_activity 
+                ON
+                    daily_activity.Id = minute_sleep.Id AND
+                    daily_activity.ActivityDate = substr(minute_sleep.date, 1, instr(minute_sleep.date, ' ') - 1)
+            GROUP BY logId
+        """
+        
+        df = self.dataframe_from_query(query)
+        df['Id'] = df['Id'].astype(int)
+        return df
+
+    def get_daily_step_distribution(self) -> pd.DataFrame:
+        """Groups the hourly_steps table into 4-hour blocks and returns 
+        the average amount of steps taken during each block"""
+
+        query = """
+            WITH transformed AS (
+                SELECT
+                    *,
+                    CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
+                FROM hourly_steps
+            )
+            SELECT 
+                4 * AVG(StepTotal) AS AverageSteps,
+                CASE 
+                    WHEN ActivityHour LIKE '%AM%'
+                        THEN CASE 
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                        END
+                    WHEN ActivityHour LIKE '%PM%'
+                        THEN CASE
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                        END
+                    ELSE 'N/A'
+                END AS HourGroup
+            FROM transformed
+            GROUP BY HourGroup;
+        """
+        
+        df = self.dataframe_from_query(query)
+        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+        return df.sort_values('HourGroup')
+
+    def get_daily_calorie_distribution(self) -> pd.DataFrame:
+        """Groups the hourly_calories table into 4-hour blocks and returns 
+        the average amount of calories burnt during each block"""
+
+        query = """
+            WITH transformed AS (
+                SELECT
+                    *,
+                    CAST(substr(ActivityHour, instr(ActivityHour, ' ') + 1, instr(ActivityHour, ':') - (instr(ActivityHour, ' ') + 1)) AS INTEGER) AS Hour
+                FROM hourly_calories
+            )
+            SELECT 
+                4 * AVG(Calories) AS AverageCalories,
+                CASE 
+                    WHEN ActivityHour LIKE '%AM%'
+                        THEN CASE 
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                        END
+                    WHEN ActivityHour LIKE '%PM%'
+                        THEN CASE
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                        END
+                    ELSE 'N/A'
+                END AS HourGroup
+            FROM transformed
+            GROUP BY HourGroup;
+        """
+
+        df = self.dataframe_from_query(query)
+        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+        return df.sort_values('HourGroup')
+
+    def get_daily_sleep_distribution(self) -> pd.DataFrame:
+        """Groups the minute_sleep table into 4-hour blocks and returns 
+        the average amount of minutes slept during each block. Here, we
+        take 'average' to mean the total number of minutes slept in an hour
+        block divided by the total number of distinct sleep sessions recorded.
+        """
+
+        query = """
+            WITH transformed AS (
+                SELECT
+                    *,
+                    CAST(substr(date, instr(date, ' ') + 1, instr(date, ':') - (instr(date, ' ') + 1)) AS INTEGER) AS Hour
+                FROM minute_sleep
+            )
+            SELECT 
+                COUNT(*) AS TotalMinutesSlept,
+                CASE 
+                    WHEN date LIKE '%AM%'
+                        THEN CASE 
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '0-4'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                        END
+                    WHEN date LIKE '%PM%'
+                        THEN CASE
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12-16'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                        END
+                    ELSE 'N/A'
+                END AS HourGroup
+            FROM transformed
+            GROUP BY HourGroup;
+        """
+
+        df = self.dataframe_from_query(query)
+        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
+        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
+
+        query  = """
+            SELECT
+                COUNT(DISTINCT logId) AS NumDistinctSleepSessions 
+            FROM minute_sleep
+        """
+
+        df2 = self.dataframe_from_query(query)
+        num_distinct_sleep_sessions = df2.at[0, 'NumDistinctSleepSessions']
+
+        df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
+        return df.sort_values('HourGroup')
+        
+    def get_daily_steps(self):
+        query = """
+            SELECT 
+                Id, 
+                ActivityDate, 
+                TotalSteps 
+            FROM daily_activity
+        """
+        
+        return self.dataframe_from_query(query)
+
+    def get_hourly_steps(self):
+        query = """
+            SELECT 
+                Id, 
+                substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS ActivityDate, 
+                StepTotal AS TotalSteps 
+            FROM hourly_steps
+        """
+        
+        return self.dataframe_from_query(query)
+
+    def get_daily_steps_and_average_heart_rate(self) -> pd.DataFrame:
+        query = """
+            SELECT 
+                average_heart_rate.UserId, 
+                average_heart_rate.Date, 
+                average_heart_rate.AverageHeartRate, 
+                daily_activity.TotalSteps
+            FROM daily_activity
+            INNER JOIN (
+                SELECT 
+                    Id AS UserId, 
+                    substr(Time, 1, instr(Time, ' ') - 1) AS Date, 
+                    AVG(value) AS AverageHeartRate
+                FROM heart_rate
+                GROUP BY Id, substr(Time, 1, instr(Time, ' ') - 1)
+            ) average_heart_rate
+            ON
+                daily_activity.Id = average_heart_rate.UserId AND
+                daily_activity.ActivityDate = average_heart_rate.Date
+        """
+
+        return self.dataframe_from_query(query)
