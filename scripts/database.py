@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 import pandas as pd
 
 class FitbitDatabase:
@@ -16,14 +17,28 @@ class FitbitDatabase:
     def get_unique_user_ids(self):
         query = "SELECT DISTINCT Id FROM daily_activity"
         return self.dataframe_from_query(query)
+    
+    @staticmethod
+    def get_date_range(df: pd.DataFrame, start_date: datetime, end_date: datetime, column_name: str) -> pd.DataFrame:
+        """Helper function to set default start and end dates."""
+        if start_date is None:
+            start_date = df[column_name].min()
+        if end_date is None:
+            end_date = df[column_name].max()
 
-    def get_data_for_given_user_id(self, user_id: int) -> pd.DataFrame:
+        return df[(df[column_name] >= start_date) & (df[column_name] <= end_date)]
+
+    def get_data_for_given_user_id(self, user_id: int, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
         query = "SELECT * FROM daily_activity WHERE Id = ?"
         df = self.dataframe_from_query(query, (user_id,))
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["ActivityDate"] = pd.to_datetime(df["ActivityDate"])
+        
+        # Use helper function to get the date range
+        df = self.get_date_range(df, start_date, end_date, "ActivityDate")
+        
         return df
 
-    def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
+    def get_sleep_moments(self, user_id: float, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
         query = """
             SELECT 
                 Id AS UserId, 
@@ -37,27 +52,41 @@ class FitbitDatabase:
 
         df = self.dataframe_from_query(query, (user_id,))
         df["Date"] = pd.to_datetime(df["Date"])
+        
+        # Use helper function to get the date range
+        df = self.get_date_range(df, start_date, end_date, "Date")
+
         return df
 
-    def get_heart_rate(self, user_id: int):
+    def get_heart_rate(self, user_id: int, start_date: datetime = None, end_date: datetime = None):
         query = """
             SELECT 
                 * 
             FROM heart_rate 
             WHERE Id = ?
         """
+        heart_rate_db = self.dataframe_from_query(query, (user_id,))
+        
+        # Convert Time to datetime with the correct format
+        heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
 
-        return self.dataframe_from_query(query, (user_id,))
+        # Use helper function to get the date range
+        heart_rate_db = self.get_date_range(heart_rate_db, start_date, end_date, "Time")
 
-    def get_intensity(self, user_id: int):
+        return heart_rate_db
+
+    def get_intensity(self, user_id: int, start_date: datetime = None, end_date: datetime = None):
         query = """
             SELECT 
                 * 
             FROM hourly_intensity 
             WHERE Id = ?
         """
+        hourly_intensity_db = self.dataframe_from_query(query, (user_id,))
+        hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
+        hourly_intensity_db = self.get_date_range(hourly_intensity_db, start_date, end_date, "ActivityHour")
 
-        return self.dataframe_from_query(query, (user_id,))
+        return hourly_intensity_db
 
     def get_daily_activity_for_chicago_comparison(self):
         query = """
