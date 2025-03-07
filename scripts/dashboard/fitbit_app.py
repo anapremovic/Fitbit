@@ -24,17 +24,12 @@ def get_fitbit_db_instance() -> FitbitDatabase:
     db_location = os.path.join(project_root, "data/fitbit_database.db")
     return FitbitDatabase(db_location)
 
-st.session_state["fitbit_db"] = get_fitbit_db_instance()
-
-@st.cache_data
-def get_all_user_ids() -> tuple[str]:
-    fitbit_db: FitbitDatabase = st.session_state["fitbit_db"]
-    users = fitbit_db.get_all_user_ids()
-    return tuple(users.loc[:, "Id"])
+fitbit_db = get_fitbit_db_instance()
+st.session_state["fitbit_db"] = fitbit_db
 
 st.sidebar.selectbox(
         "User ID",
-        ("All",) +  get_all_user_ids(),
+        ("All",) + fitbit_db.user_ids,
         key = "selected_user"
     )
 
