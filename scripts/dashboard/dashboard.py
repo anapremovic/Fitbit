@@ -15,6 +15,7 @@ project_root = os.path.dirname(
 sys.path.append(project_root)
 # ----------
 from scripts.database import FitbitDatabase as db
+from scripts.dashboard import components as ct
 
 db_location = os.path.join(project_root, "data/fitbit_database.db")
 fitbit_database = db(db_location)

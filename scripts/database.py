@@ -13,6 +13,10 @@ class FitbitDatabase:
         self.cursor.execute(query, parameters)
         rows = self.cursor.fetchall()
         return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
+
+    def get_unique_user_ids(self):
+        query = "SELECT DISTINCT Id FROM daily_activity"
+        return self.dataframe_from_query(query)
     
     @staticmethod
     def get_date_range(df: pd.DataFrame, start_date: datetime, end_date: datetime, column_name: str) -> pd.DataFrame:
@@ -32,17 +36,6 @@ class FitbitDatabase:
         # Use helper function to get the date range
         df = self.get_date_range(df, start_date, end_date, "ActivityDate")
         
-        return df
-
-    def get_all_user_ids(self):
-        query = """
-            SELECT
-                DISTINCT Id
-            FROM daily_activity
-        """
-
-        df = self.dataframe_from_query(query)
-        df["Id"] = df["Id"].astype(int)
         return df
 
     def get_sleep_moments(self, user_id: float, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
