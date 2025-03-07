@@ -28,7 +28,7 @@ st.session_state["fitbit_db"] = get_fitbit_db_instance()
 
 @st.cache_data
 def get_all_user_ids() -> tuple[str]:
-    fitbit_db: FitbitDatabase = st.session_state[""]
+    fitbit_db: FitbitDatabase = st.session_state["fitbit_db"]
     users = fitbit_db.get_all_user_ids()
     return tuple(users.loc[:, "Id"])
 
