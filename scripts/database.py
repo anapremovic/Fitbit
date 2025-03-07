@@ -26,7 +26,7 @@ class FitbitDatabase:
         if end_date is None:
             end_date = df[column_name].max()
 
-        return df[(df[column_name] >= start_date) & (df[column_name] <= end_date)]
+        return df[(df.loc[:, column_name] >= start_date) & (df.loc[:, column_name] <= end_date)]
 
     def get_data_for_given_user_id(self, user_id: int, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
         query = "SELECT * FROM daily_activity WHERE Id = ?"
