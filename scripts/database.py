@@ -1,11 +1,14 @@
 import sqlite3
-import datetime
 import pandas as pd
+import datetime as dt
 
 class FitbitDatabase:
     def __init__(self, db_location):
         self.connection = sqlite3.connect(db_location)
         self.cursor = self.connection.cursor()
+
+        self.user_ids = self._get_all_user_ids()
+        self.first_date, self.last_date = self._get_date_range()
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
@@ -13,32 +16,41 @@ class FitbitDatabase:
         self.cursor.execute(query, parameters)
         rows = self.cursor.fetchall()
         return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
-
-    def get_unique_user_ids(self):
-        query = "SELECT DISTINCT Id FROM daily_activity"
-        return self.dataframe_from_query(query)
     
-    @staticmethod
-    def get_date_range(df: pd.DataFrame, start_date: datetime, end_date: datetime, column_name: str) -> pd.DataFrame:
-        """Helper function to set default start and end dates."""
-        if start_date is None:
-            start_date = df[column_name].min()
-        if end_date is None:
-            end_date = df[column_name].max()
+    def _get_all_user_ids(self):
+        """Since the result from this function is pretty widely useable, we run it in just once in 
+        self.__init__ and store the result in self.user_ids for further reference"""
 
-        return df[(df.loc[:, column_name] >= start_date) & (df.loc[:, column_name] <= end_date)]
+        query = """
+            SELECT
+                DISTINCT Id
+            FROM daily_activity
+        """
 
-    def get_data_for_given_user_id(self, user_id: int, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
-        query = "SELECT * FROM daily_activity WHERE Id = ?"
-        df = self.dataframe_from_query(query, (user_id,))
-        df["ActivityDate"] = pd.to_datetime(df["ActivityDate"])
-        
-        # Use helper function to get the date range
-        df = self.get_date_range(df, start_date, end_date, "ActivityDate")
-        
-        return df
+        df = self.dataframe_from_query(query)
+        df["Id"] = df["Id"].astype(int)
+        return tuple(df.loc[:, "Id"])
 
-    def get_sleep_moments(self, user_id: float, start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
+    
+    def _get_date_range(self) -> tuple[ dt.datetime ]:
+        """Since the result from this function is pretty widely useable, we run it in just once in 
+        self.__init__ and store the result in self.date_range for further reference"""
+
+        """Should only be run once on init, then stored in self.date_range"""
+        query = """
+            SELECT
+                DISTINCT ActivityDate AS Date
+            FROM daily_activity
+        """
+
+        df = self.dataframe_from_query(query)
+        df["Date"] = pd.to_datetime(df["Date"])
+        min_date = df.loc[:, "Date"].min().to_pydatetime()
+        max_date = df.loc[:, "Date"].max().to_pydatetime()
+        return (min_date, max_date)
+
+
+    def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
         query = """
             SELECT 
                 Id AS UserId, 
@@ -52,41 +64,27 @@ class FitbitDatabase:
 
         df = self.dataframe_from_query(query, (user_id,))
         df["Date"] = pd.to_datetime(df["Date"])
-        
-        # Use helper function to get the date range
-        df = self.get_date_range(df, start_date, end_date, "Date")
-
         return df
 
-    def get_heart_rate(self, user_id: int, start_date: datetime = None, end_date: datetime = None):
+    def get_heart_rate(self, user_id: int):
         query = """
             SELECT 
                 * 
             FROM heart_rate 
             WHERE Id = ?
         """
-        heart_rate_db = self.dataframe_from_query(query, (user_id,))
-        
-        # Convert Time to datetime with the correct format
-        heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
 
-        # Use helper function to get the date range
-        heart_rate_db = self.get_date_range(heart_rate_db, start_date, end_date, "Time")
+        return self.dataframe_from_query(query, (user_id,))
 
-        return heart_rate_db
-
-    def get_intensity(self, user_id: int, start_date: datetime = None, end_date: datetime = None):
+    def get_intensity(self, user_id: int):
         query = """
             SELECT 
                 * 
             FROM hourly_intensity 
             WHERE Id = ?
         """
-        hourly_intensity_db = self.dataframe_from_query(query, (user_id,))
-        hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
-        hourly_intensity_db = self.get_date_range(hourly_intensity_db, start_date, end_date, "ActivityHour")
 
-        return hourly_intensity_db
+        return self.dataframe_from_query(query, (user_id,))
 
     def get_daily_activity_for_chicago_comparison(self):
         query = """

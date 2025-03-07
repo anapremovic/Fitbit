@@ -59,10 +59,10 @@ class Part3:
         print('Conflicts found for the following users and dates:')
         print(conflicting_data)
 
-    def generate_sleep_data_over_time_line_plot(self, user_id: float, start_date: datetime = None, end_date: datetime = None):
+    def generate_sleep_data_over_time_line_plot(self, user_id: float):
         """Generates a line plot which visualizes sleep data over time for a given user."""
 
-        sleep_moments_for_user = self.db.get_sleep_moments(user_id, start_date, end_date)
+        sleep_moments_for_user = self.db.get_sleep_moments(user_id)
         if sleep_moments_for_user.empty:
             print(f"No sleep data found for User {user_id}.")
             return
@@ -112,6 +112,10 @@ class Part3:
         # Connect to database
         heart_rate_db = self.db.get_heart_rate(user_id)
         hourly_intensity_db = self.db.get_intensity(user_id)
+        
+        # Convert Time to datetime with the correct format
+        heart_rate_db["Time"] = pd.to_datetime(heart_rate_db["Time"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
+        hourly_intensity_db["ActivityHour"] = pd.to_datetime(hourly_intensity_db["ActivityHour"], format="%m/%d/%Y %I:%M:%S %p", errors="coerce")
 
         # Set default time ranges if None
         if start_date is None: start_date = heart_rate_db["Time"].min()
