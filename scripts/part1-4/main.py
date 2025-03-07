@@ -1,5 +1,5 @@
 # ----------
-# Add project root to PATH to simplify relative imports
+# Ensures that all Python files can be imported from any location
 import sys
 import os
 

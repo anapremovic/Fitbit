@@ -5,7 +5,6 @@ import matplotlib.dates as mdates
 import statsmodels.formula.api as smf
 import datetime as datetime
 import seaborn as sns
-import os
 
 class Part1:
     def __init__(self, activity_csv: str):
