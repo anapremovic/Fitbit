@@ -13,6 +13,16 @@ class FitbitDatabase:
         rows = self.cursor.fetchall()
         return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
 
+    def get_unique_user_ids(self):
+        query = "SELECT DISTINCT Id FROM daily_activity"
+        return self.dataframe_from_query(query)
+
+    def get_data_for_given_user_id(self, user_id: int) -> pd.DataFrame:
+        query = "SELECT * FROM daily_activity WHERE Id = ?"
+        df = self.dataframe_from_query(query, (user_id,))
+        df["Date"] = pd.to_datetime(df["Date"])
+        return df
+
     def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
         query = """
             SELECT 

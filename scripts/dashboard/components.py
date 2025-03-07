@@ -1,13 +1,20 @@
 import streamlit as st
-from ...scripts import database as db
-import os
-import sys
+from scripts.database import FitbitDatabase
+import pandas as pd
 
-# project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# file_location = os.path.join(project_root, "database.py") # CHANGE LATER
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) 
-sys.path.append(project_root)
+class DashboardComponents:
+	"""
+	Purpose: Parts of our dashboard that are repeated
+	"""
+	def __init__(self, db: FitbitDatabase):
+		self.db = db
 
-def user_id_sidebar():
-	print(db.get_unique_user_ids())
-	# return st.sidebar.selectbox("Users", options=["a", "b"])
+	def user_id_sidebar(self):
+		df_ids = self.db.get_unique_user_ids()
+
+		selected_user = st.sidebar.selectbox(
+			"Select a user:",
+			df_ids.to_numpy().flatten()  # Convert to a 1D array
+		)
+
+		return selected_user  # Return the selected user
