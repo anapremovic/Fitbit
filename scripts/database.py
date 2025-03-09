@@ -4,11 +4,26 @@ import datetime as dt
 
 class FitbitDatabase:
     def __init__(self, db_location):
-        self.connection = sqlite3.connect(db_location)
+        self.db_location = db_location
+        self.connection = sqlite3.connect(db_location, check_same_thread=False)  # Disable thread safety check
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
         self.first_date, self.last_date = self._get_date_range()
+        self.chosen_start, self.chosen_end = None, None
+        self.start, self.end = self._get_date_range(self.chosen_start, self.chosen_end)
+
+    def refresh_connection(self):
+        """Close and re-open the database connection."""
+        self.connection.close()  # Close the current connection
+        self.connection = sqlite3.connect(self.db_location, check_same_thread=False)  # Open a fresh connection
+        self.cursor = self.connection.cursor()
+
+    def update_dates(self, start, end):
+        self.chosen_start = start
+        self.chosen_end = end
+        self.start, self.end = self._get_date_range(start, end)
+        self.refresh_connection()  # Refresh connection to reload data within new date range
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
@@ -31,24 +46,21 @@ class FitbitDatabase:
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
-    
-    def _get_date_range(self) -> tuple[ dt.datetime ]:
+    def _get_date_range(self, start_date: dt.datetime = None, end_date: dt.datetime = None) -> tuple[dt.datetime, dt.datetime]:
         """Since the result from this function is pretty widely useable, we run it in just once in 
         self.__init__ and store the result in self.date_range for further reference"""
 
-        """Should only be run once on init, then stored in self.date_range"""
         query = """
-            SELECT
-                DISTINCT ActivityDate AS Date
+            SELECT DISTINCT ActivityDate AS Date
             FROM daily_activity
         """
-
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
-        min_date = df.loc[:, "Date"].min().to_pydatetime()
-        max_date = df.loc[:, "Date"].max().to_pydatetime()
-        return (min_date, max_date)
 
+        min_date = df["Date"].min().to_pydatetime() if start_date is None else start_date
+        max_date = df["Date"].max().to_pydatetime() if end_date is None else end_date
+
+        return (min_date, max_date)
 
     def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
         query = """

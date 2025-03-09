@@ -16,7 +16,7 @@ def get_fitbit_db_instance() -> FitbitDatabase:
     """Creates an instance of FitbitDatabase and, with that, establishes a connection
     to fitbit_database.db. The result should be saved to st.session_state so that 
     other pages can easily access this same instance.
-     
+
     The decorator @st.cache_resource ensures the result is cached, so that this code is 
     only run once on startup.
     """
@@ -29,29 +29,43 @@ st.session_state["fitbit_db"] = fitbit_db
 
 st.sidebar.header("Filters")
 
-st.sidebar.selectbox(
+selected_user = st.sidebar.selectbox(
     "User ID", 
     key="selected_user", 
     options=("All",) + fitbit_db.user_ids
 )
+
+# Un-comment this to see the corresponding user's id on the dashboard
+# if selected_user:
+#     st.write(selected_user)
 
 left, right = st.sidebar.columns(2)
 with left: 
     start_date = st.date_input(
         "Start date", 
         key="selected-start-date", 
-        value=fitbit_db.first_date, 
+        value=fitbit_db.start, 
         min_value=fitbit_db.first_date, 
-        max_value=fitbit_db.last_date,
+        max_value=fitbit_db.end,
     )
 with right:
     end_date = st.date_input(
         "End date", 
         key="selected-end-date", 
-        value=fitbit_db.last_date, 
-        min_value=fitbit_db.first_date, 
+        value=fitbit_db.end, 
+        min_value=fitbit_db.chosen_start, 
         max_value=fitbit_db.last_date
     )
+
+# After calling update_dates, the connection will be refreshed
+fitbit_db.update_dates(start=start_date, end=end_date)
+fitbit_db.chosen_start = start_date
+fitbit_db.chosen_end = end_date
+
+# Invalidate cache if needed
+if start_date != fitbit_db.chosen_start or end_date != fitbit_db.chosen_end:
+    st.cache_resource.clear()  # Clear the cache to ensure fresh instance
+    fitbit_db.update_dates(start=start_date, end=end_date)
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
