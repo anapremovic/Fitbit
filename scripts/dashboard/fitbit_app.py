@@ -29,16 +29,29 @@ st.session_state["fitbit_db"] = fitbit_db
 
 st.sidebar.header("Filters")
 
-st.sidebar.selectbox("User ID", key="selected_user", options=("All",) + fitbit_db.user_ids)
+st.sidebar.selectbox(
+    "User ID", 
+    key="selected_user", 
+    options=("All",) + fitbit_db.user_ids
+)
 
 left, right = st.sidebar.columns(2)
 with left: 
-    start_date = st.date_input("Start date", key="selected-start-date", value=fitbit_db.first_date, 
-                               min_value=fitbit_db.first_date, max_value=fitbit_db.last_date,
+    start_date = st.date_input(
+        "Start date", 
+        key="selected-start-date", 
+        value=fitbit_db.first_date, 
+        min_value=fitbit_db.first_date, 
+        max_value=fitbit_db.last_date,
     )
 with right:
-    end_date = st.date_input("End date", key="selected-end-date", value=fitbit_db.last_date, 
-                             min_value=fitbit_db.first_date, max_value=fitbit_db.last_date)
+    end_date = st.date_input(
+        "End date", 
+        key="selected-end-date", 
+        value=fitbit_db.last_date, 
+        min_value=fitbit_db.first_date, 
+        max_value=fitbit_db.last_date
+    )
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
