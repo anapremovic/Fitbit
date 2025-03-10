@@ -9,21 +9,14 @@ class FitbitDatabase:
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
-        self.first_date, self.last_date = self._get_date_range()
-        self.chosen_start, self.chosen_end = None, None
-        self.start, self.end = self._get_date_range(self.chosen_start, self.chosen_end)
+        self.first_date, self.last_date = self._get_date_range() # Absolute max and min of our DB's data range
+        self.chosen_start, self.chosen_end = self._get_date_range(None, None) # User chooses the start and end dates they want to display
 
     def refresh_connection(self):
         """Close and re-open the database connection."""
-        self.connection.close()  # Close the current connection
-        self.connection = sqlite3.connect(self.db_location, check_same_thread=False)  # Open a fresh connection
-        self.cursor = self.connection.cursor()
-
-    def update_dates(self, start, end):
-        self.chosen_start = start
-        self.chosen_end = end
-        self.start, self.end = self._get_date_range(start, end)
-        self.refresh_connection()  # Refresh connection to reload data within new date range
+        # self.connection.close()  # Close the current connection
+        # self.connection = sqlite3.connect(self.db_location, check_same_thread=False)  # Open a fresh connection
+        # self.cursor = self.connection.cursor()
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
