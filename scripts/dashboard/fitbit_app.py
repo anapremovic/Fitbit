@@ -42,23 +42,20 @@ selected_user = st.sidebar.selectbox(
 left, right = st.sidebar.columns(2)
 with left: 
     start_date = st.date_input(
-        "Start date", 
-        key="selected-start-date", 
-        value=fitbit_db.chosen_start, 
-        min_value=fitbit_db.first_date, 
-        max_value=fitbit_db.chosen_end,
+        "Start date",
+        key="selected-start-date",
+        value=st.session_state.get("selected-start-date", fitbit_db.first_date),
+        min_value=fitbit_db.first_date,
+        max_value=st.session_state.get("selected-end-date", fitbit_db.last_date),
     )
 with right:
     end_date = st.date_input(
-        "End date", 
+        "End date",
         key="selected-end-date", 
-        value=fitbit_db.chosen_end, 
-        min_value=fitbit_db.chosen_start, 
+        value=st.session_state.get("selected-end-date", fitbit_db.last_date),
+        min_value=st.session_state.get("selected-start-date", fitbit_db.first_date),
         max_value=fitbit_db.last_date
     )
-
-fitbit_db.chosen_start = start_date
-fitbit_db.chosen_end = end_date
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
