@@ -5,7 +5,7 @@ import datetime as dt
 class FitbitDatabase:
     def __init__(self, db_location):
         self.db_location = db_location
-        self.connection = sqlite3.connect(db_location)
+        self.connection = sqlite3.connect(db_location, check_same_thread = False)
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
