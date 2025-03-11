@@ -9,14 +9,7 @@ class FitbitDatabase:
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
-        self.first_date, self.last_date = self._get_date_range() # Absolute max and min of our DB's data range
-        self.chosen_start, self.chosen_end = self._get_date_range(None, None) # User chooses the start and end dates they want to display
-
-    def refresh_connection(self):
-        """Close and re-open the database connection."""
-        # self.connection.close()  # Close the current connection
-        # self.connection = sqlite3.connect(self.db_location, check_same_thread=False)  # Open a fresh connection
-        # self.cursor = self.connection.cursor()
+        self.first_date, self.last_date = self._get_date_range() # Min and max of our DB's data range
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
@@ -39,7 +32,7 @@ class FitbitDatabase:
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
-    def _get_date_range(self, start_date: dt.datetime = None, end_date: dt.datetime = None) -> tuple[dt.datetime, dt.datetime]:
+    def _get_date_range(self) -> tuple[dt.datetime, dt.datetime]:
         """Since the result from this function is pretty widely useable, we run it in just once in 
         self.__init__ and store the result in self.date_range for further reference"""
 
@@ -50,10 +43,10 @@ class FitbitDatabase:
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
-        min_date = df["Date"].min().to_pydatetime() if start_date is None else start_date
-        max_date = df["Date"].max().to_pydatetime() if end_date is None else end_date
+        first_date = df["Date"].min().to_pydatetime()
+        last_date = df["Date"].max().to_pydatetime()
 
-        return (min_date, max_date)
+        return (first_date, last_date)
 
     def get_sleep_moments(self, user_id: float = None) -> pd.DataFrame:
         query = """

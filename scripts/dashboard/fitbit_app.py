@@ -41,31 +41,23 @@ selected_user = st.sidebar.selectbox(
     on_change=update_selected_user
 )
 
-
-# Un-comment this to see the corresponding user's id on the dashboard
-# if selected_user:
-#     st.write(selected_user)
-
 left, right = st.sidebar.columns(2)
 with left: 
     start_date = st.date_input(
-        "Start date", 
-        key="selected-start-date", 
-        value=fitbit_db.chosen_start, 
-        min_value=fitbit_db.first_date, 
-        max_value=fitbit_db.chosen_end,
+        "Start date",
+        key="selected-start-date",
+        value=st.session_state.get("selected-start-date", fitbit_db.first_date),
+        min_value=fitbit_db.first_date,
+        max_value=st.session_state.get("selected-end-date", fitbit_db.last_date),
     )
 with right:
     end_date = st.date_input(
-        "End date", 
+        "End date",
         key="selected-end-date", 
-        value=fitbit_db.chosen_end, 
-        min_value=fitbit_db.chosen_start, 
+        value=st.session_state.get("selected-end-date", fitbit_db.last_date),
+        min_value=st.session_state.get("selected-start-date", fitbit_db.first_date),
         max_value=fitbit_db.last_date
     )
-
-fitbit_db.chosen_start = start_date
-fitbit_db.chosen_end = end_date
 
 sleep_moments = fitbit_db.get_sleep_moments(st.session_state["selected_user"])
 print(sleep_moments)
