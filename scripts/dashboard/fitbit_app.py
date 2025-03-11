@@ -35,10 +35,6 @@ selected_user = st.sidebar.selectbox(
     options=("All",) + fitbit_db.user_ids
 )
 
-# Un-comment this to see the corresponding user's id on the dashboard
-# if selected_user:
-#     st.write(selected_user)
-
 left, right = st.sidebar.columns(2)
 with left: 
     start_date = st.date_input(

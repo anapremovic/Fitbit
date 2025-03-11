@@ -43,10 +43,10 @@ class FitbitDatabase:
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
-        min_date = df["Date"].min().to_pydatetime()
-        max_date = df["Date"].max().to_pydatetime()
+        first_date = df["Date"].min().to_pydatetime()
+        last_date = df["Date"].max().to_pydatetime()
 
-        return (min_date, max_date)
+        return (first_date, last_date)
 
     def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
         query = """
