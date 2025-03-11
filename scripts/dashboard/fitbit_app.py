@@ -60,11 +60,6 @@ with right:
 fitbit_db.chosen_start = start_date
 fitbit_db.chosen_end = end_date
 
-# # Invalidate cache if needed
-# if start_date != fitbit_db.chosen_start or end_date != fitbit_db.chosen_end:
-#     st.cache_resource.clear()  # Clear the cache to ensure fresh instance
-#     fitbit_db.update_dates(start=start_date, end=end_date)
-
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
 health_page = st.Page("health_page.py", title="Health", icon="❤️")
