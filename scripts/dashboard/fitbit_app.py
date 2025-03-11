@@ -16,7 +16,7 @@ def get_fitbit_db_instance() -> FitbitDatabase:
     """Creates an instance of FitbitDatabase and, with that, establishes a connection
     to fitbit_database.db. The result should be saved to st.session_state so that 
     other pages can easily access this same instance.
-     
+
     The decorator @st.cache_resource ensures the result is cached, so that this code is 
     only run once on startup.
     """
@@ -29,27 +29,27 @@ st.session_state["fitbit_db"] = fitbit_db
 
 st.sidebar.header("Filters")
 
-st.sidebar.selectbox(
-    "User ID", 
-    key="selected_user", 
+selected_user = st.sidebar.selectbox(
+    "User ID",
+    key="selected_user",
     options=("All",) + fitbit_db.user_ids
 )
 
 left, right = st.sidebar.columns(2)
 with left: 
     start_date = st.date_input(
-        "Start date", 
-        key="selected-start-date", 
-        value=fitbit_db.first_date, 
-        min_value=fitbit_db.first_date, 
-        max_value=fitbit_db.last_date,
+        "Start date",
+        key="selected-start-date",
+        value=st.session_state.get("selected-start-date", fitbit_db.first_date),
+        min_value=fitbit_db.first_date,
+        max_value=st.session_state.get("selected-end-date", fitbit_db.last_date),
     )
 with right:
     end_date = st.date_input(
-        "End date", 
+        "End date",
         key="selected-end-date", 
-        value=fitbit_db.last_date, 
-        min_value=fitbit_db.first_date, 
+        value=st.session_state.get("selected-end-date", fitbit_db.last_date),
+        min_value=st.session_state.get("selected-start-date", fitbit_db.first_date),
         max_value=fitbit_db.last_date
     )
 

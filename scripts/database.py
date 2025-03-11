@@ -4,11 +4,12 @@ import datetime as dt
 
 class FitbitDatabase:
     def __init__(self, db_location):
+        self.db_location = db_location
         self.connection = sqlite3.connect(db_location)
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
-        self.first_date, self.last_date = self._get_date_range()
+        self.first_date, self.last_date = self._get_date_range() # Min and max of our DB's data range
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
@@ -31,24 +32,21 @@ class FitbitDatabase:
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
-    
-    def _get_date_range(self) -> tuple[ dt.datetime ]:
+    def _get_date_range(self) -> tuple[dt.datetime, dt.datetime]:
         """Since the result from this function is pretty widely useable, we run it in just once in 
         self.__init__ and store the result in self.date_range for further reference"""
 
-        """Should only be run once on init, then stored in self.date_range"""
         query = """
-            SELECT
-                DISTINCT ActivityDate AS Date
+            SELECT DISTINCT ActivityDate AS Date
             FROM daily_activity
         """
-
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
-        min_date = df.loc[:, "Date"].min().to_pydatetime()
-        max_date = df.loc[:, "Date"].max().to_pydatetime()
-        return (min_date, max_date)
 
+        first_date = df["Date"].min().to_pydatetime()
+        last_date = df["Date"].max().to_pydatetime()
+
+        return (first_date, last_date)
 
     def get_sleep_moments(self, user_id: float) -> pd.DataFrame:
         query = """
