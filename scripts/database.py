@@ -53,7 +53,7 @@ class FitbitDatabase:
             SELECT 
                 Id AS UserId, 
                 MAX(SUBSTR(date, 1, INSTR(date, ' ') - 1)) AS Date, 
-                COUNT(*) AS SleepMin 
+                COUNT(*) / 60.0 AS SleepHours 
             FROM minute_sleep 
             GROUP BY logId
         """
