@@ -48,7 +48,7 @@ class FitbitDatabase:
 
         return (first_date, last_date)
 
-    def get_sleep_moments(self, user_id: float = None) -> pd.DataFrame:
+    def get_sleep_moments(self) -> pd.DataFrame:
         query = """
             SELECT 
                 Id AS UserId, 
@@ -56,15 +56,10 @@ class FitbitDatabase:
                 COUNT(*) AS SleepMin 
             FROM minute_sleep 
             GROUP BY logId
-            ORDER BY Date;
         """
 
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
-
-        if user_id is not None:
-            print("UserId: " + str(user_id))
-            df = df[df["UserId"] == user_id]
 
         return df
 

@@ -1,28 +1,35 @@
 import streamlit as st
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-from scripts.database import FitbitDatabase
+class HealthDiagrams:
+    def __init__(self):
+        self.fitbit_db = st.session_state["fitbit_db"]
 
-fitbit_db: FitbitDatabase = st.session_state["fitbit_db"]
+    def sleep_quantity_over_time(self, user_id):
+        """Returns a Matplotlib figure for the number of hours slept each day."""
+        sleep_moments = self.fitbit_db.get_sleep_moments()
+
+        if user_id == "All":
+            sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep minutes
+            title = "Sleep Quantity Over Time For All Users"
+            y_label = "Average Hours Slept"
+        else:
+            sleep_moments = sleep_moments[sleep_moments.loc[:, "UserId"] == user_id] # Filter by user
+            title = f"Sleep Quantity Over Time For User {user_id}"
+            y_label = "Hours Slept"
 
 
+        if sleep_moments.empty:
+            return None
 
-"""
-    def generate_sleep_data_over_time_line_plot(self, user_id: float):
-        Generates a line plot which visualizes sleep data over time for a given user.
-
-        sleep_moments_for_user = self.db.get_sleep_moments(user_id)
-        if sleep_moments_for_user.empty:
-            print(f"No sleep data found for User {user_id}.")
-            return
-
-        plt.figure(figsize=(10, 5))
-        sns.lineplot(x=sleep_moments_for_user["Date"], y=sleep_moments_for_user["SleepMin"], marker="o", color="b")
-        plt.title(f"Sleep Over Time for User {user_id}", fontsize=14)
+        fig = plt.figure(figsize=(10, 5))
+        sns.lineplot(x=sleep_moments["Date"], y=sleep_moments["SleepHours"], marker="o", color="b")
+        plt.title(title, fontsize=14)
         plt.xlabel("Date", fontsize=12)
-        plt.ylabel("Minutes Slept", fontsize=12)
+        plt.ylabel(y_label, fontsize=12)
         plt.xticks(rotation=45, ha='right')
         plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both', nbins=6))
         plt.grid(True)
         plt.tight_layout()
-        plt.show()
-"""
+        return fig
