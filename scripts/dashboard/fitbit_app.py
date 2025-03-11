@@ -26,14 +26,21 @@ def get_fitbit_db_instance() -> FitbitDatabase:
 
 fitbit_db = get_fitbit_db_instance()
 st.session_state["fitbit_db"] = fitbit_db
+st.session_state["selected_user"] = None
 
 st.sidebar.header("Filters")
+
+def update_selected_user():
+    if st.session_state["selected_user"] == "All":
+        st.session_state["selected_user"] = None
 
 selected_user = st.sidebar.selectbox(
     "User ID",
     key="selected_user",
-    options=("All",) + fitbit_db.user_ids
+    options=("All",) + fitbit_db.user_ids,
+    on_change=update_selected_user
 )
+
 
 # Un-comment this to see the corresponding user's id on the dashboard
 # if selected_user:
@@ -59,6 +66,10 @@ with right:
 
 fitbit_db.chosen_start = start_date
 fitbit_db.chosen_end = end_date
+
+sleep_moments = fitbit_db.get_sleep_moments(st.session_state["selected_user"])
+print(sleep_moments)
+st.write(sleep_moments)
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
