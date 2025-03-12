@@ -19,7 +19,7 @@ class FitbitDatabase:
         return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
     
     def _get_all_user_ids(self):
-        """Since the result from this function is pretty widely useable, we run it in just once in 
+        """Since the result from this function is pretty widely usable, we run it in just once in
         self.__init__ and store the result in self.user_ids for further reference"""
 
         query = """
@@ -33,7 +33,7 @@ class FitbitDatabase:
         return tuple(df.loc[:, "Id"])
 
     def _get_date_range(self) -> tuple[dt.datetime, dt.datetime]:
-        """Since the result from this function is pretty widely useable, we run it in just once in 
+        """Since the result from this function is pretty widely usable, we run it in just once in
         self.__init__ and store the result in self.date_range for further reference"""
 
         query = """
