@@ -1,12 +1,15 @@
 import sqlite3
 import pandas as pd
 import datetime as dt
+import streamlit as st
 
 class FitbitDatabase:
     def __init__(self, db_location):
         self.db_location = db_location
-        self.connection = sqlite3.connect(db_location, check_same_thread = False)
-        self.cursor = self.connection.cursor()
+        self.connection = st.connection("sqlite", type="sql", url=F"sqlite:///{db_location}")
+
+        cursor_connection = sqlite3.connect(db_location)
+        self.cursor = cursor_connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
         self.start_date, self.end_date = self._get_date_range() # Min and max of our DB's data range
@@ -17,7 +20,7 @@ class FitbitDatabase:
         self.cursor.execute(query, parameters)
         rows = self.cursor.fetchall()
         return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
-    
+
     def _get_all_user_ids(self):
         """Since the result from this function is pretty widely usable, we run it in just once in
         self.__init__ and store the result in self.user_ids for further reference"""
@@ -28,7 +31,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
@@ -40,7 +43,8 @@ class FitbitDatabase:
             SELECT DISTINCT ActivityDate AS Date
             FROM daily_activity
         """
-        df = self.dataframe_from_query(query)
+
+        df = self.connection.query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
         start_date = df["Date"].min().to_pydatetime()
@@ -58,7 +62,7 @@ class FitbitDatabase:
             GROUP BY logId
         """
 
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
         return df
