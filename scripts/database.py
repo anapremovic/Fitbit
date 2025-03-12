@@ -84,16 +84,12 @@ class FitbitDatabase:
 
         return self.dataframe_from_query(query, (user_id,))
 
-    def get_daily_activity_for_chicago_comparison(self):
+    def get_daily_activity(self):
         query = """
             SELECT
-                Id,
-                ActivityDate,
-                TotalDistance,
-                Calories
+                *
             FROM daily_activity
         """
-
         return self.dataframe_from_query(query)
 
     def get_active_and_sleep_min(self, day_filter: str = "") -> pd.DataFrame:

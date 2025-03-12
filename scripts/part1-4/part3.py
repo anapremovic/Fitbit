@@ -174,7 +174,7 @@ class Part3:
         Author: L.D. Lee
         """
         # Connect to database and load Fitbit data
-        daily_activity_db = self.db.get_daily_activity_for_chicago_comparison()
+        daily_activity_db = self.db.get_daily_activity()
         daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
 
         # Aggregate TotalDistance and Calories per day
