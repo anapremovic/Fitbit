@@ -1,4 +1,3 @@
-import sqlite3
 import pandas as pd
 import datetime as dt
 import streamlit as st
@@ -8,18 +7,8 @@ class FitbitDatabase:
         self.db_location = db_location
         self.connection = st.connection("sqlite", type="sql", url=F"sqlite:///{db_location}")
 
-        cursor_connection = sqlite3.connect(db_location)
-        self.cursor = cursor_connection.cursor()
-
         self.user_ids = self._get_all_user_ids()
         self.start_date, self.end_date = self._get_date_range() # Min and max of our DB's data range
-
-    def dataframe_from_query(self, query, parameters = ()):
-        """Executes query and returns DataFrame with named columns"""
-
-        self.cursor.execute(query, parameters)
-        rows = self.cursor.fetchall()
-        return pd.DataFrame(rows, columns = [x[0] for x in self.cursor.description])
 
     def _get_all_user_ids(self):
         """Since the result from this function is pretty widely usable, we run it in just once in
@@ -72,20 +61,20 @@ class FitbitDatabase:
             SELECT 
                 * 
             FROM heart_rate 
-            WHERE Id = ?
+            WHERE Id = :id
         """
 
-        return self.dataframe_from_query(query, (user_id,))
+        return self.connection.query(query, params={"id": user_id})
 
     def get_intensity(self, user_id: int):
         query = """
             SELECT 
                 * 
             FROM hourly_intensity 
-            WHERE Id = ?
+            WHERE Id = :id
         """
 
-        return self.dataframe_from_query(query, (user_id,))
+        return self.connection.query(query, params={"id": user_id})
 
     def get_daily_activity_for_chicago_comparison(self):
         query = """
@@ -97,7 +86,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        return self.dataframe_from_query(query)
+        return self.connection.query(query)
 
     def get_active_and_sleep_min(self, day_filter: str = "") -> pd.DataFrame:
         query = """
@@ -121,7 +110,7 @@ class FitbitDatabase:
             GROUP BY daily_activity.Id, daily_activity.ActivityDate
         """
 
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
         if day_filter == "weekdays":
@@ -146,7 +135,7 @@ class FitbitDatabase:
             GROUP BY logId
         """
         
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         df['Id'] = df['Id'].astype(int)
         return df
 
@@ -182,7 +171,7 @@ class FitbitDatabase:
             GROUP BY HourGroup;
         """
         
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
         df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
         return df.sort_values('HourGroup')
@@ -219,7 +208,7 @@ class FitbitDatabase:
             GROUP BY HourGroup;
         """
 
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
         df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
         return df.sort_values('HourGroup')
@@ -259,7 +248,7 @@ class FitbitDatabase:
             GROUP BY HourGroup;
         """
 
-        df = self.dataframe_from_query(query)
+        df = self.connection.query(query)
         hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
         df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
 
@@ -269,7 +258,7 @@ class FitbitDatabase:
             FROM minute_sleep
         """
 
-        df2 = self.dataframe_from_query(query)
+        df2 = self.connection.query(query)
         num_distinct_sleep_sessions = df2.at[0, 'NumDistinctSleepSessions']
 
         df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
@@ -284,7 +273,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
         
-        return self.dataframe_from_query(query)
+        return self.connection.query(query)
 
     def get_hourly_steps(self):
         query = """
@@ -295,7 +284,7 @@ class FitbitDatabase:
             FROM hourly_steps
         """
         
-        return self.dataframe_from_query(query)
+        return self.connection.query(query)
 
     def get_daily_steps_and_average_heart_rate(self) -> pd.DataFrame:
         query = """
@@ -318,4 +307,4 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        return self.dataframe_from_query(query)
+        return self.connection.query(query)
