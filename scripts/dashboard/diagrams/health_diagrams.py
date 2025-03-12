@@ -6,7 +6,7 @@ class HealthDiagrams:
     def __init__(self):
         self.fitbit_db = st.session_state["fitbit_db"]
 
-    def sleep_quantity_over_time(self, user_id):
+    def sleep_quantity_over_time(self, user_id) -> plt.Figure:
         """Returns a Matplotlib figure for the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
@@ -19,9 +19,8 @@ class HealthDiagrams:
             title = f"Sleep Quantity Over Time For User {user_id}"
             y_label = "Hours Slept"
 
-
         if sleep_moments.empty:
-            return None
+            return plt.figure()
 
         fig = plt.figure(figsize=(10, 5))
         sns.lineplot(x=sleep_moments["Date"], y=sleep_moments["SleepHours"], marker="o", color="b")
