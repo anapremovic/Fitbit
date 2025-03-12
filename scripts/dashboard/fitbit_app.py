@@ -31,7 +31,7 @@ st.sidebar.header("Filters")
 
 selected_user = st.sidebar.selectbox(
     "User ID",
-    key="selected_user",
+    key="selected-user",
     options=("All",) + fitbit_db.user_ids
 )
 

@@ -1,3 +1,4 @@
+import datetime as datetime
 import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -6,10 +7,14 @@ class HealthDiagrams:
     def __init__(self):
         self.fitbit_db = st.session_state["fitbit_db"]
 
-    def sleep_quantity_over_time(self, user_id) -> plt.Figure:
-        """Returns a Matplotlib figure for the number of hours slept each day."""
+    def sleep_quantity_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
+        """Returns a Matplotlib figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
+        # Filter Dates
+        sleep_moments = sleep_moments[(sleep_moments["Date"] >= first_date) & (sleep_moments["Date"] <= last_date)]
+
+        # Filter UserIds
         if user_id == "All":
             sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep minutes
             title = "Sleep Quantity Over Time For All Users"
