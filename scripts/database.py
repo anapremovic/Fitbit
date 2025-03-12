@@ -9,7 +9,7 @@ class FitbitDatabase:
         self.cursor = self.connection.cursor()
 
         self.user_ids = self._get_all_user_ids()
-        self.first_date, self.last_date = self._get_date_range() # Min and max of our DB's data range
+        self.start_date, self.end_date = self._get_date_range() # Min and max of our DB's data range
 
     def dataframe_from_query(self, query, parameters = ()):
         """Executes query and returns DataFrame with named columns"""
@@ -43,10 +43,10 @@ class FitbitDatabase:
         df = self.dataframe_from_query(query)
         df["Date"] = pd.to_datetime(df["Date"])
 
-        first_date = df["Date"].min().to_pydatetime()
-        last_date = df["Date"].max().to_pydatetime()
+        start_date = df["Date"].min().to_pydatetime()
+        end_date = df["Date"].max().to_pydatetime()
 
-        return first_date, last_date
+        return start_date, end_date
 
     def get_sleep_moments(self) -> pd.DataFrame:
         query = """
