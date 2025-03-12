@@ -8,5 +8,5 @@ user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
-fig = health_diagrams.sleep_quantity_over_time(user, start_date, end_date)
-st.pyplot(fig)
+sleep_quantity_over_time = health_diagrams.get_sleep_quantity_over_time(user, start_date, end_date)
+st.pyplot(sleep_quantity_over_time)

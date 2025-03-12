@@ -7,7 +7,7 @@ class HealthDiagrams:
     def __init__(self):
         self.fitbit_db = st.session_state["fitbit_db"]
 
-    def sleep_quantity_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
+    def get_sleep_quantity_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
         """Returns a Matplotlib figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
