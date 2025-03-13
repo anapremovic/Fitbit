@@ -24,31 +24,38 @@ def plot_distance_walked_density(data):
     plt.title("Density Plot of Walking Distances")
     return plt
 
-def plot_calories_burned(data, user_id: int, start_date: datetime = None, end_date: datetime = None):
-    """
-    Purpose: This function displays the calories burned for each day given a specific user's ID. 
-    Can also set a date range to see a snapshot of the results. Otherwise, the entire duration of calories burned is shown 
-    """
-    data_for_id = data.loc[data.loc[:, "Id"] == user_id ].copy()
-    data_for_id["datetime"] = pd.to_datetime(data_for_id.loc[:,"ActivityDate"], errors="coerce") # Create datetime column
-    # Set default time ranges
-    if start_date is None:
-        start_date = data_for_id["datetime"].min()
-    if end_date is None:
-        end_date = data_for_id["datetime"].max()
-    # Ensure data is in between start and end dates
-    data_for_id = data_for_id[
-        (data_for_id.loc[:,"datetime"] >= start_date) & 
-        (data_for_id.loc[:,"datetime"] <= end_date)
-    ]
+def plot_day_of_week_frequency(data):
+    """Create bar plot that displays the frequency of workouts per day of week"""
+    data["ActivityDate"] = pd.to_datetime(data.loc[:, "ActivityDate"])
+    day_of_week_counts = data.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
 
-    # Setup pyplot
-    plt.figure(figsize=(12, 8))
-    plt.plot(data_for_id["datetime"], data_for_id["Calories"], marker='o', linestyle="-")
-    plt.xlabel("Date of Activity")
-    plt.ylabel("Calories Burned")
-    plt.title(f"Calories Burned per Day for ID: {user_id}")
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator())  # set ticks for each day
+    plt.figure(figsize=(8, 5))
+    plt.bar(day_of_week_counts.index, day_of_week_counts.values, color="green")
+    plt.xticks(ticks=range(7), labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+    plt.ylabel("Frequency")
+    plt.title("Total Number of Workouts Per Day of Week")
+    return plt
 
-    plt.xticks(rotation = 30)
+def generate_steps_to_calories_regression(data, user_id: int):
+    """Create a regression to visualize the relationship between
+    the steps taken and the calories burned for a given user"""
+    user_entries = data.loc[data.loc[:, 'Id'] == user_id ]
+    user_steps = user_entries.loc[:, 'TotalSteps']
+    user_calories = user_entries.loc[:, 'Calories']
+
+    plt.scatter(user_steps, user_calories, color="green", label='Observations')
+
+    least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(Id)', data=data).fit()
+    base_intercept = least_squares_model.params["Intercept"]
+    steps_coef = least_squares_model.params["TotalSteps"]
+    user_coef = least_squares_model.params.get(f'C(Id)[T.{user_id}]', 0)
+
+    y_intercept = (0, base_intercept + user_coef)
+    plt.axline(y_intercept, slope=steps_coef, color="green", label='Regression line')
+
+    plt.title(f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}')
+    plt.xlabel('Total steps')
+    plt.ylabel('Calories burned')
+    plt.grid()
+    plt.legend()
     return plt

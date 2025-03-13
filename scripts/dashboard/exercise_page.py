@@ -14,12 +14,17 @@ end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
 st.title("Exercise")
 col1, col2 = st.columns(2)
+data = fitbit_db.get_daily_activity()
 with col1:
-    data = fitbit_db.get_daily_activity()
     if(user == "All"):
         st.pyplot(exercise_diagrams.plot_distance_walked_density(data))
     else:
-        st.pyplot(exercise_diagrams.plot_calories_burned(data, user, start_date, end_date))
+        st.pyplot(exercise_diagrams.generate_steps_to_calories_regression(data, user))
+
+with col2:
+    if(user == "All"):
+        st.pyplot(exercise_diagrams.plot_day_of_week_frequency(data))
+    
 
     
     
