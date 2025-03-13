@@ -31,7 +31,7 @@ st.sidebar.header("Filters")
 
 selected_user = st.sidebar.selectbox(
     "User ID",
-    key="selected_user",
+    key="selected-user",
     options=("All",) + fitbit_db.user_ids
 )
 
@@ -40,17 +40,17 @@ with left:
     start_date = st.date_input(
         "Start date",
         key="selected-start-date",
-        value=st.session_state.get("selected-start-date", fitbit_db.first_date),
-        min_value=fitbit_db.first_date,
-        max_value=st.session_state.get("selected-end-date", fitbit_db.last_date),
+        value=st.session_state.get("selected-start-date", fitbit_db.min_date),
+        min_value=fitbit_db.min_date,
+        max_value=st.session_state.get("selected-end-date", fitbit_db.max_date),
     )
 with right:
     end_date = st.date_input(
         "End date",
         key="selected-end-date", 
-        value=st.session_state.get("selected-end-date", fitbit_db.last_date),
-        min_value=st.session_state.get("selected-start-date", fitbit_db.first_date),
-        max_value=fitbit_db.last_date
+        value=st.session_state.get("selected-end-date", fitbit_db.max_date),
+        min_value=st.session_state.get("selected-start-date", fitbit_db.min_date),
+        max_value=fitbit_db.max_date
     )
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")

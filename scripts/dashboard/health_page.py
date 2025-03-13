@@ -1,5 +1,12 @@
 import streamlit as st
+import pandas as pd
 
-from scripts.database import FitbitDatabase
+from scripts.dashboard.diagrams.health_diagrams import HealthDiagrams
 
-fitbit_db: FitbitDatabase = st.session_state["fitbit_db"]
+health_diagrams = HealthDiagrams(st.session_state["fitbit_db"])
+user = st.session_state["selected-user"]
+start_date = pd.to_datetime(st.session_state["selected-start-date"])
+end_date = pd.to_datetime(st.session_state["selected-end-date"])
+
+sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, start_date, end_date)
+st.pyplot(sleep_duration_over_time)
