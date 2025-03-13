@@ -26,3 +26,27 @@ def plot_calories_burned(data, user_id: int, start_date: datetime = None, end_da
 
     plt.xticks(rotation = 30)
     return plt
+
+def plot_weight_change_vs_steps(weight_data, step_data, user_id: int):
+    """Generates a plot of weight change vs daily steps for a given user"""
+    weight_data = weight_data.loc[user_id, ['Weight']]
+    
+    # Reindex step_data to be by date for a particular user
+    step_data = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('ActivityDate').loc[:, ['TotalSteps']]
+
+    # Reindex weight_data to match step_data and forward-fill missing values
+    df = weight_data.reindex(step_data.index).ffill()
+
+    # Join TotalSteps from step_data to df
+    df = df.join(step_data, how='left')
+
+    
+    # Plot weight change vs. daily steps
+    plt.figure(figsize=(8, 5))
+    sns.scatterplot(x=df["TotalSteps"], y=df["Weight"], edgecolor='black')
+
+    plt.xlabel("Steps per Day")
+    plt.ylabel("Weight (kg)")
+    plt.title(f"Weight vs. Daily Steps for User {user_id}")
+    plt.grid(True)
+    return plt

@@ -312,3 +312,18 @@ class FitbitDatabase:
         """
 
         return self.dataframe_from_query(query)
+    
+    def collect_weight_data():
+        query = """SELECT 
+            Id,
+            substr(Date, 1, instr(Date, ' ') - 1) AS Date,
+            WeightKg AS Weight,
+            WeightPounds,
+            BMI
+        FROM weight_log"""
+        cursor.execute(query)
+        df = dataframe_from_cursor_contents()
+        df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
+        df = df.drop(columns=['WeightPounds'])
+        df = df.set_index(['Id', 'Date'])
+        return df
