@@ -7,7 +7,7 @@ class HealthDiagrams:
     def __init__(self):
         self.fitbit_db = st.session_state["fitbit_db"]
 
-    def get_sleep_quantity_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
+    def get_sleep_duration_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
         """Returns a Matplotlib figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
@@ -17,11 +17,11 @@ class HealthDiagrams:
         # Filter UserIds
         if user_id == "All":
             sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep minutes
-            title = "Sleep Quantity Over Time For All Users"
+            title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
             sleep_moments = sleep_moments[sleep_moments.loc[:, "UserId"] == user_id] # Filter by user
-            title = f"Sleep Quantity Over Time For User {user_id}"
+            title = f"Sleep Duration Over Time For User {user_id}"
             y_label = "Hours Slept"
 
         if sleep_moments.empty:
