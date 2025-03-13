@@ -3,7 +3,7 @@ import pandas as pd
 
 from scripts.dashboard.diagrams.health_diagrams import HealthDiagrams
 
-health_diagrams = HealthDiagrams()
+health_diagrams = HealthDiagrams(st.session_state["fitbit_db"])
 user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])

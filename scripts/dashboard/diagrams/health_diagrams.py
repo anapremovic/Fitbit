@@ -1,11 +1,12 @@
 import datetime as datetime
-import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from scripts.database import FitbitDatabase
+
 class HealthDiagrams:
-    def __init__(self):
-        self.fitbit_db = st.session_state["fitbit_db"]
+    def __init__(self, fitbit_db: FitbitDatabase):
+        self.fitbit_db = fitbit_db
 
     def get_sleep_duration_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
         """Returns a Matplotlib figure that visualizes the number of hours slept each day."""
