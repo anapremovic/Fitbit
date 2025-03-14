@@ -123,10 +123,10 @@ class FitbitDatabase:
     def get_sedentary_sleep_activity(self):
         query = """
             SELECT 
-                minute_sleep.Id,
-                COUNT(*) AS MinutesSlept,
+                minute_sleep.Id AS UserId,
+                COUNT(*) / 60.0 AS HoursSlept,
                 ActivityDate AS Date, 
-                SedentaryMinutes
+                SedentaryMinutes / 60.0 AS SedentaryHours
             FROM minute_sleep 
             INNER JOIN daily_activity 
                 ON
@@ -134,9 +134,10 @@ class FitbitDatabase:
                     daily_activity.ActivityDate = substr(minute_sleep.date, 1, instr(minute_sleep.date, ' ') - 1)
             GROUP BY logId
         """
-        
+
         df = self.connection.query(query)
-        df['Id'] = df['Id'].astype(int)
+        df["Date"] = pd.to_datetime(df["Date"])
+
         return df
 
     def get_daily_step_distribution(self) -> pd.DataFrame:
