@@ -7,13 +7,16 @@ from scripts.database import FitbitDatabase
 class HealthDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
-
-    def get_sleep_duration_over_time(self, user_id, first_date: datetime, last_date: datetime) -> go.Figure():
+        
+    def _filter_dates(self, df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+        return df[(df.loc[:, "Date"] >= start_date) & (df.loc[:, "Date"] <= end_date)]
+    
+    def get_sleep_duration_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
         # Filter Dates
-        sleep_moments = sleep_moments[(sleep_moments["Date"] >= first_date) & (sleep_moments["Date"] <= last_date)]
+        sleep_moments = self._filter_dates(sleep_moments, start_date, end_date)
 
         # Filter UserIds
         if user_id == "All":
