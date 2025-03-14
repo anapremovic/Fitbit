@@ -17,7 +17,7 @@ class HealthDiagrams:
 
         # Filter UserIds
         if user_id == "All":
-            sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep minutes
+            sleep_moments = sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep hours
             title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
