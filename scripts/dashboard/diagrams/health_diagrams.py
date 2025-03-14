@@ -1,6 +1,6 @@
 import datetime as datetime
-import seaborn as sns
-import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objects as go
 
 from scripts.database import FitbitDatabase
 
@@ -8,8 +8,8 @@ class HealthDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
 
-    def get_sleep_duration_over_time(self, user_id, first_date: datetime, last_date: datetime) -> plt.Figure:
-        """Returns a Matplotlib figure that visualizes the number of hours slept each day."""
+    def get_sleep_duration_over_time(self, user_id, first_date: datetime, last_date: datetime) -> go.Figure():
+        """Returns a Plotly figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
         # Filter Dates
@@ -26,15 +26,6 @@ class HealthDiagrams:
             y_label = "Hours Slept"
 
         if sleep_moments.empty:
-            return plt.figure()
+            return go.Figure()
 
-        fig = plt.figure(figsize=(10, 5))
-        sns.lineplot(x=sleep_moments["Date"], y=sleep_moments["SleepHours"], marker="o", color="b")
-        plt.title(title, fontsize=14)
-        plt.xlabel("Date", fontsize=12)
-        plt.ylabel(y_label, fontsize=12)
-        plt.xticks(rotation=45, ha='right')
-        plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both', nbins=6))
-        plt.grid(True)
-        plt.tight_layout()
-        return fig
+        return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
