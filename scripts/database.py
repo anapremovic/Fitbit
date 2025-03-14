@@ -229,7 +229,9 @@ class FitbitDatabase:
                 FROM minute_sleep
             )
             SELECT 
-                COUNT(*) AS TotalMinutesSlept,
+				Id AS UserId,
+				substr(date, 1, instr(date, ' ') - 1) AS SleepDate,
+                COUNT(*) / 60.0 AS TotalHoursSlept,
                 CASE 
                     WHEN date LIKE '%AM%'
                         THEN CASE 
@@ -246,24 +248,17 @@ class FitbitDatabase:
                     ELSE 'N/A'
                 END AS HourGroup
             FROM transformed
-            GROUP BY HourGroup;
+            GROUP BY UserId, SleepDate, HourGroup;
         """
 
         df = self.connection.query(query)
-        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
 
-        query  = """
-            SELECT
-                COUNT(DISTINCT logId) AS NumDistinctSleepSessions 
-            FROM minute_sleep
-        """
+        df.rename(columns={"SleepDate": "Date"}, inplace=True)
+        df["Date"] = pd.to_datetime(df["Date"])
 
-        df2 = self.connection.query(query)
-        num_distinct_sleep_sessions = df2.at[0, 'NumDistinctSleepSessions']
-
-        df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
-        return df.sort_values('HourGroup')
+        hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
+        df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
+        return df.sort_values("HourGroup")
         
     def get_daily_steps(self):
         query = """
