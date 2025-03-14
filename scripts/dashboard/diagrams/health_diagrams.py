@@ -31,9 +31,6 @@ class HealthDiagrams:
             title = f"Sleep Duration Over Time For User {user_id}"
             y_label = "Hours Slept"
 
-        if sleep_moments.empty:
-            return go.Figure()
-
         return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
 
     def get_sedentary_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
@@ -45,9 +42,6 @@ class HealthDiagrams:
         if user_id != "All":
             title = F"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
             sedentary_and_sleep_data = self._filter_users(sedentary_and_sleep_data, user_id)
-
-        if sedentary_and_sleep_data.empty:
-            return go.Figure()
 
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
                           title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"))
