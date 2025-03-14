@@ -7,10 +7,15 @@ from scripts.database import FitbitDatabase
 class HealthDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
-        
+
     def _filter_dates(self, df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+        """Helper function to filter DataFrame by user selected date range from dashboard."""
         return df[(df.loc[:, "Date"] >= start_date) & (df.loc[:, "Date"] <= end_date)]
     
+    def _filter_users(self, df: pd.DataFrame, user_id: float):
+        """Helper function to filter DataFrame by user selected user ID from dashboard."""
+        return df[(df.loc[:, "UserId"] == user_id)]
+
     def get_sleep_duration_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
@@ -24,7 +29,7 @@ class HealthDiagrams:
             title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
-            sleep_moments = sleep_moments[sleep_moments.loc[:, "UserId"] == user_id] # Filter by user
+            sleep_moments = self._filter_users(sleep_moments, user_id)
             title = f"Sleep Duration Over Time For User {user_id}"
             y_label = "Hours Slept"
 
