@@ -15,20 +15,18 @@ class ExerciseDiagrams:
         """Purpose: Create a density plot of the total distance walked by individuals"""
         data = self.fitbit_db.get_daily_activity()
         users = pd.unique(data.loc[:,'Id'])
-        distances = []
-        for user in users:
-            distances.append(
-                data.loc[ data.loc[:,'Id'] == user, 'TotalDistance' ].sum()
-            )
+        distances = [data.loc[data.loc[:, 'Id'] == user, 'TotalDistance'].sum() for user in users]
+
+        fig, ax = plt.subplots()
 
         #Clip the data at 0 as there are no users walking less than 0 kilometers
         #Reduce the bandwidth to prevent smoothing and create a more representative plot
         sns.kdeplot(distances, fill=True, color="blue", clip =(0, None), bw_adjust=1)
 
-        plt.xlabel("Distance Walked (km)")
-        plt.ylabel("Density")
-        plt.title("Density Plot of Walking Distances")
-        return plt
+        ax.set_xlabel("Distance Walked (km)")
+        ax.set_ylabel("Density")
+        ax.set_title("Density Plot of Walking Distances")
+        return fig
 
     def plot_day_of_week_frequency(self):
         """Create bar plot that displays the frequency of workouts per day of week"""
@@ -36,12 +34,12 @@ class ExerciseDiagrams:
         data["ActivityDate"] = pd.to_datetime(data.loc[:, "ActivityDate"])
         day_of_week_counts = data.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
 
-        plt.figure(figsize=(8, 5))
-        plt.bar(day_of_week_counts.index, day_of_week_counts.values, color="green")
-        plt.xticks(ticks=range(7), labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
-        plt.ylabel("Frequency")
-        plt.title("Total Number of Workouts Per Day of Week")
-        return plt
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.bar(day_of_week_counts.index, day_of_week_counts.values, color="green")
+        ax.set_xticks(ticks=range(7), labels=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+        ax.set_ylabel("Frequency")
+        ax.set_title("Total Number of Workouts Per Day of Week")
+        return fig
 
     def plot_steps_to_calories_regression(self, user_id: int):
         """Create a regression to visualize the relationship between
@@ -51,7 +49,9 @@ class ExerciseDiagrams:
         user_steps = user_entries.loc[:, 'TotalSteps']
         user_calories = user_entries.loc[:, 'Calories']
 
-        plt.scatter(user_steps, user_calories, color="green", label='Observations')
+        fig, ax = plt.subplots()
+
+        ax.scatter(user_steps, user_calories, color="green", label='Observations')
 
         least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(Id)', data=data).fit()
         base_intercept = least_squares_model.params["Intercept"]
@@ -59,14 +59,15 @@ class ExerciseDiagrams:
         user_coef = least_squares_model.params.get(f'C(Id)[T.{user_id}]', 0)
 
         y_intercept = (0, base_intercept + user_coef)
-        plt.axline(y_intercept, slope=steps_coef, color="green", label='Regression line')
+        ax.axline(y_intercept, slope=steps_coef, color="green", label='Regression line')
 
-        plt.title(f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}')
-        plt.xlabel('Total steps')
-        plt.ylabel('Calories burned')
-        plt.grid()
-        plt.legend()
-        return plt
+        ax.set_title(f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}')
+        ax.set_xlabel('Total Steps')
+        ax.set_ylabel('Calories Burned')
+        ax.grid()
+        ax.legend()
+
+        return fig
 
     def plot_weather_correlation_for_chicago(self, chicago_data):
         """
@@ -92,7 +93,7 @@ class ExerciseDiagrams:
         corr_precip_calories = merged_data["Calories"].corr(merged_data["precip"])
 
         # Create subplots for visualizations
-        _, axes = plt.subplots(2, 2, figsize=(12, 12))
+        fig, axes = plt.subplots(2, 2, figsize=(12, 12))
 
         # Scatter Plot: Temperature vs. Total Distance
         sns.regplot(x=merged_data["temp"], y=merged_data["TotalDistance"], ax=axes[0, 0], color="red")
@@ -118,5 +119,5 @@ class ExerciseDiagrams:
         axes[1, 1].set_xlabel("Precipitation (mm)")
         axes[1, 1].set_ylabel("Calories Burned")
 
-        plt.tight_layout()
-        return plt
+        fig.tight_layout()
+        return fig

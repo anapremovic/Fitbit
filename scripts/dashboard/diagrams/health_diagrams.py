@@ -59,15 +59,15 @@ class HealthDiagrams:
         ]
 
         # Setup pyplot
-        plt.figure(figsize=(12, 8))
-        plt.plot(data_for_id["datetime"], data_for_id["Calories"], marker='o', linestyle="-")
-        plt.xlabel("Date of Activity")
-        plt.ylabel("Calories Burned")
-        plt.title(f"Calories Burned per Day for ID: {user_id}")
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator())  # set ticks for each day
+        fix, ax = plt.subplots(figsize=(12, 8))
+        ax.plot(data_for_id["datetime"], data_for_id["Calories"], marker='o', linestyle="-")
+        ax.set_xlabel("Date of Activity")
+        ax.set_ylabel("Calories Burned")
+        ax.set_title(f"Calories Burned per Day for ID: {user_id}")
+        ax.xaxis.set_major_locator(mdates.DayLocator())
 
-        plt.xticks(rotation = 30)
-        return plt
+        ax.set_xticks(rotation = 30)
+        return fig
 
     def plot_weight_change_vs_steps(weight_data, step_data, user_id: int):
         """Generates a plot of weight change vs daily steps for a given user"""
@@ -86,11 +86,11 @@ class HealthDiagrams:
 
         
         # Plot weight change vs. daily steps
-        plt.figure(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(8, 5))
         sns.scatterplot(x=df["TotalSteps"], y=df["Weight"], edgecolor='black')
 
-        plt.xlabel("Steps per Day")
-        plt.ylabel("Weight (kg)")
-        plt.title(f"Weight vs. Daily Steps for User {user_id}")
-        plt.grid(True)
+        ax.set_xlabel("Steps per Day")
+        ax.set_ylabel("Weight (kg)")
+        ax.set_title(f"Weight vs. Daily Steps for User {user_id}")
+        ax.grid(True)
         return plt

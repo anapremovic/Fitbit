@@ -12,7 +12,7 @@ def get_exercise_diagrams():
     return ExerciseDiagrams(st.session_state["fitbit_db"])
 diagrams = get_exercise_diagrams()
 
-user = st.session_state["selected_user"]
+user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
