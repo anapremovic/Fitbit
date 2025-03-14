@@ -46,7 +46,7 @@ class HealthDiagrams:
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
                           title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"))
 
-    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime):
+    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure of a regression between hours spent active and hours slept"""
         active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs("")
 
@@ -59,7 +59,7 @@ class HealthDiagrams:
         return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols",
                           title=title, labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"))
 
-    def get_sleep_duration_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime):
+    def get_sleep_duration_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
         sleep duration per time block."""
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
@@ -79,19 +79,38 @@ class HealthDiagrams:
         return px.bar(sleep_data, x="HourGroup", y="AverageHoursSlept", title=title,
                       labels=dict(HourGroup="Time", AverageHoursSlept="Average Hours Slept"))
 
-    def get_heart_rate_over_time(self, user_id, start_date: datetime, end_date: datetime):
+    def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure(), go.Figure()):
         """Returns a Plotly figure that visualizes the heart rate each day."""
         heart_rate_data = self.fitbit_db.get_heart_rate()
 
         heart_rate_data = self._filter_dates(heart_rate_data, start_date, end_date)
-
         if user_id == "All":
             heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean()
-            title = "Heart Rate Over Time For All Users"
-            y_label = "Average Heart Rate"
+            over_time_plot_title = "Heart Rate Over Time For All Users"
+            over_time_plot_y_label = "Average Heart Rate (bpm)"
+            average_plot_title = "Average Heart Rate For All Users Over Date Range"
         else:
             heart_rate_data = self._filter_users(heart_rate_data, user_id)
-            title = f"Heart Rate Over Time For User {user_id}"
-            y_label = "Heart Rate"
+            over_time_plot_title = f"Heart Rate Over Time For User {user_id}"
+            over_time_plot_y_label = "Heart Rate (bpm)"
+            average_plot_title = f"Average Heart Rate For User {user_id} Over Date Range"
 
-        return px.line(heart_rate_data, x="Date", y="HeartRate", title=title, labels=dict(HeartRate=y_label))
+        avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean()
+
+        over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
+        average_plot = go.Figure(go.Scatter(
+            x=[0],
+            y=[0],
+            text=[avg_heart_rate],
+            mode='text',
+            textfont=dict(size=50),
+        ))
+        average_plot.update_layout(
+            showlegend=False,
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            title=average_plot_title,
+            title_y=0.95
+        )
+
+        return over_time_plot, average_plot
