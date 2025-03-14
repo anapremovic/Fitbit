@@ -56,15 +56,19 @@ class FitbitDatabase:
 
         return df
 
-    def get_heart_rate(self, user_id: int):
+    def get_heart_rate(self):
         query = """
             SELECT 
-                * 
-            FROM heart_rate 
-            WHERE Id = :id
+                Id AS UserId,
+                Time AS Date,
+                Value AS HeartRate
+            FROM heart_rate
         """
 
-        return self.connection.query(query, params={"id": user_id})
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        return df
 
     def get_intensity(self, user_id: int):
         query = """

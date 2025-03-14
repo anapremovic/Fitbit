@@ -78,3 +78,20 @@ class HealthDiagrams:
 
         return px.bar(sleep_data, x="HourGroup", y="AverageHoursSlept", title=title,
                       labels=dict(HourGroup="Time", AverageHoursSlept="Average Hours Slept"))
+
+    def get_heart_rate_over_time(self, user_id, start_date: datetime, end_date: datetime):
+        """Returns a Plotly figure that visualizes the heart rate each day."""
+        heart_rate_data = self.fitbit_db.get_heart_rate()
+
+        heart_rate_data = self._filter_dates(heart_rate_data, start_date, end_date)
+
+        if user_id == "All":
+            heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean()
+            title = "Heart Rate Over Time For All Users"
+            y_label = "Average Heart Rate"
+        else:
+            heart_rate_data = self._filter_users(heart_rate_data, user_id)
+            title = f"Heart Rate Over Time For User {user_id}"
+            y_label = "Heart Rate"
+
+        return px.line(heart_rate_data, x="Date", y="HeartRate", title=title, labels=dict(HeartRate=y_label))
