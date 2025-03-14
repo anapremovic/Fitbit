@@ -193,7 +193,9 @@ class FitbitDatabase:
                 FROM hourly_calories
             )
             SELECT 
-                4 * AVG(Calories) AS AverageCalories,
+                Id AS UserId,
+				substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS Date,
+				4 * AVG(Calories) AS AverageCalories,
                 CASE 
                     WHEN ActivityHour LIKE '%AM%'
                         THEN CASE 
@@ -210,13 +212,16 @@ class FitbitDatabase:
                     ELSE 'N/A'
                 END AS HourGroup
             FROM transformed
-            GROUP BY HourGroup;
+            GROUP BY UserId, Date, HourGroup;
         """
 
         df = self.connection.query(query)
-        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-        return df.sort_values('HourGroup')
+
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
+        df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
+        return df.sort_values("HourGroup")
 
     def get_daily_sleep_distribution(self) -> pd.DataFrame:
         """Groups the minute_sleep table into 4-hour blocks and returns 

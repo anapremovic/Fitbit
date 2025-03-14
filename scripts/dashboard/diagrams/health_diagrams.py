@@ -79,6 +79,23 @@ class HealthDiagrams:
         return px.bar(sleep_data, x="HourGroup", y="AverageHoursSlept", title=title,
                       labels=dict(HourGroup="Time", AverageHoursSlept="Average Hours Slept"))
 
+    def get_calories_burned_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+        """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
+        calories burned per time block."""
+        calorie_data = self.fitbit_db.get_daily_calorie_distribution()
+
+        calorie_data = self._filter_dates(calorie_data, start_date, end_date)
+        if user_id == "All":
+            calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean() # Average over all users
+            title = "Calories Burned Per 4-Hour Time Blocks For All Users"
+        else:
+            calorie_data = calorie_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["AverageCalories"].mean()
+            calorie_data = self._filter_users(calorie_data, user_id)
+            title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
+
+        return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
+                      labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
+
     def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure(), go.Figure()):
         """Returns a Plotly figure that visualizes the heart rate each day."""
         heart_rate_data = self.fitbit_db.get_heart_rate()
