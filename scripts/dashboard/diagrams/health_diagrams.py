@@ -66,11 +66,11 @@ class HealthDiagrams:
 
         sleep_data = self._filter_dates(sleep_data, start_date, end_date)
 
-        sleep_data = sleep_data.groupby((["UserId", "HourGroup"]), as_index=False)["TotalHoursSlept"].mean()
+        sleep_data = sleep_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["TotalHoursSlept"].mean()
         sleep_data.rename(columns={"TotalHoursSlept": "AverageHoursSlept"}, inplace=True) # Average for time block
 
         if user_id == "All":
-            sleep_data = sleep_data.groupby("HourGroup", as_index=False)["AverageHoursSlept"].mean() # Average over all users
+            sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["AverageHoursSlept"].mean() # Average over all users
             title = "Sleep Duration Per 4-Hour Time Blocks For All Users"
         else:
             sleep_data = self._filter_users(sleep_data, user_id)
