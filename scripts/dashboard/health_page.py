@@ -13,5 +13,5 @@ sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, st
 sedentary_hrs_to_sleep_hrs = health_diagrams.get_sedentary_hrs_to_sleep_hrs_regression(user, start_date, end_date)
 
 # Show on dashboard
-st.plotly_chart(sleep_duration_over_time)
-st.plotly_chart(sedentary_hrs_to_sleep_hrs)
+st.plotly_chart(sleep_duration_over_time, key="sleep_duration_over_time")
+st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
