@@ -313,7 +313,7 @@ class FitbitDatabase:
 
         return self.dataframe_from_query(query)
     
-    def collect_weight_data():
+    def collect_weight_data(self) -> pd.DataFrame:
         query = """SELECT 
             Id,
             substr(Date, 1, instr(Date, ' ') - 1) AS Date,
