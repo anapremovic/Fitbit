@@ -65,16 +65,13 @@ class HealthDiagrams:
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
         sleep_data = self._filter_dates(sleep_data, start_date, end_date)
-
-        sleep_data = sleep_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["TotalHoursSlept"].mean()
-        sleep_data.rename(columns={"TotalHoursSlept": "AverageHoursSlept"}, inplace=True) # Average for time block
-
         if user_id == "All":
             sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["AverageHoursSlept"].mean() # Average over all users
-            title = "Sleep Duration Per 4-Hour Time Blocks For All Users"
+            title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
         else:
+            sleep_data = sleep_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["AverageHoursSlept"].mean()
             sleep_data = self._filter_users(sleep_data, user_id)
-            title = f"Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
+            title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
 
         return px.bar(sleep_data, x="HourGroup", y="AverageHoursSlept", title=title,
                       labels=dict(HourGroup="Time", AverageHoursSlept="Average Hours Slept"))
