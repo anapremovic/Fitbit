@@ -34,14 +34,27 @@ class HealthDiagrams:
         return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
 
     def get_sedentary_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
-        """Returns a Plotly figure of a regression between minutes spent sedentary and minutes slept."""
+        """Returns a Plotly figure of a regression between hours spent sedentary and hours slept."""
         sedentary_and_sleep_data = self.fitbit_db.get_sedentary_sleep_activity()
 
         sedentary_and_sleep_data = self._filter_dates(sedentary_and_sleep_data, start_date, end_date)
-        title = "Relation Between Daily Sedentary Time and Sleep Duration For All Users"
+        title = "Relation Between Daily Sedentary Time And Sleep Duration For All Users"
         if user_id != "All":
-            title = F"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
+            title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
             sedentary_and_sleep_data = self._filter_users(sedentary_and_sleep_data, user_id)
 
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
                           title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"))
+
+    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime):
+        """Returns a Plotly figure of a regression between hours spent active and hours slept"""
+        active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs("")
+
+        active_and_sleep_data = self._filter_dates(active_and_sleep_data, start_date, end_date)
+        title = "Relation Between Daily Active Time And Sleep Duration For All Users"
+        if user_id != "All":
+            title = f"Relation Between Daily Active Time And Sleep Duration For User {user_id}"
+            active_and_sleep_data = self._filter_users(active_and_sleep_data, user_id)
+
+        return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols",
+                          title=title, labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"))

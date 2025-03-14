@@ -18,12 +18,12 @@ class Part3:
     def execute_part_3(self):
         """Generate all visualizations for part 3 of the project."""
         self.verify_correctness()
-        self.generate_sleep_data_over_time_line_plot(6962181067)
-        self.generate_sleep_min_to_active_min_regression()
+        # self.generate_sleep_data_over_time_line_plot(6962181067)
+        # self.generate_sleep_min_to_active_min_regression()
         self.display_heart_rate_and_intensity(2022484408)
         self.display_heart_rate_and_intensity(2022484408, datetime.datetime(2016, 4, 3), datetime.datetime(2016, 4, 7))
         self.display_weather_correlation_for_chicago()
-        self.generate_sedentary_min_to_sleep_min_regression()
+        # self.generate_sedentary_min_to_sleep_min_regression()
         self.generate_daily_step_distribution_barplot()
         self.generate_daily_calorie_distribution_barplot()
         self.generate_daily_sleep_distribution_barplot()
@@ -82,7 +82,7 @@ class Part3:
     def generate_sleep_min_to_active_min_regression(self):
         """Generates a regression that shows how sleep minutes relate to active minutes for all users and days."""
 
-        active_and_sleep_min_grouped_by_user = self.db.get_active_and_sleep_min()
+        active_and_sleep_min_grouped_by_user = self.db.get_active_and_sleep_hrs()
         if active_and_sleep_min_grouped_by_user.empty:
             print("No activity and/or sleep data available.")
             return

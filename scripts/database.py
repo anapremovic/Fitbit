@@ -88,13 +88,13 @@ class FitbitDatabase:
 
         return self.connection.query(query)
 
-    def get_active_and_sleep_min(self, day_filter: str = "") -> pd.DataFrame:
+    def get_active_and_sleep_hrs(self, day_filter: str = "") -> pd.DataFrame:
         query = """
             SELECT 
                 daily_activity.Id AS UserId,
                 daily_activity.ActivityDate AS Date,
-                SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
-                SUM(sleep_moments.SleepMin) AS TotalSleepMin
+                SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) / 60.0 AS TotalActiveHours,
+                SUM(sleep_moments.SleepMin) / 60.0 AS TotalSleepHours
             FROM daily_activity
             INNER JOIN (
                 SELECT

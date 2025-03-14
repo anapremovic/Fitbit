@@ -11,14 +11,14 @@ class Part4:
 
     def execute_part_4(self):
         """Generate all visualizations for part 4 of the project."""
-        self.compare_sleep_to_active_min_relationship_for_week_periods()
+        # self.compare_sleep_to_active_min_relationship_for_week_periods()
         self.plot_steps_to_heart_rate_and_avg_heart_rate(10000, 15000)
 
     def compare_sleep_to_active_min_relationship_for_week_periods(self):
         """Generate three regressions to compare how sleep minutes affect active minutes on all days, weekdays only, and weekends only."""
-        all_days = self.db.get_active_and_sleep_min()
-        weekdays = self.db.get_active_and_sleep_min("weekdays")
-        weekends = self.db.get_active_and_sleep_min("weekends")
+        all_days = self.db.get_active_and_sleep_hrs()
+        weekdays = self.db.get_active_and_sleep_hrs("weekdays")
+        weekends = self.db.get_active_and_sleep_hrs("weekends")
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(24, 5))
         Part4.plot_sleep_min_to_active_min(all_days, ax1, "All Days")
