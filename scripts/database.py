@@ -240,7 +240,7 @@ class FitbitDatabase:
             SELECT 
 				Id AS UserId,
 				substr(date, 1, instr(date, ' ') - 1) AS SleepDate,
-                COUNT(*) / (COUNT(DISTINCT logId) * 60.0) AS AverageHoursSlept,
+                COUNT(*) / 60.0 AS HoursSlept,
                 CASE 
                     WHEN date LIKE '%AM%'
                         THEN CASE 

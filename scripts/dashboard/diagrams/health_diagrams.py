@@ -65,16 +65,14 @@ class HealthDiagrams:
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
         sleep_data = self._filter_dates(sleep_data, start_date, end_date)
-        if user_id == "All":
-            sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["AverageHoursSlept"].mean() # Average over all users
-            title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
-        else:
-            sleep_data = sleep_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["AverageHoursSlept"].mean()
+        title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
+        if user_id != "All":
             sleep_data = self._filter_users(sleep_data, user_id)
             title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
+        sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
-        return px.bar(sleep_data, x="HourGroup", y="AverageHoursSlept", title=title,
-                      labels=dict(HourGroup="Time", AverageHoursSlept="Average Hours Slept"))
+        return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
+                      labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
 
     def get_calories_burned_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
