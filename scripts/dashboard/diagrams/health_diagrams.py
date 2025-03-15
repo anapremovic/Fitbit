@@ -23,7 +23,7 @@ class HealthDiagrams:
 
         sleep_moments = self._filter_dates(sleep_moments, start_date, end_date)
         if user_id == "All":
-            sleep_moments = sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Change to average sleep hours
+            sleep_moments = sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Average over all users
             title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
@@ -80,13 +80,11 @@ class HealthDiagrams:
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
 
         calorie_data = self._filter_dates(calorie_data, start_date, end_date)
-        if user_id == "All":
-            calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean() # Average over all users
-            title = "Calories Burned Per 4-Hour Time Blocks For All Users"
-        else:
-            calorie_data = calorie_data.groupby((["UserId", "HourGroup"]), as_index=False, observed=False)["AverageCalories"].mean()
+        title = "Calories Burned Per 4-Hour Time Blocks For All Users"
+        if user_id != "All":
             calorie_data = self._filter_users(calorie_data, user_id)
             title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
+        calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
         return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
                       labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
@@ -97,7 +95,7 @@ class HealthDiagrams:
 
         heart_rate_data = self._filter_dates(heart_rate_data, start_date, end_date)
         if user_id == "All":
-            heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean()
+            heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean() # Average over all users
             over_time_plot_title = "Heart Rate Over Time For All Users"
             over_time_plot_y_label = "Average Heart Rate (bpm)"
             average_plot_title = "Average Heart Rate For All Users Over Date Range"
@@ -107,7 +105,7 @@ class HealthDiagrams:
             over_time_plot_y_label = "Heart Rate (bpm)"
             average_plot_title = f"Average Heart Rate For User {user_id} Over Date Range"
 
-        avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean()
+        avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean() # Average over all dates
 
         over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
         average_plot = go.Figure(go.Scatter(
