@@ -74,6 +74,22 @@ class HealthDiagrams:
         return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
                       labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
 
+    def get_calories_burned_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+        """Returns a Plotly figure that visualizes the number of calories burned each day."""
+        calorie_data = self.fitbit_db.get_calories()
+
+        calorie_data = self._filter_dates(calorie_data, start_date, end_date)
+        if user_id == "All":
+            calorie_data = calorie_data.groupby("Date", as_index=False)["Calories"].mean() # Average over all users
+            title = "Calories Burned Over Time For All Users"
+            y_label = "Average Calories Burned"
+        else:
+            calorie_data = self._filter_users(calorie_data, user_id)
+            title = f"Calories Burned Over Time For User {user_id}"
+            y_label = "Calories Burned"
+
+        return px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
+
     def get_calories_burned_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
         calories burned per time block."""

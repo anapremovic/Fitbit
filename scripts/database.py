@@ -56,6 +56,20 @@ class FitbitDatabase:
 
         return df
 
+    def get_calories(self) -> pd.DataFrame:
+        query = """
+            SELECT 
+                Id AS UserId, 
+                ActivityDate AS Date,
+                Calories
+            FROM daily_activity;
+        """
+
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df["Date"])
+
+        return df
+
     def get_heart_rate(self):
         query = """
             SELECT 
