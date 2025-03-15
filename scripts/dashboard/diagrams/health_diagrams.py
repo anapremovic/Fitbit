@@ -9,11 +9,13 @@ class HealthDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
 
-    def _filter_dates(self, df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+    @staticmethod
+    def _filter_dates(df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
         """Helper function to filter DataFrame by user selected date range from dashboard."""
         return df[(df.loc[:, "Date"] >= start_date) & (df.loc[:, "Date"] <= end_date)]
 
-    def _filter_users(self, df: pd.DataFrame, user_id: float):
+    @staticmethod
+    def _filter_users(df: pd.DataFrame, user_id: float):
         """Helper function to filter DataFrame by user selected user ID from dashboard."""
         return df[(df.loc[:, "UserId"] == user_id)]
 
