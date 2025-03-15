@@ -48,9 +48,9 @@ class HealthDiagrams:
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
                           title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"))
 
-    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime, week_period: str = "") -> go.Figure():
         """Returns a Plotly figure of a regression between hours spent active and hours slept"""
-        active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs("")
+        active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs(week_period)
 
         active_and_sleep_data = HealthDiagrams.filter_dates(active_and_sleep_data, start_date, end_date)
         title = "Relation Between Daily Active Time And Sleep Duration For All Users"

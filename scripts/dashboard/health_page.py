@@ -8,6 +8,18 @@ user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
+if "weekdays-only" not in st.session_state:
+    st.session_state["weekdays-only"] = False
+if "weekends-only" not in st.session_state:
+    st.session_state["weekends-only"] = False
+
+def disable_weekends_toggle():
+    if st.session_state["weekdays-only"]:
+        st.session_state["weekends-only"] = False
+def disable_weekdays_toggle():
+    if st.session_state["weekends-only"]:
+        st.session_state["weekdays-only"] = False
+
 # Diagrams
 sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, start_date, end_date)
 sleep_duration_per_time_blocks = health_diagrams.get_sleep_duration_per_time_blocks(user, start_date, end_date)
@@ -22,6 +34,24 @@ st.plotly_chart(sleep_duration_over_time, key="sleep_duration_over_time")
 st.plotly_chart(sleep_duration_per_time_blocks, key="sleep_duration_per_time_blocks")
 st.plotly_chart(calories_burned_over_time, key="calories_burned_over_time")
 st.plotly_chart(calories_burned_per_time_blocks, key="calories_burned_per_time_blocks")
+
+st.toggle(
+    "Weekdays Only",
+    key="weekdays-only",
+    on_change=disable_weekends_toggle
+)
+st.toggle(
+    "Weekends Only",
+    key="weekends-only",
+    on_change=disable_weekdays_toggle
+)
+if st.session_state["weekdays-only"]:
+    active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date,
+                                                                                     "weekdays")
+elif st.session_state["weekends-only"]:
+    active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date,
+                                                                                     "weekends")
+
 st.plotly_chart(active_hrs_to_sleep_hrs, key="active_hrs_to_sleep_hrs")
 st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
 st.plotly_chart(heart_rate_over_time, key="heart_rate_over_time")
