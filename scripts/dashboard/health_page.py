@@ -48,12 +48,13 @@ with line:
 with bar:
     st.plotly_chart(sleep_duration_per_time_blocks, key="sleep_duration_per_time_blocks")
 
-weekdays, weekends = st.columns(2)
-with weekdays:
-    st.toggle("Weekdays Only", key="weekdays-only", on_change=disable_weekends_toggle)
-with weekends:
-    st.toggle("Weekends Only", key="weekends-only", on_change=disable_weekdays_toggle)
-st.plotly_chart(active_hrs_to_sleep_hrs, key="active_hrs_to_sleep_hrs")
+with st.container(border=True):
+    weekdays, weekends = st.columns(2)
+    with weekdays:
+        st.toggle("Weekdays Only", key="weekdays-only", on_change=disable_weekends_toggle)
+    with weekends:
+        st.toggle("Weekends Only", key="weekends-only", on_change=disable_weekdays_toggle)
+    st.plotly_chart(active_hrs_to_sleep_hrs, key="active_hrs_to_sleep_hrs")
 
 st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
 
