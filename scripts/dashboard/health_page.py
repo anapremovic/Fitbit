@@ -38,31 +38,31 @@ heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_t
 # Show on dashboard
 
 # Sleep
-col1, col2 = st.columns(2)
-with col1:
+line, bar = st.columns(2)
+with line:
     st.plotly_chart(sleep_duration_over_time, key="sleep_duration_over_time")
-with col2:
+with bar:
     st.plotly_chart(sleep_duration_per_time_blocks, key="sleep_duration_per_time_blocks")
 
-col1, col2 = st.columns(2)
-with col1:
+weekdays, weekends = st.columns(2)
+with weekdays:
     st.toggle("Weekdays Only", key="weekdays-only", on_change=disable_weekends_toggle)
-with col2:
+with weekends:
     st.toggle("Weekends Only", key="weekends-only", on_change=disable_weekdays_toggle)
 st.plotly_chart(active_hrs_to_sleep_hrs, key="active_hrs_to_sleep_hrs")
 
 st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
 
 # Calories
-col1, col2 = st.columns(2)
-with col1:
+line, bar = st.columns(2)
+with line:
     st.plotly_chart(calories_burned_over_time, key="calories_burned_over_time")
-with col2:
+with bar:
     st.plotly_chart(calories_burned_per_time_blocks, key="calories_burned_per_time_blocks")
 
 # Heart Rate
-col1, col2 = st.columns([3, 1])
-with col1:
+plot, number = st.columns([3, 1])
+with plot:
     st.plotly_chart(heart_rate_over_time, key="heart_rate_over_time")
-with col2:
+with number:
     st.plotly_chart(average_heart_rate, key="average_heart_rate")
