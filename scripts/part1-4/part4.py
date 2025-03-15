@@ -11,7 +11,7 @@ class Part4:
 
     def execute_part_4(self):
         """Generate all visualizations for part 4 of the project."""
-        # self.compare_sleep_to_active_min_relationship_for_week_periods()
+        self.compare_sleep_to_active_min_relationship_for_week_periods()
         self.plot_steps_to_heart_rate_and_avg_heart_rate(10000, 15000)
 
     def compare_sleep_to_active_min_relationship_for_week_periods(self):
