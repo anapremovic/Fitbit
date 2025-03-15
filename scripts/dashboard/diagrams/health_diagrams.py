@@ -123,7 +123,7 @@ class HealthDiagrams:
             over_time_plot_y_label = "Heart Rate (bpm)"
             average_plot_title = f"Average Heart Rate For User {user_id} Over Date Range"
 
-        avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean() # Average over all dates
+        avg_heart_rate = "{0:.2f}".format(heart_rate_data.loc[:, "HeartRate"].mean()) # Average over all dates
 
         over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
         average_plot = go.Figure(go.Scatter(
