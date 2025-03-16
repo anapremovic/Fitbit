@@ -213,15 +213,15 @@ class FitbitDatabase:
                 CASE 
                     WHEN ActivityHour LIKE '%AM%'
                         THEN CASE 
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '24:00-4:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4:00-8:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8:00-12:00'
                         END
                     WHEN ActivityHour LIKE '%PM%'
                         THEN CASE
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12:00-16:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16:00-20:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20:00-24:00'
                         END
                     ELSE 'N/A'
                 END AS HourGroup
@@ -233,7 +233,7 @@ class FitbitDatabase:
 
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
-        hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
+        hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
         df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
         return df.sort_values("HourGroup")
 
@@ -258,15 +258,15 @@ class FitbitDatabase:
                 CASE 
                     WHEN date LIKE '%AM%'
                         THEN CASE 
-                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '0-4'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '24:00-4:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4:00-8:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8:00-12:00'
                         END
                     WHEN date LIKE '%PM%'
                         THEN CASE
-                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12-16'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12:00-16:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16:00-20:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20:00-24:00'
                         END
                     ELSE 'N/A'
                 END AS HourGroup
@@ -279,7 +279,7 @@ class FitbitDatabase:
         df.rename(columns={"SleepDate": "Date"}, inplace=True)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
-        hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
+        hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
         df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
         return df.sort_values("HourGroup")
         
