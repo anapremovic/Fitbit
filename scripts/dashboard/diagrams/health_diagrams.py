@@ -67,10 +67,10 @@ class HealthDiagrams:
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
         sleep_data = HealthDiagrams.filter_dates(sleep_data, start_date, end_date)
-        title = "Average Sleep Duration Per 4-Hour" + "<br>" + "Time Blocks For All Users"
+        title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
         if user_id != "All":
             sleep_data = HealthDiagrams.filter_users(sleep_data, user_id)
-            title = "Average Sleep Duration Per 4-Hour" + "<br>" + f"Time Blocks For User {user_id}"
+            title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
         sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
         return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
@@ -98,10 +98,10 @@ class HealthDiagrams:
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
 
         calorie_data = HealthDiagrams.filter_dates(calorie_data, start_date, end_date)
-        title = "Calories Burned Per 4-Hour" + "<br>" + "Time Blocks For All Users"
+        title = "Calories Burned Per 4-Hour Time Blocks For All Users"
         if user_id != "All":
             calorie_data = HealthDiagrams.filter_users(calorie_data, user_id)
-            title = "Calories Burned Per 4-Hour" + "<br>" + f"Time Blocks For User {user_id}"
+            title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
         return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
