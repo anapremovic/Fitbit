@@ -45,8 +45,8 @@ class HealthDiagrams:
             title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
             sedentary_and_sleep_data = HealthDiagrams.filter_users(sedentary_and_sleep_data, user_id)
 
-        return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
-                          title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"))
+        return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
+                          labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
 
     def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime, week_period: str = "") -> go.Figure():
         """Returns a Plotly figure of a regression between hours spent active and hours slept"""
@@ -58,8 +58,8 @@ class HealthDiagrams:
             title = f"Relation Between Daily Active Time And Sleep Duration For User {user_id}"
             active_and_sleep_data = HealthDiagrams.filter_users(active_and_sleep_data, user_id)
 
-        return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols",
-                          title=title, labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"))
+        return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
+                          labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
 
     def get_sleep_duration_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
