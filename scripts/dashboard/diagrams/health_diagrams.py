@@ -73,6 +73,7 @@ class HealthDiagrams:
         """Generates a plot of weight change vs daily steps for a given user"""
         weight_data = self.fitbit_db.collect_weight_data()
         step_data = self.fitbit_db.get_daily_steps()
+        weight_data = weight_data.set_index(['Id', 'Date'])
         weight_data = weight_data.loc[user_id, ['Weight']]
         
         # Reindex step_data to be by date for a particular user

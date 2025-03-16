@@ -317,5 +317,4 @@ class FitbitDatabase:
         df = self.connection.query(query)
         df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
         df = df.drop(columns=['WeightPounds'])
-        df = df.set_index(['Id', 'Date'])
         return df
