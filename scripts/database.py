@@ -52,7 +52,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
 
@@ -66,7 +66,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
 
@@ -80,7 +80,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
 
@@ -129,7 +129,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         if day_filter == "weekdays":
             return df[df["Date"].dt.weekday < 5]
@@ -154,7 +154,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
 
@@ -231,7 +231,7 @@ class FitbitDatabase:
 
         df = self.connection.query(query)
 
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
         df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
@@ -277,7 +277,7 @@ class FitbitDatabase:
         df = self.connection.query(query)
 
         df.rename(columns={"SleepDate": "Date"}, inplace=True)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         hour_groups_ordered = ["0-4", "4-8", "8-12", "12-16", "16-20", "20-24"]
         df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
@@ -326,4 +326,7 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
