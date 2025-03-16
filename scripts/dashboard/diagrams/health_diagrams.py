@@ -19,7 +19,7 @@ class HealthDiagrams:
         """Helper function to filter DataFrame by user selected user ID from dashboard."""
         return df[(df.loc[:, "UserId"] == user_id)]
 
-    def get_sleep_duration_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_sleep_duration_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
         """Returns a Plotly figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
@@ -35,7 +35,7 @@ class HealthDiagrams:
 
         return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
 
-    def get_sedentary_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_sedentary_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
         """Returns a Plotly figure of a regression between hours spent sedentary and hours slept."""
         sedentary_and_sleep_data = self.fitbit_db.get_sedentary_sleep_activity()
 
@@ -48,7 +48,7 @@ class HealthDiagrams:
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
                           labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
 
-    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime, week_period: str = "") -> go.Figure():
+    def get_active_hrs_to_sleep_hrs_regression(self, user_id, start_date: datetime, end_date: datetime, week_period: str = "") -> go.Figure:
         """Returns a Plotly figure of a regression between hours spent active and hours slept"""
         active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs(week_period)
 
@@ -61,7 +61,7 @@ class HealthDiagrams:
         return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
                           labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
 
-    def get_sleep_duration_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_sleep_duration_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
         sleep duration per time block."""
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
@@ -76,7 +76,7 @@ class HealthDiagrams:
         return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
                       labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
 
-    def get_calories_burned_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_calories_burned_over_time(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
         """Returns a Plotly figure that visualizes the number of calories burned each day."""
         calorie_data = self.fitbit_db.get_calories()
 
@@ -92,7 +92,7 @@ class HealthDiagrams:
 
         return px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
 
-    def get_calories_burned_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure():
+    def get_calories_burned_per_time_blocks(self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
         """Returns a Plotly figure of a bar plot that divides a day into 6 4-hour time blocks and computes the average
         calories burned per time block."""
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
@@ -107,7 +107,7 @@ class HealthDiagrams:
         return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
                       labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
 
-    def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure(), go.Figure()):
+    def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure, go.Figure):
         """Returns a Plotly figure that visualizes the heart rate each day."""
         heart_rate_data = self.fitbit_db.get_heart_rate()
 
