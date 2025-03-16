@@ -42,11 +42,12 @@ heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_t
 # Show on dashboard
 
 st.subheader("Sleep Duration")
-line, bar = st.columns(2)
-with line:
-    st.plotly_chart(sleep_duration_over_time, key="sleep_duration_over_time")
-with bar:
-    st.plotly_chart(sleep_duration_per_time_blocks, key="sleep_duration_per_time_blocks")
+with st.container(border=True):
+    line, bar = st.columns(2)
+    with line:
+        st.plotly_chart(sleep_duration_over_time, key="sleep_duration_over_time")
+    with bar:
+        st.plotly_chart(sleep_duration_per_time_blocks, key="sleep_duration_per_time_blocks")
 
 st.subheader("What Affects Sleep")
 with st.container(border=True):
@@ -57,18 +58,21 @@ with st.container(border=True):
         st.toggle("Weekends Only", key="weekends-only", on_change=disable_weekdays_toggle)
     st.plotly_chart(active_hrs_to_sleep_hrs, key="active_hrs_to_sleep_hrs")
 
-st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
+with st.container(border=True):
+    st.plotly_chart(sedentary_hrs_to_sleep_hrs, key="sedentary_hrs_to_sleep_hrs")
 
 st.subheader("Calories")
-line, bar = st.columns(2)
-with line:
-    st.plotly_chart(calories_burned_over_time, key="calories_burned_over_time")
-with bar:
-    st.plotly_chart(calories_burned_per_time_blocks, key="calories_burned_per_time_blocks")
+with st.container(border=True):
+    line, bar = st.columns(2)
+    with line:
+        st.plotly_chart(calories_burned_over_time, key="calories_burned_over_time")
+    with bar:
+        st.plotly_chart(calories_burned_per_time_blocks, key="calories_burned_per_time_blocks")
 
 st.subheader("Heart Rate")
-plot, number = st.columns([3, 1])
-with plot:
-    st.plotly_chart(heart_rate_over_time, key="heart_rate_over_time")
-with number:
-    st.plotly_chart(average_heart_rate, key="average_heart_rate")
+with st.container(border=True):
+    plot, number = st.columns([3, 1])
+    with plot:
+        st.plotly_chart(heart_rate_over_time, key="heart_rate_over_time")
+    with number:
+        st.plotly_chart(average_heart_rate, key="average_heart_rate")
