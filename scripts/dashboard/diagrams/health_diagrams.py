@@ -10,12 +10,12 @@ class HealthDiagrams:
         self.fitbit_db = fitbit_db
 
     @staticmethod # Not bound to a specific instance of HealthDiagrams, just a helper
-    def filter_dates(df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
+    def filter_by_date_range(df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
         """Helper function to filter DataFrame by user selected date range from dashboard."""
         return df[(df.loc[:, "Date"] >= start_date) & (df.loc[:, "Date"] <= end_date)]
 
     @staticmethod # Not bound to a specific instance of HealthDiagrams, just a helper
-    def filter_users(df: pd.DataFrame, user_id: float) -> pd.DataFrame:
+    def filter_by_user(df: pd.DataFrame, user_id: float) -> pd.DataFrame:
         """Helper function to filter DataFrame by user selected user ID from dashboard."""
         return df[(df.loc[:, "UserId"] == user_id)]
 
@@ -23,13 +23,13 @@ class HealthDiagrams:
         """Returns a Plotly figure that visualizes the number of hours slept each day."""
         sleep_moments = self.fitbit_db.get_sleep_moments()
 
-        sleep_moments = HealthDiagrams.filter_dates(sleep_moments, start_date, end_date)
+        sleep_moments = HealthDiagrams.filter_by_date_range(sleep_moments, start_date, end_date)
         if user_id == "All":
             sleep_moments = sleep_moments.groupby("Date", as_index=False)["SleepHours"].mean() # Average over all users
             title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
-            sleep_moments = HealthDiagrams.filter_users(sleep_moments, user_id)
+            sleep_moments = HealthDiagrams.filter_by_user(sleep_moments, user_id)
             title = f"Sleep Duration Over Time For User {user_id}"
             y_label = "Hours Slept"
 
@@ -39,11 +39,11 @@ class HealthDiagrams:
         """Returns a Plotly figure of a regression between hours spent sedentary and hours slept."""
         sedentary_and_sleep_data = self.fitbit_db.get_sedentary_sleep_activity()
 
-        sedentary_and_sleep_data = HealthDiagrams.filter_dates(sedentary_and_sleep_data, start_date, end_date)
+        sedentary_and_sleep_data = HealthDiagrams.filter_by_date_range(sedentary_and_sleep_data, start_date, end_date)
         title = "Relation Between Daily Sedentary Time And Sleep Duration For All Users"
         if user_id != "All":
             title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
-            sedentary_and_sleep_data = HealthDiagrams.filter_users(sedentary_and_sleep_data, user_id)
+            sedentary_and_sleep_data = HealthDiagrams.filter_by_user(sedentary_and_sleep_data, user_id)
 
         return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
                           labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
@@ -52,11 +52,11 @@ class HealthDiagrams:
         """Returns a Plotly figure of a regression between hours spent active and hours slept"""
         active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs(week_period)
 
-        active_and_sleep_data = HealthDiagrams.filter_dates(active_and_sleep_data, start_date, end_date)
+        active_and_sleep_data = HealthDiagrams.filter_by_date_range(active_and_sleep_data, start_date, end_date)
         title = "Relation Between Daily Active Time And Sleep Duration For All Users"
         if user_id != "All":
             title = f"Relation Between Daily Active Time And Sleep Duration For User {user_id}"
-            active_and_sleep_data = HealthDiagrams.filter_users(active_and_sleep_data, user_id)
+            active_and_sleep_data = HealthDiagrams.filter_by_user(active_and_sleep_data, user_id)
 
         return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
                           labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
@@ -66,10 +66,10 @@ class HealthDiagrams:
         sleep duration per time block."""
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
-        sleep_data = HealthDiagrams.filter_dates(sleep_data, start_date, end_date)
+        sleep_data = HealthDiagrams.filter_by_date_range(sleep_data, start_date, end_date)
         title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
         if user_id != "All":
-            sleep_data = HealthDiagrams.filter_users(sleep_data, user_id)
+            sleep_data = HealthDiagrams.filter_by_user(sleep_data, user_id)
             title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
         sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
@@ -80,13 +80,13 @@ class HealthDiagrams:
         """Returns a Plotly figure that visualizes the number of calories burned each day."""
         calorie_data = self.fitbit_db.get_calories()
 
-        calorie_data = HealthDiagrams.filter_dates(calorie_data, start_date, end_date)
+        calorie_data = HealthDiagrams.filter_by_date_range(calorie_data, start_date, end_date)
         if user_id == "All":
             calorie_data = calorie_data.groupby("Date", as_index=False)["Calories"].mean() # Average over all users
             title = "Calories Burned Over Time For All Users"
             y_label = "Average Calories Burned"
         else:
-            calorie_data = HealthDiagrams.filter_users(calorie_data, user_id)
+            calorie_data = HealthDiagrams.filter_by_user(calorie_data, user_id)
             title = f"Calories Burned Over Time For User {user_id}"
             y_label = "Calories Burned"
 
@@ -97,10 +97,10 @@ class HealthDiagrams:
         calories burned per time block."""
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
 
-        calorie_data = HealthDiagrams.filter_dates(calorie_data, start_date, end_date)
+        calorie_data = HealthDiagrams.filter_by_date_range(calorie_data, start_date, end_date)
         title = "Calories Burned Per 4-Hour Time Blocks For All Users"
         if user_id != "All":
-            calorie_data = HealthDiagrams.filter_users(calorie_data, user_id)
+            calorie_data = HealthDiagrams.filter_by_user(calorie_data, user_id)
             title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
@@ -111,14 +111,14 @@ class HealthDiagrams:
         """Returns a Plotly figure that visualizes the heart rate each day."""
         heart_rate_data = self.fitbit_db.get_heart_rate()
 
-        heart_rate_data = HealthDiagrams.filter_dates(heart_rate_data, start_date, end_date)
+        heart_rate_data = HealthDiagrams.filter_by_date_range(heart_rate_data, start_date, end_date)
         if user_id == "All":
             heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean() # Average over all users
             over_time_plot_title = "Heart Rate Over Time For All Users"
             over_time_plot_y_label = "Average Heart Rate (bpm)"
             average_plot_title = "Average Heart Rate" + "<br>" + "For All Users" + "<br>" + "Over Date Range"
         else:
-            heart_rate_data = HealthDiagrams.filter_users(heart_rate_data, user_id)
+            heart_rate_data = HealthDiagrams.filter_by_user(heart_rate_data, user_id)
             over_time_plot_title = f"Heart Rate Over Time For User {user_id}"
             over_time_plot_y_label = "Heart Rate (bpm)"
             average_plot_title = "Average Heart Rate" + "<br>" + f"For User {user_id}" + "<br>" + "Over Date Range"
