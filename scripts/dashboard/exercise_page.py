@@ -27,5 +27,8 @@ with col1:
 with col2:
     if user == "All":
         st.plotly_chart(diagrams.plot_day_of_week_frequency())
-        
-# st.plotly_chart(diagrams.plot_weather_correlation_for_chicago())
+
+chicago_figures = diagrams.plot_weather_correlation_for_chicago()
+
+for graph_name in chicago_figures:
+    st.plotly_chart(chicago_figures[graph_name])

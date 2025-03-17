@@ -3,13 +3,12 @@
 import sys
 import os
 
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(project_root)
 # ----------
 
-
 import pandas as pd
-# import numpy as np
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import statsmodels.formula.api as smf
@@ -18,6 +17,9 @@ from scripts.database import FitbitDatabase
 class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, weather_csv: str):
         self.fitbit_db = fitbit_db
+        
+        weather_csv = os.path.join(project_root, "data/chicago_data.csv")
+        
         self.chicago_data = pd.read_csv(weather_csv)
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
@@ -71,65 +73,13 @@ class ExerciseDiagrams:
         fig.add_trace(go.Scatter(x=user_entries['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
         return fig
 
-# def plot_weather_correlation_for_chicago(self, chicago_data):
-#         """
-#         Purpose: Displays weather data for the city of Chicago and creates a relationship between the variables
-#         """
-#         daily_activity_db = self.db.get_daily_activity()
-#         # Connect to database and load Fitbit data
-#         daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
-
-#         # Aggregate TotalDistance and Calories per day
-#         activity_agg = daily_activity_db.groupby("ActivityDate").agg(
-#             TotalDistance=("TotalDistance", "sum"),
-#             Calories=("Calories", "sum")
-#         ).reset_index()
-
-#         # Merge Fitbit and weather data
-#         merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime").loc[:, ["TotalDistance", "Calories", "temp", "precip"]]
-
-#         # Compute Correlations
-#         corr_temp_distance = merged_data["TotalDistance"].corr(merged_data["temp"])
-#         corr_precip_distance = merged_data["TotalDistance"].corr(merged_data["precip"])
-#         corr_temp_calories = merged_data["Calories"].corr(merged_data["temp"])
-#         corr_precip_calories = merged_data["Calories"].corr(merged_data["precip"])
-
-#         # Create subplots for visualizations
-#         fig, axes = plt.subplots(2, 2, figsize=(12, 12))
-
-#         # Scatter Plot: Temperature vs. Total Distance
-#         sns.regplot(x=merged_data["temp"], y=merged_data["TotalDistance"], ax=axes[0, 0], color="red")
-#         axes[0, 0].set_title(f"Temperature vs. Total Distance (Corr: {corr_temp_distance:.3f})")
-#         axes[0, 0].set_xlabel("Temperature (°C)")
-#         axes[0, 0].set_ylabel("Total Distance (km)")
-
-#         # Scatter Plot: Precipitation vs. Total Distance
-#         sns.regplot(x=merged_data["precip"], y=merged_data["TotalDistance"], ax=axes[0, 1], color="blue")
-#         axes[0, 1].set_title(f"Precipitation vs. Total Distance (Corr: {corr_precip_distance:.3f})")
-#         axes[0, 1].set_xlabel("Precipitation (mm)")
-#         axes[0, 1].set_ylabel("Total Distance (km)")
-
-#         # Scatter Plot: Temperature vs. Calories Burned
-#         sns.regplot(x=merged_data["temp"], y=merged_data["Calories"], ax=axes[1, 0], color="orange")
-#         axes[1, 0].set_title(f"Temperature vs. Calories Burned (Corr: {corr_temp_calories:.3f})")
-#         axes[1, 0].set_xlabel("Temperature (°C)")
-#         axes[1, 0].set_ylabel("Calories Burned")
-
-#         # Scatter Plot: Precipitation vs. Calories Burned
-#         sns.regplot(x=merged_data["precip"], y=merged_data["Calories"], ax=axes[1, 1], color="green")
-#         axes[1, 1].set_title(f"Precipitation vs. Calories Burned (Corr: {corr_precip_calories:.3f})")
-#         axes[1, 1].set_xlabel("Precipitation (mm)")
-#         axes[1, 1].set_ylabel("Calories Burned")
-
-#         fig.tight_layout()
-        return fig
-
     def plot_weather_correlation_for_chicago(self):
         """
-        Purpose: Displays weather data for the city of Chicago and creates a relationship between the variables
+        Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
+        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
+        
         daily_activity_db = self.fitbit_db.get_daily_activity()
-        # Connect to database and load Fitbit data
         daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
 
         # Aggregate TotalDistance and Calories per day
@@ -139,12 +89,71 @@ class ExerciseDiagrams:
         ).reset_index()
 
         # Merge Fitbit and weather data
-        merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime").loc[:, ["TotalDistance", "Calories", "temp", "precip"]]
+        merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime")
 
-        fig = px.scatter_matrix(
-            merged_data, 
-            dimensions=['TotalDistance', 'Calories', 'temp', 'precip'],
-            title='Weather Correlation with Activity in Chicago',
-            labels={'TotalDistance': 'Total Distance (km)', 'Calories': 'Calories Burned', 'temp': 'Temperature (°C)', 'precip': 'Precipitation (mm)'}
+        def scatter_with_fit(x, y, title, xlabel, ylabel, color):
+            """
+            Purpose: Helper function to create a best-fit line
+            """
+            
+            # Compute regression line
+            slope, intercept = np.polyfit(x, y, 1)
+            y_pred = slope * np.array(x) + intercept  # Predicted values
+
+            # Create figure
+            fig = go.Figure()
+
+            # Scatter plot
+            fig.add_trace(go.Scatter(
+                x=x, y=y, mode="markers", name="Data", marker=dict(color=color)
+            ))
+
+            # Best-fit line
+            fig.add_trace(go.Scatter(
+                x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
+            ))
+
+            # Update layout
+            fig.update_layout(
+                title=title,
+                xaxis_title=xlabel,
+                yaxis_title=ylabel
+            )
+
+            return fig
+
+        figs = {}
+
+        figs["distance_vs_temp"] = scatter_with_fit(
+            merged_data["temp"], merged_data["TotalDistance"],
+            title="Total Distance vs. Temperature",
+            xlabel="Temperature (°C)",
+            ylabel="Total Distance (km)",
+            color="red"
         )
-        return fig
+
+        figs["calories_vs_temp"] = scatter_with_fit(
+            merged_data["temp"], merged_data["Calories"],
+            title="Calories Burned vs. Temperature",
+            xlabel="Temperature (°C)",
+            ylabel="Calories Burned",
+            color="orange"
+        )
+
+        figs["distance_vs_precip"] = scatter_with_fit(
+            merged_data["precip"], merged_data["TotalDistance"],
+            title="Total Distance vs. Precipitation",
+            xlabel="Precipitation (mm)",
+            ylabel="Total Distance (km)",
+            color="blue"
+        )
+
+        figs["calories_vs_precip"] = scatter_with_fit(
+            merged_data["precip"], merged_data["Calories"],
+            title="Calories Burned vs. Precipitation",
+            xlabel="Precipitation (mm)",
+            ylabel="Calories Burned",
+            color="green"
+        )
+
+        return figs
