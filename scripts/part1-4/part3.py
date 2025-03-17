@@ -81,7 +81,7 @@ class Part3:
     def generate_sleep_min_to_active_min_regression(self):
         """Generates a regression that shows how sleep minutes relate to active minutes for all users and days."""
 
-        active_and_sleep_min_grouped_by_user = self.db.get_active_and_sleep_min()
+        active_and_sleep_min_grouped_by_user = self.db.get_active_and_sleep_hrs()
         if active_and_sleep_min_grouped_by_user.empty:
             print("No activity and/or sleep data available.")
             return

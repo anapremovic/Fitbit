@@ -24,7 +24,9 @@ def get_fitbit_db_instance() -> FitbitDatabase:
     db_location = os.path.join(project_root, "data/fitbit_database.db")
     return FitbitDatabase(db_location)
 
-st.set_page_config(layout="wide")
+st.set_page_config(
+    layout="wide",
+)
 
 fitbit_db = get_fitbit_db_instance()
 st.session_state["fitbit_db"] = fitbit_db
