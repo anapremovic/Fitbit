@@ -15,12 +15,10 @@ import statsmodels.formula.api as smf
 from scripts.database import FitbitDatabase
 
 class ExerciseDiagrams:
-    def __init__(self, fitbit_db: FitbitDatabase, weather_csv: str):
+    def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str):
         self.fitbit_db = fitbit_db
         
-        weather_csv = os.path.join(project_root, "data/chicago_data.csv")
-        
-        self.chicago_data = pd.read_csv(weather_csv)
+        self.chicago_data = pd.read_csv(os.path.join(project_root, chicago_csv))
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
     def plot_distance_walked_density(self):
@@ -91,11 +89,15 @@ class ExerciseDiagrams:
         # Merge Fitbit and weather data
         merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime")
 
-        def scatter_with_fit(x, y, title, xlabel, ylabel, color):
+        # Function to create scatter plot with best-fit line and correlation
+        def scatter_with_fit(x, y, xlabel, ylabel, color):
             """
-            Purpose: Helper function to create a best-fit line
+            Purpose: Helper function for plotting best-fit line
             """
             
+            # Compute correlation
+            correlation = x.corr(y)  # Pearson correlation
+
             # Compute regression line
             slope, intercept = np.polyfit(x, y, 1)
             y_pred = slope * np.array(x) + intercept  # Predicted values
@@ -113,47 +115,37 @@ class ExerciseDiagrams:
                 x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
             ))
 
-            # Update layout
+            # Update layout with correlation in title
             fig.update_layout(
-                title=title,
+                title=f"{ylabel} vs. {xlabel} (Corr: {correlation:.3f})",
                 xaxis_title=xlabel,
                 yaxis_title=ylabel
             )
 
-            return fig
+            return fig, correlation
 
         figs = {}
+        correlations = {}
 
-        figs["distance_vs_temp"] = scatter_with_fit(
+        figs["distance_vs_temp"], correlations["distance_vs_temp"] = scatter_with_fit(
             merged_data["temp"], merged_data["TotalDistance"],
-            title="Total Distance vs. Temperature",
-            xlabel="Temperature (°C)",
-            ylabel="Total Distance (km)",
-            color="red"
+            xlabel="Temperature (°C)", ylabel="Total Distance (km)", color="red"
         )
 
-        figs["calories_vs_temp"] = scatter_with_fit(
+        figs["calories_vs_temp"], correlations["calories_vs_temp"] = scatter_with_fit(
             merged_data["temp"], merged_data["Calories"],
-            title="Calories Burned vs. Temperature",
-            xlabel="Temperature (°C)",
-            ylabel="Calories Burned",
-            color="orange"
+            xlabel="Temperature (°C)", ylabel="Calories Burned", color="orange"
         )
 
-        figs["distance_vs_precip"] = scatter_with_fit(
+        figs["distance_vs_precip"], correlations["distance_vs_precip"] = scatter_with_fit(
             merged_data["precip"], merged_data["TotalDistance"],
-            title="Total Distance vs. Precipitation",
-            xlabel="Precipitation (mm)",
-            ylabel="Total Distance (km)",
-            color="blue"
+            xlabel="Precipitation (mm)", ylabel="Total Distance (km)", color="blue"
         )
 
-        figs["calories_vs_precip"] = scatter_with_fit(
+        figs["calories_vs_precip"], correlations["calories_vs_precip"] = scatter_with_fit(
             merged_data["precip"], merged_data["Calories"],
-            title="Calories Burned vs. Precipitation",
-            xlabel="Precipitation (mm)",
-            ylabel="Calories Burned",
-            color="green"
+            xlabel="Precipitation (mm)", ylabel="Calories Burned", color="green"
         )
 
-        return figs
+        return figs, correlations
+

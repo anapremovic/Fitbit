@@ -1,10 +1,5 @@
 import streamlit as st
-# from scripts.database import FitbitDatabase
-# import sys
-# import os
-# import numpy as np
 import pandas as pd
-# import plotly.express as px
 from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
 
 @st.cache_resource
@@ -28,7 +23,16 @@ with col2:
     if user == "All":
         st.plotly_chart(diagrams.plot_day_of_week_frequency())
 
-chicago_figures = diagrams.plot_weather_correlation_for_chicago()
+chicago_figures, chicago_correlations = diagrams.plot_weather_correlation_for_chicago()
 
-for graph_name in chicago_figures:
-    st.plotly_chart(chicago_figures[graph_name])
+temp, precip = st.columns(2)
+
+print(chicago_figures)
+
+with temp:
+    st.plotly_chart(chicago_figures["distance_vs_temp"])
+    st.plotly_chart(chicago_figures["calories_vs_temp"])
+
+with precip:
+    st.plotly_chart(chicago_figures["distance_vs_precip"])
+    st.plotly_chart(chicago_figures["calories_vs_precip"])
