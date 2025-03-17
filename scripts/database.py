@@ -52,19 +52,37 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
 
-    def get_heart_rate(self, user_id: int):
+    def get_calories(self) -> pd.DataFrame:
         query = """
             SELECT 
-                * 
-            FROM heart_rate 
-            WHERE Id = :id
+                Id AS UserId, 
+                ActivityDate AS Date,
+                Calories
+            FROM daily_activity;
         """
 
-        return self.connection.query(query, params={"id": user_id})
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
+
+    def get_heart_rate(self):
+        query = """
+            SELECT 
+                Id AS UserId,
+                Time AS Date,
+                Value AS HeartRate
+            FROM heart_rate
+        """
+
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
 
     def get_intensity(self, user_id: int):
         query = """
@@ -88,13 +106,13 @@ class FitbitDatabase:
 
         return self.connection.query(query)
 
-    def get_active_and_sleep_min(self, day_filter: str = "") -> pd.DataFrame:
+    def get_active_and_sleep_hrs(self, day_filter: str = "") -> pd.DataFrame:
         query = """
             SELECT 
                 daily_activity.Id AS UserId,
                 daily_activity.ActivityDate AS Date,
-                SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) AS TotalActiveMin,
-                SUM(sleep_moments.SleepMin) AS TotalSleepMin
+                SUM(daily_activity.VeryActiveMinutes + daily_activity.FairlyActiveMinutes + daily_activity.LightlyActiveMinutes) / 60.0 AS TotalActiveHours,
+                SUM(sleep_moments.SleepMin) / 60.0 AS TotalSleepHours
             FROM daily_activity
             INNER JOIN (
                 SELECT
@@ -111,7 +129,7 @@ class FitbitDatabase:
         """
 
         df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         if day_filter == "weekdays":
             return df[df["Date"].dt.weekday < 5]
@@ -123,10 +141,10 @@ class FitbitDatabase:
     def get_sedentary_sleep_activity(self):
         query = """
             SELECT 
-                minute_sleep.Id,
-                COUNT(*) AS MinutesSlept,
+                minute_sleep.Id AS UserId,
+                COUNT(*) / 60.0 AS HoursSlept,
                 ActivityDate AS Date, 
-                SedentaryMinutes
+                SedentaryMinutes / 60.0 AS SedentaryHours
             FROM minute_sleep 
             INNER JOIN daily_activity 
                 ON
@@ -134,9 +152,10 @@ class FitbitDatabase:
                     daily_activity.ActivityDate = substr(minute_sleep.date, 1, instr(minute_sleep.date, ' ') - 1)
             GROUP BY logId
         """
-        
+
         df = self.connection.query(query)
-        df['Id'] = df['Id'].astype(int)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
         return df
 
     def get_daily_step_distribution(self) -> pd.DataFrame:
@@ -188,30 +207,35 @@ class FitbitDatabase:
                 FROM hourly_calories
             )
             SELECT 
-                4 * AVG(Calories) AS AverageCalories,
+                Id AS UserId,
+				substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS Date,
+				4 * AVG(Calories) AS AverageCalories,
                 CASE 
                     WHEN ActivityHour LIKE '%AM%'
                         THEN CASE 
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '24:00-4:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4:00-8:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8:00-12:00'
                         END
                     WHEN ActivityHour LIKE '%PM%'
                         THEN CASE
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12:00-16:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16:00-20:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20:00-24:00'
                         END
                     ELSE 'N/A'
                 END AS HourGroup
             FROM transformed
-            GROUP BY HourGroup;
+            GROUP BY UserId, Date, HourGroup;
         """
 
         df = self.connection.query(query)
-        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-        return df.sort_values('HourGroup')
+
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
+        df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
+        return df.sort_values("HourGroup")
 
     def get_daily_sleep_distribution(self) -> pd.DataFrame:
         """Groups the minute_sleep table into 4-hour blocks and returns 
@@ -228,41 +252,36 @@ class FitbitDatabase:
                 FROM minute_sleep
             )
             SELECT 
-                COUNT(*) AS TotalMinutesSlept,
+				Id AS UserId,
+				substr(date, 1, instr(date, ' ') - 1) AS SleepDate,
+                COUNT(*) / 60.0 AS HoursSlept,
                 CASE 
                     WHEN date LIKE '%AM%'
                         THEN CASE 
-                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '0-4'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '24:00-4:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4:00-8:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8:00-12:00'
                         END
                     WHEN date LIKE '%PM%'
                         THEN CASE
-                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12-16'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                            WHEN (Hour BETWEEN 1 AND 3 OR Hour = 12) THEN '12:00-16:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16:00-20:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20:00-24:00'
                         END
                     ELSE 'N/A'
                 END AS HourGroup
             FROM transformed
-            GROUP BY HourGroup;
+            GROUP BY UserId, SleepDate, HourGroup;
         """
 
         df = self.connection.query(query)
-        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
 
-        query  = """
-            SELECT
-                COUNT(DISTINCT logId) AS NumDistinctSleepSessions 
-            FROM minute_sleep
-        """
+        df.rename(columns={"SleepDate": "Date"}, inplace=True)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
-        df2 = self.connection.query(query)
-        num_distinct_sleep_sessions = df2.at[0, 'NumDistinctSleepSessions']
-
-        df.loc[:, 'AverageMinutesSlept'] = df.loc[:, 'TotalMinutesSlept'] / num_distinct_sleep_sessions
-        return df.sort_values('HourGroup')
+        hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
+        df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
+        return df.sort_values("HourGroup")
         
     def get_daily_steps(self):
         query = """
@@ -307,4 +326,7 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
