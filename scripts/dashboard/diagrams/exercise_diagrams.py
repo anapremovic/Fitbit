@@ -36,7 +36,7 @@ class ExerciseDiagrams:
             nbins=30, 
             marginal='box', 
             histnorm='probability density',
-            title='Density Plot of Walking Distances',
+            title='Distribution of Distances Walked',
             labels={'x': 'Distance Walked (km)', 'y': 'Density'}
         )
         return fig
@@ -171,21 +171,6 @@ class ExerciseDiagrams:
             labels={"HourGroup": "Time", "AverageSteps": "Steps Taken"}
         )
 
-    def plot_daily_calorie_distribution_barplot(self): # Part 3: generate_daily_calorie_distribution_barplot
-        """Divide a day into 6 4-hour blocks and compute the average amount of calories
-        burnt per time block across all users. Visualize results in a bar plot."""
-
-        calorie_data = self.fitbit_db.get_daily_calorie_distribution()
-
-        return px.bar(
-            calorie_data,
-            x="HourGroup",
-            y="AverageCalories",
-            color_discrete_sequence=["red"],
-            title="Average Number of Calories Burnt per 4-Hour Time Block Across All Users",
-            labels={"HourGroup": "Time", "AverageCalories": "Calories Burnt"}
-        )
-    
     def plot_steps_to_heart_rate_and_avg_heart_rate(self, min_steps: int, max_steps: int): # Part 4
         """
         Plots daily steps vs heart rate regression and computes average heart rate for given step range
@@ -220,7 +205,7 @@ class ExerciseDiagrams:
         # Figure for the scatter plot
         fig1 = go.Figure([scatter_trace, regression_trace])
         fig1.update_layout(
-            title="Daily Steps vs. Average Heart Rate",
+            title="Relation Between Daily Steps and Average Heart Rate",
             xaxis_title="Daily Steps",
             yaxis_title="Average Daily Heart Rate (bpm)",
             template="plotly_white"

@@ -39,7 +39,6 @@ if user == "All":
 
     st.subheader("Daily Distributions")
     st.plotly_chart(diagrams.plot_daily_step_distribution_barplot())
-    st.plotly_chart(diagrams.plot_daily_calorie_distribution_barplot())
     
     heart_rate_graph, avg_heart_rate = st.columns([4, 1])
     
