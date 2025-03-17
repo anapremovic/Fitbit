@@ -21,8 +21,11 @@ class ExerciseDiagrams:
         self.chicago_data = pd.read_csv(os.path.join(project_root, chicago_csv))
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
-    def plot_distance_walked_density(self):
-        """Purpose: Create a density plot of the total distance walked by individuals"""
+    def plot_distance_walked_density(self): # Part 1: generate_distance_walked_density_plot
+        """
+        Purpose: Create a density plot of the total distance walked by individuals
+        """
+
         data = self.fitbit_db.get_daily_activity()
         users = pd.unique(data.loc[:,'Id'])
         distances = [data.loc[data.loc[:, 'Id'] == user, 'TotalDistance'].sum() for user in users]
@@ -37,8 +40,11 @@ class ExerciseDiagrams:
         )
         return fig
 
-    def plot_day_of_week_frequency(self):
-        """Create bar plot that displays the frequency of workouts per day of week"""
+    def plot_day_of_week_frequency(self): # Part 1: generate_day_of_week_frequency_plot
+        """
+        Create bar plot that displays the frequency of workouts per day of week
+        """
+
         data = self.fitbit_db.get_daily_activity()
         data["ActivityDate"] = pd.to_datetime(data.loc[:, "ActivityDate"])
         day_of_week_counts = data.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
@@ -51,7 +57,7 @@ class ExerciseDiagrams:
         )
         return fig
 
-    def plot_steps_to_calories_regression(self, user_id: int):
+    def plot_steps_to_calories_regression(self, user_id: int): # Part 1: generate_steps_to_calories_regression
         data = self.fitbit_db.get_daily_activity()
         user_entries = data[data['Id'] == user_id]
         
@@ -71,7 +77,7 @@ class ExerciseDiagrams:
         fig.add_trace(go.Scatter(x=user_entries['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
         return fig
 
-    def plot_weather_correlation_for_chicago(self):
+    def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
@@ -149,3 +155,32 @@ class ExerciseDiagrams:
 
         return figs, correlations
 
+    def plot_daily_step_distribution_barplot(self): # Part 3: generate_daily_step_distribution_barplot
+        """Divide a day into 6 4-hour blocks and compute the average amount of steps
+        taken per time block across all users. Visualize results in a bar plot."""
+        
+        step_data = self.fitbit_db.get_daily_step_distribution()
+
+        return px.bar(
+            step_data,
+            x="HourGroup",
+            y="AverageSteps",
+            color_discrete_sequence=["green"],
+            title="Average Number of Steps Taken per 4-Hour Time Block Across All Users",
+            labels={"HourGroup": "Time", "AverageSteps": "Steps Taken"}
+        )
+
+    def plot_daily_calorie_distribution_barplot(self): # Part 3: generate_daily_calorie_distribution_barplot
+        """Divide a day into 6 4-hour blocks and compute the average amount of calories
+        burnt per time block across all users. Visualize results in a bar plot."""
+
+        calorie_data = self.fitbit_db.get_daily_calorie_distribution()
+
+        return px.bar(
+            calorie_data,
+            x="HourGroup",
+            y="AverageCalories",
+            color_discrete_sequence=["red"],
+            title="Average Number of Calories Burnt per 4-Hour Time Block Across All Users",
+            labels={"HourGroup": "Time", "AverageCalories": "Calories Burnt"}
+        )
