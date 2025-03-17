@@ -13,6 +13,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import statsmodels.formula.api as smf
 from scripts.database import FitbitDatabase
+import sklearn.linear_model as sk
 
 class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str):
@@ -184,3 +185,81 @@ class ExerciseDiagrams:
             title="Average Number of Calories Burnt per 4-Hour Time Block Across All Users",
             labels={"HourGroup": "Time", "AverageCalories": "Calories Burnt"}
         )
+    
+    def plot_steps_to_heart_rate_and_avg_heart_rate(self, min_steps: int, max_steps: int): # Part 4
+        """
+        Plots daily steps vs heart rate regression and computes average heart rate for given step range
+        """
+
+        daily_steps_and_average_heart_rate_by_user = self.fitbit_db.get_daily_steps_and_average_heart_rate()
+        x, y, regression_line = self.fit_regression(
+            daily_steps_and_average_heart_rate_by_user, "TotalSteps", "AverageHeartRate"
+        )
+        avg_heart_rate = self.compute_avg_heart_rate(
+            daily_steps_and_average_heart_rate_by_user, min_steps, max_steps
+        )
+
+        # Scatter plot of Daily Steps vs Average Heart Rate
+        scatter_trace = go.Scatter(
+            x=x.flatten(),
+            y=y,
+            mode="markers",
+            marker=dict(color="green"),
+            name="Observations"
+        )
+
+        # Regression line
+        regression_trace = go.Scatter(
+            x=x.flatten(),
+            y=regression_line,
+            mode="lines",
+            line=dict(color="green"),
+            name="Regression Line"
+        )
+
+        # Figure for the scatter plot
+        fig1 = go.Figure([scatter_trace, regression_trace])
+        fig1.update_layout(
+            title="Daily Steps vs. Average Heart Rate",
+            xaxis_title="Daily Steps",
+            yaxis_title="Average Daily Heart Rate (bpm)",
+            template="plotly_white"
+        )
+
+        # Display Average Heart Rate for given step range
+        if not np.isnan(avg_heart_rate):
+            fig2 = go.Figure()
+            fig2.add_trace(
+                go.Indicator(
+                    mode="number",
+                    value=avg_heart_rate,
+                    title={
+                        "text": f"Average Heart Rate <br> for {min_steps} to {max_steps} steps",
+                        "font": {"size": 16}
+                    },
+                    number={"font": {"size": 36}, "suffix": " bpm"}
+                )
+            )
+
+        return fig1, fig2
+    
+    @staticmethod
+    def fit_regression(data: pd.DataFrame, x_col: str, y_col: str):
+        """Helper function to fit a regression to plot."""
+        x = data.loc[:, [x_col]].values
+        y = data.loc[:, y_col].values
+        model = sk.LinearRegression()
+        model.fit(x, y)
+        regression_line = model.predict(x)
+
+        return x, y, regression_line
+
+
+    @staticmethod
+    def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
+        """Helper function to compute the average heart rate for users for given step range."""
+        filtered_data = data[
+            (data["TotalSteps"] >= min_steps) &
+            (data["TotalSteps"] <= max_steps)
+        ]
+        return filtered_data["AverageHeartRate"].mean()
