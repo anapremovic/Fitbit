@@ -125,7 +125,8 @@ class HealthDiagrams:
         if heart_rate_data.empty:
             avg_heart_rate = "No Data"
         else:
-            avg_heart_rate = "{0:.2f}".format(heart_rate_data.loc[:, "HeartRate"].mean()) # Average over all dates
+            # Average over all dates
+            avg_heart_rate = "{0:.2f}".format(heart_rate_data.loc[:, "HeartRate"].mean()) + " bpm"
 
         heart_rate_data = heart_rate_data.sort_values(by="Date") # Fix overlapping lines in plotly
         over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
