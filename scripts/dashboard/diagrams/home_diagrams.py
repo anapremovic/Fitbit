@@ -16,7 +16,7 @@ class HomeDiagrams:
         fig = go.Figure(go.Indicator(
             mode="number",
             value=duration_days,
-            title={"text": "Days tracked", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
+            title={"text": "Days Followed", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
             number={"font": {"size": LARGE_FONT_SIZE}}#, "suffix": " days"} # Change color later
         ))
 
@@ -93,23 +93,26 @@ class HomeDiagrams:
             df, 
             x="Id", 
             y="AverageSteps",
-            title="Average Daily Steps per User - Color Indicating Average Intensity",
-            labels={"Id": "User ID", "AverageSteps": "Steps", "AverageCalories": "Calories"},
+            title="Average Daily Steps per User,<br>Color Indicates Average Intensity",
+            labels={"Id": "User", "AverageSteps": "Steps", "AverageCalories": "Calories"},
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
-        fig1.update_xaxes(type='category', tickangle=-45)
+        fig1.update_xaxes(type='category', tickangle=-45, showticklabels=False)
+        # Color scale is also given in the next barplot. Since they are same, 
+        # we can remove this one
+        fig1.update_layout(coloraxis_showscale=False)
 
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
         fig2 = px.bar(
             df, 
             x="Id", 
             y="AverageActiveMinutes",
-            title="Average Daily Steps per User - Color Indicating Average Intensity",
-            labels={"Id": "User ID", "AverageActiveMinutes": "Active Time", "AverageCalories": "Calories"},
+            title="Average Daily Active Time per User,<br>Color Indicates Average Intensity",
+            labels={"Id": "User", "AverageActiveMinutes": "Active Minutes", "AverageCalories": "Calories"},
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
-        fig2.update_xaxes(type='category', tickangle=-45)
+        fig2.update_xaxes(type='category', showticklabels=False)
 
         return (fig1, fig2)

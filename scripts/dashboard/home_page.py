@@ -40,9 +40,9 @@ with right:
     with col5:
         st.plotly_chart(collective_metrics[2])
 
-st.divider()
 
-left, right = st.columns(2)
+
+left, right = st.columns([0.9, 1.1])
 bar_plots = home_diagrams.get_steps_and_active_barplot()
 with left:
     st.plotly_chart(bar_plots[0])
