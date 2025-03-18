@@ -23,7 +23,7 @@ with div:
             <style>
                 .divider-vertical-line {
                     border-left: 2px solid rgba(49, 51, 63, 1);
-                    height: 200px;
+                    height: 170px;
                     margin: auto;
                 }
             </style>
@@ -39,8 +39,6 @@ with right:
         st.plotly_chart(collective_metrics[1])
     with col5:
         st.plotly_chart(collective_metrics[2])
-
-
 
 left, right = st.columns([0.9, 1.1])
 bar_plots = home_diagrams.get_steps_and_active_barplot()

@@ -20,7 +20,7 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}}#, "suffix": " days"} # Change color later
         ))
 
-        fig.update_layout(height=200, margin=dict(l=0, r=0, t=0, b=0))
+        fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
 
         return fig
     
@@ -35,7 +35,7 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}} # Change color later
         ))
 
-        fig.update_layout(height=200, margin=dict(l=0, r=0, t=0, b=0))
+        fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
 
         return fig
 
@@ -79,9 +79,9 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}} # Change color later
         ))
 
-        fig1.update_layout(height=200, margin=dict(l=0, r=0, t=0, b=0))
-        fig2.update_layout(height=200, margin=dict(l=0, r=0, t=0, b=0))
-        fig3.update_layout(height=200, margin=dict(l=0, r=0, t=0, b=0))
+        fig1.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
+        fig2.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
+        fig3.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
 
         return (fig1, fig2, fig3)
 
