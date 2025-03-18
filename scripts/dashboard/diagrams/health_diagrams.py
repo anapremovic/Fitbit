@@ -107,7 +107,7 @@ class HealthDiagrams:
         return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
                       labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
 
-    def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure, go.Figure):
+    def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> tuple[go.Figure, go.Figure]:
         """Returns a Plotly figure that visualizes the heart rate each day."""
         heart_rate_data = self.fitbit_db.get_heart_rate()
 
