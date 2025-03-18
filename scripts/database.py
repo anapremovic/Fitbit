@@ -70,13 +70,28 @@ class FitbitDatabase:
 
         return df
 
-    def get_heart_rate(self):
+    def get_heart_rate(self, user_id: float) -> pd.DataFrame:
         query = """
             SELECT 
                 Id AS UserId,
                 Time AS Date,
                 Value AS HeartRate
             FROM heart_rate
+            WHERE Id = :id
+	    """
+
+        df = self.connection.query(query, params={"id": user_id})
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
+
+    def get_heart_rate_averaged_over_all_users(self) -> pd.DataFrame:
+        query = """
+            SELECT 
+                SUBSTR(Time, 1, INSTR(Time, ' ') - 1) AS Date,
+                AVG(Value) AS HeartRate
+            FROM heart_rate
+            GROUP BY SUBSTR(Time, 1, INSTR(Time, ' ') - 1)
         """
 
         df = self.connection.query(query)

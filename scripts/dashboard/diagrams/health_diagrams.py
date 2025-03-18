@@ -109,25 +109,25 @@ class HealthDiagrams:
 
     def get_heart_rate_over_time_and_average(self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure, go.Figure):
         """Returns a Plotly figure that visualizes the heart rate each day."""
-        heart_rate_data = self.fitbit_db.get_heart_rate()
-
-        heart_rate_data = HealthDiagrams.filter_by_date_range(heart_rate_data, start_date, end_date)
         if user_id == "All":
-            heart_rate_data = heart_rate_data.groupby("Date", as_index=False)["HeartRate"].mean() # Average over all users
+            heart_rate_data = self.fitbit_db.get_heart_rate_averaged_over_all_users()
             over_time_plot_title = "Heart Rate Over Time For All Users"
             over_time_plot_y_label = "Average Heart Rate (bpm)"
             average_plot_title = "Average Heart Rate" + "<br>" + "For All Users" + "<br>" + "Over Date Range"
         else:
-            heart_rate_data = HealthDiagrams.filter_by_user(heart_rate_data, user_id)
+            heart_rate_data = self.fitbit_db.get_heart_rate(user_id)
             over_time_plot_title = f"Heart Rate Over Time For User {user_id}"
             over_time_plot_y_label = "Heart Rate (bpm)"
             average_plot_title = "Average Heart Rate" + "<br>" + f"For User {user_id}" + "<br>" + "Over Date Range"
+
+        heart_rate_data = HealthDiagrams.filter_by_date_range(heart_rate_data, start_date, end_date)
 
         if heart_rate_data.empty:
             avg_heart_rate = "No Data"
         else:
             avg_heart_rate = "{0:.2f}".format(heart_rate_data.loc[:, "HeartRate"].mean()) # Average over all dates
 
+        heart_rate_data = heart_rate_data.sort_values(by="Date") # Fix overlapping lines in plotly
         over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
         average_plot = go.Figure(go.Scatter(
             x=[0],
