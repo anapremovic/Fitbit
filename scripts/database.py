@@ -94,13 +94,10 @@ class FitbitDatabase:
 
         return self.connection.query(query, params={"id": user_id})
 
-    def get_daily_activity_for_chicago_comparison(self):
+    def get_daily_activity(self):
         query = """
             SELECT
-                Id,
-                ActivityDate,
-                TotalDistance,
-                Calories
+                *
             FROM daily_activity
         """
 

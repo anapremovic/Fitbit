@@ -30,9 +30,10 @@ with div:
     )
 with right:
     col3, col4, col5 = st.columns(3)
+    collective_metrics = home_diagrams.get_collective_metrics()
     with col3:
-        st.plotly_chart(home_diagrams.get_collective_steps())
+        st.plotly_chart(collective_metrics[0])
     with col4:
-        pass
+        st.plotly_chart(collective_metrics[1])
     with col5:
-        pass
+        st.plotly_chart(collective_metrics[2])
