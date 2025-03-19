@@ -109,13 +109,10 @@ class FitbitDatabase:
 
         return self.connection.query(query, params={"id": user_id})
 
-    def get_daily_activity_for_chicago_comparison(self):
+    def get_daily_activity(self):
         query = """
             SELECT
-                Id,
-                ActivityDate,
-                TotalDistance,
-                Calories
+                *
             FROM daily_activity
         """
 
@@ -341,7 +338,18 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+        return self.connection.query(query)
 
+    def collect_weight_data(self) -> pd.DataFrame:
+        query = """SELECT 
+            Id,
+            substr(Date, 1, instr(Date, ' ') - 1) AS Date,
+            WeightKg AS Weight,
+            WeightPounds,
+            BMI
+        FROM weight_log"""
+        df = self.connection.query(query)
+        df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
+        df = df.drop(columns=['WeightPounds'])
+        
         return df
