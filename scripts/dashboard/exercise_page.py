@@ -4,7 +4,8 @@ from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
 
 @st.cache_resource
 def get_exercise_diagrams():
-    return ExerciseDiagrams(st.session_state["fitbit_db"], f"{st.session_state["project_root"]}/data/chicago_data.csv")
+    project_root = st.session_state["project_root"]
+    return ExerciseDiagrams(st.session_state["fitbit_db"], f"{project_root}/data/chicago_data.csv")
 diagrams = get_exercise_diagrams()
 
 user = st.session_state["selected-user"]
