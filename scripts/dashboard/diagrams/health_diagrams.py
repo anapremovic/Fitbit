@@ -150,26 +150,27 @@ class HealthDiagrams:
     def plot_weight_change_vs_steps(self, user_id: int, start_date: datetime, end_date: datetime):
         """Generates a plot of weight change vs daily steps for a given user"""
         weight_data = self.fitbit_db.collect_weight_data()
-        weight_data['Date'] = pd.to_datetime(weight_data['Date'])
-        weight_data = HealthDiagrams.filter_by_date_range(weight_data, start_date, end_date)
-        weight_data = weight_data.set_index(['Id', 'Date'])
         step_data = self.fitbit_db.get_daily_steps()
-        step_data['Date'] = pd.to_datetime(step_data['ActivityDate'])
+        weight_data = HealthDiagrams.filter_by_date_range(weight_data, start_date, end_date)
         step_data = HealthDiagrams.filter_by_date_range(step_data, start_date, end_date)
+        weight_data = weight_data.set_index(['Id', 'Date'])
         
-        if user_id not in weight_data.index.get_level_values(0):
+        if user_id in weight_data.index.get_level_values(0):
+            weight_data = weight_data.loc[user_id, ['Weight']]
+            # Reindex step_data to be by date for a particular user
+            step_data = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
+        elif user_id == "All":
+            weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
+            step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+        else:
             return None
         
-        weight_data = weight_data.loc[user_id, ['Weight']]
-        
-        # Reindex step_data to be by date for a particular user
-        step_data = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
 
         # Reindex weight_data to match step_data and forward-fill missing values
         df = weight_data.reindex(step_data.index).ffill()
 
         # Join TotalSteps from step_data to df
-        df = df.join(step_data, how='left')
+        df = df.merge(step_data, on='Date', how='left')
 
         
         # Create subplots (3 plots: Weight vs Steps, Weight vs Date, Steps vs Date)
@@ -193,17 +194,29 @@ class HealthDiagrams:
         )
 
         # Update layout
+        if user_id == "All":
+            title_text = "Average weight and step analysis for all users"
+        else:
+            title_text = f"Weight & Steps Analysis for User {user_id}"
+
         fig.update_layout(
-            title_text=f"Weight & Steps Analysis for User {user_id}",
-            template="plotly_white",
+            title_text=title_text,
             showlegend=False
         )
 
+        if user_id == "All":
+            fig.update_yaxes(title_text="Average weight for all users (kg)", row=1, col=1)
+        else:
+            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
 
         fig.update_xaxes(title_text="Date", row=1, col=1)
-        fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
+
+        if user_id == "All":
+            fig.update_yaxes(title_text="Average steps for all users ", row=1, col=2)
+        else:
+            fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=2)
-        fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
+        
 
         return fig
