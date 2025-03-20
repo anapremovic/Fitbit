@@ -46,3 +46,4 @@ if user == "All":
     
     with heart_rate_graph: st.plotly_chart(heart_rate_graph_diagram)
     with avg_heart_rate: st.plotly_chart(avg_heart_rate_diagram)
+

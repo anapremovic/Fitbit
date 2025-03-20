@@ -1,12 +1,3 @@
-# ----------
-# Ensures that all Python files can be imported from any location
-import sys
-import os
-
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-sys.path.append(project_root)
-# ----------
-
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -19,7 +10,7 @@ class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str):
         self.fitbit_db = fitbit_db
         
-        self.chicago_data = pd.read_csv(os.path.join(project_root, chicago_csv))
+        self.chicago_data = pd.read_csv(chicago_csv)
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
     def plot_distance_walked_density(self): # Part 1: generate_distance_walked_density_plot
@@ -35,7 +26,7 @@ class ExerciseDiagrams:
             x=distances,
             nbins=30, 
             marginal='box', 
-            histnorm='probability density',
+            histnorm='density',
             title='Distribution of Distances Walked',
             labels={'x': 'Distance Walked (km)', 'y': 'Density'}
         )
@@ -122,9 +113,9 @@ class ExerciseDiagrams:
                 x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
             ))
 
-            # Update layout with correlation in title
+            # Update layout of graph
             fig.update_layout(
-                title=f"{ylabel} vs. {xlabel} (Corr: {correlation:.3f})",
+                title=f"{ylabel} vs. {xlabel}",
                 xaxis_title=xlabel,
                 yaxis_title=ylabel
             )

@@ -26,6 +26,29 @@ def disable_weekdays_toggle():
         st.session_state["weekdays-only"] = False
 
 # Diagrams
+
+st.markdown("""
+            <style>
+            .stSpinner > div {
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+with st.spinner("Loading Data"):
+    sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, start_date, end_date)
+    sleep_duration_per_time_blocks = health_diagrams.get_sleep_duration_per_time_blocks(user, start_date, end_date)
+    calories_burned_over_time = health_diagrams.get_calories_burned_over_time(user, start_date, end_date)
+    calories_burned_per_time_blocks = health_diagrams.get_calories_burned_per_time_blocks(user, start_date, end_date)
+    if st.session_state["weekdays-only"]:
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date, "weekdays")
+    elif st.session_state["weekends-only"]:
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date, "weekends")
+    else:
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date)
+    sedentary_hrs_to_sleep_hrs = health_diagrams.get_sedentary_hrs_to_sleep_hrs_regression(user, start_date, end_date)
+    heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_time_and_average(user, start_date, end_date)
 sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, start_date, end_date)
 sleep_duration_per_time_blocks = health_diagrams.get_sleep_duration_per_time_blocks(user, start_date, end_date)
 calories_burned_over_time = health_diagrams.get_calories_burned_over_time(user, start_date, end_date)
