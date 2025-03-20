@@ -23,18 +23,18 @@ with col2:
 
 chicago_figures, chicago_correlations = diagrams.plot_weather_correlation_for_chicago(user, start_date, end_date)
 
+st.subheader("Correlations Between Distance, Calories, Temperature, and Precipitation")
+temp, precip = st.columns(2)
+
+with temp:
+    st.plotly_chart(chicago_figures["distance_vs_temp"])
+    st.plotly_chart(chicago_figures["calories_vs_temp"])
+
+with precip:
+    st.plotly_chart(chicago_figures["distance_vs_precip"])
+    st.plotly_chart(chicago_figures["calories_vs_precip"])
+
 if user == "All":
-    st.subheader("Correlations Between Distance, Calories, Temperature, and Precipitation")
-    temp, precip = st.columns(2)
-
-    with temp:
-        st.plotly_chart(chicago_figures["distance_vs_temp"])
-        st.plotly_chart(chicago_figures["calories_vs_temp"])
-
-    with precip:
-        st.plotly_chart(chicago_figures["distance_vs_precip"])
-        st.plotly_chart(chicago_figures["calories_vs_precip"])
-
     st.subheader("Daily Distributions")
     st.plotly_chart(diagrams.plot_daily_step_distribution_barplot())
     

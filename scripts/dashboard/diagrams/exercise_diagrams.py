@@ -88,14 +88,19 @@ class ExerciseDiagrams:
         fig.add_trace(go.Scatter(x=data['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
         return fig
 
-    def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
+    def plot_weather_correlation_for_chicago(self, user_id, start_date: datetime, end_date: datetime): # Part 3: display_weather_correlation_for_chicago
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
-        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
+        self.chicago_data.rename(columns={"datetime": "Date"}, inplace=True)
+        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
         
         daily_activity_db = self.fitbit_db.get_daily_activity()
-        daily_activity_db["Date"] = pd.to_datetime(daily_activity_db["Date"])
+
+        self.chicago_data = Util.filter_by_date_range(self.chicago_data, start_date, end_date)
+        daily_activity_db = Util.filter_by_date_range(daily_activity_db, start_date, end_date)
+        if user_id != "All":
+            daily_activity_db = Util.filter_by_user(daily_activity_db, user_id)
 
         # Aggregate TotalDistance and Calories per day
         activity_agg = daily_activity_db.groupby("Date").agg(
@@ -104,7 +109,7 @@ class ExerciseDiagrams:
         ).reset_index()
 
         # Merge Fitbit and weather data
-        merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="datetime")
+        merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="Date")
 
         # Function to create scatter plot with best-fit line and correlation
         def scatter_with_fit(x, y, xlabel, ylabel, color):
@@ -132,9 +137,14 @@ class ExerciseDiagrams:
                 x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
             ))
 
+            if user_id == "All":
+                title = f"Relation Between {xlabel}" + "<br>" + f" And {ylabel} For All Users"
+            else:
+                title = f"Relation Between {xlabel}" + "<br>" + f" And {ylabel} For User {user_id}"
+
             # Update layout of graph
             fig.update_layout(
-                title=f"{ylabel} vs. {xlabel}",
+                title=title,
                 xaxis_title=xlabel,
                 yaxis_title=ylabel
             )
