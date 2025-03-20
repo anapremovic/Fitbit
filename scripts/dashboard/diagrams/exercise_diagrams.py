@@ -4,7 +4,6 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import statsmodels.formula.api as smf
-import sklearn.linear_model as sk
 
 from scripts.dashboard.utils.util import Util
 from scripts.database import FitbitDatabase
@@ -198,7 +197,7 @@ class ExerciseDiagrams:
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
 
-    def plot_steps_to_heart_rate_and_avg_heart_rate(self, user_id, start_date: datetime, end_date: datetime, min_steps: int, max_steps: int): # Part 4
+    def plot_steps_to_heart_rate_and_avg_heart_rate(self, user_id, start_date: datetime, end_date: datetime): # Part 4
         """
         Plots daily steps vs heart rate regression and computes average heart rate for given step range
         """
@@ -208,20 +207,17 @@ class ExerciseDiagrams:
         daily_steps_and_average_heart_rate = (
             Util.filter_by_date_range(daily_steps_and_average_heart_rate, start_date, end_date))
         regression_title = "Relation Between Daily Steps and Average Heart Rate For All Users"
-        average_plot_title = f"Average Heart Rate <br> for all users <br> for {min_steps} to {max_steps} steps"
+        average_plot_title = f"Average Heart Rate <br> For All Users"
         if user_id != "All":
             daily_steps_and_average_heart_rate = (
                 Util.filter_by_user(daily_steps_and_average_heart_rate, user_id))
             regression_title = f"Relation Between Daily Steps and Average Heart Rate For User {user_id}"
-            average_plot_title = f"Average Heart Rate <br> for user {user_id} <br> for {min_steps} to {max_steps} steps"
+            average_plot_title = f"Average Heart Rate <br> For User {user_id}"
 
-        avg_heart_rate = self.compute_avg_heart_rate(
-                            daily_steps_and_average_heart_rate, min_steps, max_steps
-                        )
-        if np.isnan(avg_heart_rate):
+        if daily_steps_and_average_heart_rate.empty:
             avg_heart_rate = "No Data"
         else:
-            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
+            avg_heart_rate = "{0:.2f}".format(daily_steps_and_average_heart_rate["AverageHeartRate"].mean()) + " bpm"
 
         fig1 = px.scatter(daily_steps_and_average_heart_rate, x="TotalSteps", y="AverageHeartRate", trendline="ols",
                           title=regression_title)
@@ -234,7 +230,7 @@ class ExerciseDiagrams:
             template="plotly_white"
         )
 
-        # Display Average Heart Rate for given step range
+        # Display Average Heart Rate
         fig2 = go.Figure(go.Scatter(
             x=[0],
             y=[0],
@@ -254,12 +250,3 @@ class ExerciseDiagrams:
         )
 
         return fig1, fig2
-
-    @staticmethod
-    def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
-        """Helper function to compute the average heart rate for users for given step range."""
-        filtered_data = data[
-            (data["TotalSteps"] >= min_steps) &
-            (data["TotalSteps"] <= max_steps)
-        ]
-        return filtered_data["AverageHeartRate"].mean()
