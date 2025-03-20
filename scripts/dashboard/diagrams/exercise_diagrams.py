@@ -1,9 +1,9 @@
+import datetime as datetime
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import statsmodels.formula.api as smf
-from scripts.database import FitbitDatabase
 import sklearn.linear_model as sk
 
 from scripts.dashboard.utils.util import Util
@@ -38,19 +38,27 @@ class ExerciseDiagrams:
         )
         return fig
 
-    def plot_day_of_week_frequency(self): # Part 1: generate_day_of_week_frequency_plot
+    def plot_day_of_week_frequency(self, user_id, start_date: datetime, end_date: datetime): # Part 1: generate_day_of_week_frequency_plot
         """
         Create bar plot that displays the frequency of workouts per day of week
         """
 
         data = self.fitbit_db.get_daily_activity()
-        data["ActivityDate"] = pd.to_datetime(data.loc[:, "ActivityDate"])
-        day_of_week_counts = data.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
+
+        data = Util.filter_by_date_range(data, start_date, end_date)
+        title = "Number Of Workouts Per Day Of Week Over All Users"
+        if user_id != "All":
+            data = Util.filter_by_user(data, user_id)
+            title = f"Number Of Workouts Per Day Of Week For User {user_id}"
+
+        day_of_week_counts = data.loc[:, "Date"].dt.dayofweek.value_counts().sort_index()
+        # ensure y has 7 elements even if date range is under 7 days
+        day_of_week_counts = day_of_week_counts.reindex(range(7), fill_value=0)
 
         fig = px.bar(
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
-            title='Total Number of Workouts Per Day of Week',
+            title=title,
             labels={'x': 'Day of the Week', 'y': 'Frequency'}
         )
         return fig

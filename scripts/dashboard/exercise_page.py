@@ -21,10 +21,9 @@ with col1:
         st.plotly_chart(diagrams.plot_steps_to_calories_regression(user, start_date, end_date))
 
 with col2:
-    if user == "All":
-        st.plotly_chart(diagrams.plot_day_of_week_frequency())
+    st.plotly_chart(diagrams.plot_day_of_week_frequency(user, start_date, end_date))
 
-chicago_figures, chicago_correlations = diagrams.plot_weather_correlation_for_chicago()
+chicago_figures, chicago_correlations = diagrams.plot_weather_correlation_for_chicago(user, start_date, end_date)
 
 if user == "All":
     st.subheader("Correlations Between Distance, Calories, Temperature, and Precipitation")
