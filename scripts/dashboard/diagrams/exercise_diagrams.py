@@ -176,19 +176,26 @@ class ExerciseDiagrams:
 
         return figs, correlations
 
-    def plot_daily_step_distribution_barplot(self): # Part 3: generate_daily_step_distribution_barplot
+    def plot_daily_step_distribution_barplot(self, user_id, start_date: datetime, end_date: datetime): # Part 3: generate_daily_step_distribution_barplot
         """Divide a day into 6 4-hour blocks and compute the average amount of steps
         taken per time block across all users. Visualize results in a bar plot."""
         
         step_data = self.fitbit_db.get_daily_step_distribution()
+
+        step_data = Util.filter_by_date_range(step_data, start_date, end_date)
+        title = "Steps Taken Per 4-Hour Time Blocks For All Users"
+        if user_id != "All":
+            step_data = Util.filter_by_user(step_data, user_id)
+            title = f"Steps Taken Per 4-Hour Time Blocks For User {user_id}"
+        step_data = step_data.groupby("HourGroup", as_index=False, observed=False)["AverageSteps"].mean()  # Average over all dates
 
         return px.bar(
             step_data,
             x="HourGroup",
             y="AverageSteps",
             color_discrete_sequence=["green"],
-            title="Average Number of Steps Taken per 4-Hour Time Block Across All Users",
-            labels={"HourGroup": "Time", "AverageSteps": "Steps Taken"}
+            title=title,
+            labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
 
     def plot_steps_to_heart_rate_and_avg_heart_rate(self, min_steps: int, max_steps: int): # Part 4
