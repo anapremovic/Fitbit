@@ -4,8 +4,7 @@ from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
 
 @st.cache_resource
 def get_exercise_diagrams():
-    project_root = st.session_state["project_root"]
-    return ExerciseDiagrams(st.session_state["fitbit_db"], f"{project_root}/data/chicago_data.csv")
+    return ExerciseDiagrams(st.session_state["fitbit_db"], "data/chicago_data.csv")
 diagrams = get_exercise_diagrams()
 
 user = st.session_state["selected-user"]
@@ -47,3 +46,4 @@ if user == "All":
     
     with heart_rate_graph: st.plotly_chart(heart_rate_graph_diagram)
     with avg_heart_rate: st.plotly_chart(avg_heart_rate_diagram)
+

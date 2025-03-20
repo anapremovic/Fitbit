@@ -304,7 +304,9 @@ class FitbitDatabase:
             FROM daily_activity
         """
         
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df['ActivityDate'])
+        return df
 
     def get_hourly_steps(self):
         query = """
@@ -351,5 +353,5 @@ class FitbitDatabase:
         df = self.connection.query(query)
         df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
         df = df.drop(columns=['WeightPounds'])
-        
+        df["Date"] = pd.to_datetime(df["Date"])
         return df

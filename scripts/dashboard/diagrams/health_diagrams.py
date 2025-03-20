@@ -2,6 +2,7 @@ import datetime as datetime
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import streamlit as st
 
 from scripts.database import FitbitDatabase
@@ -154,3 +155,78 @@ class HealthDiagrams:
         )
 
         return over_time_plot, average_plot
+    
+    def plot_weight_change_vs_steps(self, user_id: int, start_date: datetime, end_date: datetime):
+        """Generates a plot of weight change vs daily steps for a given user"""
+        weight_data = self.fitbit_db.collect_weight_data()
+        step_data = self.fitbit_db.get_daily_steps()
+        weight_data = HealthDiagrams.filter_by_date_range(weight_data, start_date, end_date)
+        step_data = HealthDiagrams.filter_by_date_range(step_data, start_date, end_date)
+        weight_data = weight_data.set_index(['Id', 'Date'])
+        
+        idInData = True
+        if user_id in weight_data.index.get_level_values(0):
+            weight_data = weight_data.loc[user_id, ['Weight']]
+            # Reindex step_data to be by date for a particular user
+            step_data = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
+        elif user_id == "All":
+            weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
+            step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+        else:
+            df = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+            df['Weight'] = None
+            idInData = False
+        
+        if idInData:
+            # Reindex weight_data to match step_data and forward-fill missing values
+            df = weight_data.reindex(step_data.index).ffill()
+            # Join TotalSteps from step_data to df
+            df = df.merge(step_data, on='Date', how='left')
+
+        # Create subplots (3 plots: Weight vs Steps, Weight vs Date, Steps vs Date)
+        fig = make_subplots(
+            rows=1, cols=2,
+            subplot_titles=["Weight Over Time", "Steps Over Time"]
+        )
+
+        # Line plot: Weight vs. Date
+        fig.add_trace(
+            go.Scatter(x=df.index, y=df["Weight"], mode="lines+markers",
+                    line=dict(color="red"), name="Weight vs Date"),
+            row=1, col=1
+        )
+
+        # Line plot: Steps vs. Date
+        fig.add_trace(
+            go.Scatter(x=df.index, y=df["TotalSteps"], mode="lines+markers",
+                    line=dict(color="green"), name="Steps vs Date"),
+            row=1, col=2
+        )
+
+        # Update layout
+        if user_id == "All":
+            title_text = "Average weight and step analysis for all users"
+        else:
+            title_text = f"Weight & Steps Analysis for User {user_id}"
+
+        fig.update_layout(
+            title_text=title_text,
+            showlegend=False
+        )
+
+        if user_id == "All":
+            fig.update_yaxes(title_text="Average weight for all users (kg)", row=1, col=1)
+        else:
+            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
+
+        fig.update_xaxes(title_text="Date", row=1, col=1)
+
+        if user_id == "All":
+            fig.update_yaxes(title_text="Average steps for all users ", row=1, col=2)
+        else:
+            fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
+
+        fig.update_xaxes(title_text="Date", row=1, col=2)
+        
+
+        return fig
