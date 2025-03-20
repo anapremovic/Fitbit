@@ -116,7 +116,12 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df.rename(columns={"ActivityDate": "Date"}, inplace=True)
+        df.rename(columns={"Id": "UserId"}, inplace=True)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
 
     def get_active_and_sleep_hrs(self, day_filter: str = "") -> pd.DataFrame:
         query = """

@@ -6,6 +6,9 @@ import statsmodels.formula.api as smf
 from scripts.database import FitbitDatabase
 import sklearn.linear_model as sk
 
+from scripts.dashboard.utils.util import Util
+from scripts.database import FitbitDatabase
+
 class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str):
         self.fitbit_db = fitbit_db
@@ -13,21 +16,24 @@ class ExerciseDiagrams:
         self.chicago_data = pd.read_csv(chicago_csv)
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
 
-    def plot_distance_walked_density(self): # Part 1: generate_distance_walked_density_plot
+    def plot_distance_walked_density(self, start_date: datetime, end_date: datetime): # Part 1: generate_distance_walked_density_plot
         """
         Purpose: Create a density plot of the total distance walked by individuals
         """
 
         data = self.fitbit_db.get_daily_activity()
-        users = pd.unique(data.loc[:,'Id'])
-        distances = [data.loc[data.loc[:, 'Id'] == user, 'TotalDistance'].sum() for user in users]
+
+        data = Util.filter_by_date_range(data, start_date, end_date)
+
+        users = pd.unique(data.loc[:,'UserId'])
+        distances = [data.loc[data.loc[:, 'UserId'] == user, 'TotalDistance'].sum() for user in users]
 
         fig = px.histogram(
             x=distances,
             nbins=30, 
             marginal='box', 
             histnorm='density',
-            title='Distribution of Distances Walked',
+            title="Distribution Of Distances Walked For All Users",
             labels={'x': 'Distance Walked (km)', 'y': 'Density'}
         )
         return fig
@@ -51,12 +57,12 @@ class ExerciseDiagrams:
 
     def plot_steps_to_calories_regression(self, user_id: int): # Part 1: generate_steps_to_calories_regression
         data = self.fitbit_db.get_daily_activity()
-        user_entries = data[data['Id'] == user_id]
+        user_entries = data[data['UserId'] == user_id]
         
-        least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(Id)', data=data).fit()
+        least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(UserId)', data=data).fit()
         steps_coef = least_squares_model.params['TotalSteps']
         base_intercept = least_squares_model.params['Intercept']
-        user_coef = least_squares_model.params.get(f'C(Id)[T.{user_id}]', 0)
+        user_coef = least_squares_model.params.get(f'C(UserId)[T.{user_id}]', 0)
 
         regression_line = [base_intercept + user_coef + steps_coef * x for x in user_entries['TotalSteps']]
 
@@ -76,16 +82,16 @@ class ExerciseDiagrams:
         self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
         
         daily_activity_db = self.fitbit_db.get_daily_activity()
-        daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
+        daily_activity_db["Date"] = pd.to_datetime(daily_activity_db["Date"])
 
         # Aggregate TotalDistance and Calories per day
-        activity_agg = daily_activity_db.groupby("ActivityDate").agg(
+        activity_agg = daily_activity_db.groupby("Date").agg(
             TotalDistance=("TotalDistance", "sum"),
             Calories=("Calories", "sum")
         ).reset_index()
 
         # Merge Fitbit and weather data
-        merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime")
+        merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="datetime")
 
         # Function to create scatter plot with best-fit line and correlation
         def scatter_with_fit(x, y, xlabel, ylabel, color):

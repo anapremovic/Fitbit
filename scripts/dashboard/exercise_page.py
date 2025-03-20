@@ -15,10 +15,10 @@ end_date = pd.to_datetime(st.session_state["selected-end-date"])
 st.title("Exercise")
 col1, col2 = st.columns(2)
 with col1:
-    if user == "All":
-        st.plotly_chart(diagrams.plot_distance_walked_density())
-    else:
-        st.plotly_chart(diagrams.plot_steps_to_calories_regression(user))
+    st.plotly_chart(diagrams.plot_distance_walked_density(start_date, end_date))
+
+    if user != "All":
+        st.plotly_chart(diagrams.plot_steps_to_calories_regression(user, start_date, end_date))
 
 with col2:
     if user == "All":
