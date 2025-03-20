@@ -16,9 +16,7 @@ st.title("Exercise")
 col1, col2 = st.columns(2)
 with col1:
     st.plotly_chart(diagrams.plot_distance_walked_density(start_date, end_date))
-
-    if user != "All":
-        st.plotly_chart(diagrams.plot_steps_to_calories_regression(user, start_date, end_date))
+st.plotly_chart(diagrams.plot_steps_to_calories_regression(user, start_date, end_date))
 
 with col2:
     st.plotly_chart(diagrams.plot_day_of_week_frequency(user, start_date, end_date))

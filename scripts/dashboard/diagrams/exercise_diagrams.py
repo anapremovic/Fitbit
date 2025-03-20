@@ -63,24 +63,29 @@ class ExerciseDiagrams:
         )
         return fig
 
-    def plot_steps_to_calories_regression(self, user_id: int): # Part 1: generate_steps_to_calories_regression
+    def plot_steps_to_calories_regression(self, user_id, start_date: datetime, end_date: datetime): # Part 1: generate_steps_to_calories_regression
         data = self.fitbit_db.get_daily_activity()
-        user_entries = data[data['UserId'] == user_id]
+
+        data = Util.filter_by_date_range(data, start_date, end_date)
+        title = f"Relation Between Daily Steps And Calories Burned For All Users"
+        if user_id != "All":
+            data = Util.filter_by_user(data, user_id)
+            title = f"Relation Between Daily Steps And Calories Burned For User {user_id}"
         
         least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(UserId)', data=data).fit()
         steps_coef = least_squares_model.params['TotalSteps']
         base_intercept = least_squares_model.params['Intercept']
         user_coef = least_squares_model.params.get(f'C(UserId)[T.{user_id}]', 0)
 
-        regression_line = [base_intercept + user_coef + steps_coef * x for x in user_entries['TotalSteps']]
+        regression_line = [base_intercept + user_coef + steps_coef * x for x in data['TotalSteps']]
 
         fig = px.scatter(
-            x=user_entries['TotalSteps'], 
-            y=user_entries['Calories'], 
-            title=f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}',
+            x=data['TotalSteps'],
+            y=data['Calories'],
+            title=title,
             labels={'x': 'Total Steps', 'y': 'Calories Burned'}
         )
-        fig.add_trace(go.Scatter(x=user_entries['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
+        fig.add_trace(go.Scatter(x=data['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
         return fig
 
     def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
