@@ -37,10 +37,9 @@ with precip:
 st.subheader("Daily Distributions")
 st.plotly_chart(diagrams.plot_daily_step_distribution_barplot(user, start_date, end_date))
 
-if user == "All":
-    heart_rate_graph, avg_heart_rate = st.columns([4, 1])
-    
-    heart_rate_graph_diagram, avg_heart_rate_diagram = diagrams.plot_steps_to_heart_rate_and_avg_heart_rate(10000, 15000) # Should have user be able to input steps later
-    
-    with heart_rate_graph: st.plotly_chart(heart_rate_graph_diagram)
-    with avg_heart_rate: st.plotly_chart(avg_heart_rate_diagram)
+heart_rate_graph, avg_heart_rate = st.columns([4, 1])
+
+heart_rate_graph_diagram, avg_heart_rate_diagram = diagrams.plot_steps_to_heart_rate_and_avg_heart_rate(user, start_date, end_date, 10000, 15000) # Should have user be able to input steps later
+
+with heart_rate_graph: st.plotly_chart(heart_rate_graph_diagram)
+with avg_heart_rate: st.plotly_chart(avg_heart_rate_diagram)

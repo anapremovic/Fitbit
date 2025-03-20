@@ -350,7 +350,10 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
 
     def collect_weight_data(self) -> pd.DataFrame:
         query = """SELECT 

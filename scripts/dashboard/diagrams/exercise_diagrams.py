@@ -138,9 +138,9 @@ class ExerciseDiagrams:
             ))
 
             if user_id == "All":
-                title = f"Relation Between {xlabel}" + "<br>" + f" And {ylabel} For All Users"
+                title = f"Relation Between {xlabel} <br> And {ylabel} For All Users"
             else:
-                title = f"Relation Between {xlabel}" + "<br>" + f" And {ylabel} For User {user_id}"
+                title = f"Relation Between {xlabel} <br> And {ylabel} For User {user_id}"
 
             # Update layout of graph
             fig.update_layout(
@@ -198,74 +198,62 @@ class ExerciseDiagrams:
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
 
-    def plot_steps_to_heart_rate_and_avg_heart_rate(self, min_steps: int, max_steps: int): # Part 4
+    def plot_steps_to_heart_rate_and_avg_heart_rate(self, user_id, start_date: datetime, end_date: datetime, min_steps: int, max_steps: int): # Part 4
         """
         Plots daily steps vs heart rate regression and computes average heart rate for given step range
         """
 
-        daily_steps_and_average_heart_rate_by_user = self.fitbit_db.get_daily_steps_and_average_heart_rate()
-        x, y, regression_line = self.fit_regression(
-            daily_steps_and_average_heart_rate_by_user, "TotalSteps", "AverageHeartRate"
-        )
+        daily_steps_and_average_heart_rate = self.fitbit_db.get_daily_steps_and_average_heart_rate()
+
+        daily_steps_and_average_heart_rate = (
+            Util.filter_by_date_range(daily_steps_and_average_heart_rate, start_date, end_date))
+        regression_title = "Relation Between Daily Steps and Average Heart Rate For All Users"
+        average_plot_title = f"Average Heart Rate <br> for all users <br> for {min_steps} to {max_steps} steps"
+        if user_id != "All":
+            daily_steps_and_average_heart_rate = (
+                Util.filter_by_user(daily_steps_and_average_heart_rate, user_id))
+            regression_title = f"Relation Between Daily Steps and Average Heart Rate For User {user_id}"
+            average_plot_title = f"Average Heart Rate <br> for user {user_id} <br> for {min_steps} to {max_steps} steps"
+
         avg_heart_rate = self.compute_avg_heart_rate(
-            daily_steps_and_average_heart_rate_by_user, min_steps, max_steps
-        )
+                            daily_steps_and_average_heart_rate, min_steps, max_steps
+                        )
+        if np.isnan(avg_heart_rate):
+            avg_heart_rate = "No Data"
+        else:
+            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
 
-        # Scatter plot of Daily Steps vs Average Heart Rate
-        scatter_trace = go.Scatter(
-            x=x.flatten(),
-            y=y,
-            mode="markers",
-            marker=dict(color="green"),
-            name="Observations"
-        )
-
-        # Regression line
-        regression_trace = go.Scatter(
-            x=x.flatten(),
-            y=regression_line,
-            mode="lines",
-            line=dict(color="green"),
-            name="Regression Line"
-        )
+        fig1 = px.scatter(daily_steps_and_average_heart_rate, x="TotalSteps", y="AverageHeartRate", trendline="ols",
+                          title=regression_title)
 
         # Figure for the scatter plot
-        fig1 = go.Figure([scatter_trace, regression_trace])
         fig1.update_layout(
-            title="Relation Between Daily Steps and Average Heart Rate",
+            title=regression_title,
             xaxis_title="Daily Steps",
             yaxis_title="Average Daily Heart Rate (bpm)",
             template="plotly_white"
         )
 
         # Display Average Heart Rate for given step range
-        if not np.isnan(avg_heart_rate):
-            fig2 = go.Figure()
-            fig2.add_trace(
-                go.Indicator(
-                    mode="number",
-                    value=avg_heart_rate,
-                    title={
-                        "text": f"Average Heart Rate <br> for {min_steps} to {max_steps} steps",
-                        "font": {"size": 16}
-                    },
-                    number={"font": {"size": 36}, "suffix": " bpm"}
-                )
-            )
+        fig2 = go.Figure(go.Scatter(
+            x=[0],
+            y=[0],
+            text=[avg_heart_rate],
+            mode='text',
+            textfont=dict(size=36),
+        ))
+        fig2.update_layout(
+            showlegend=False,
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            title={
+                "text": average_plot_title,
+                "font": {"size": 16}
+            },
+            title_y=0.95
+        )
 
         return fig1, fig2
-    
-    @staticmethod
-    def fit_regression(data: pd.DataFrame, x_col: str, y_col: str):
-        """Helper function to fit a regression to plot."""
-        x = data.loc[:, [x_col]].values
-        y = data.loc[:, y_col].values
-        model = sk.LinearRegression()
-        model.fit(x, y)
-        regression_line = model.predict(x)
-
-        return x, y, regression_line
-
 
     @staticmethod
     def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
