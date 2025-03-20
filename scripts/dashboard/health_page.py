@@ -49,6 +49,7 @@ with st.spinner("Loading Data"):
         active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date)
     sedentary_hrs_to_sleep_hrs = health_diagrams.get_sedentary_hrs_to_sleep_hrs_regression(user, start_date, end_date)
     heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_time_and_average(user, start_date, end_date)
+    weight_over_time = health_diagrams.plot_weight_change_vs_steps(user, start_date, end_date)
 
 # Show on dashboard
 
@@ -87,3 +88,8 @@ with st.container(border=True):
         st.plotly_chart(heart_rate_over_time, key="heart_rate_over_time")
     with number:
         st.plotly_chart(average_heart_rate, key="average_heart_rate")
+
+if weight_over_time:
+    st.subheader("Weight")
+    with st.container(border=True):
+        st.plotly_chart(weight_over_time, key="weight_over_time")
