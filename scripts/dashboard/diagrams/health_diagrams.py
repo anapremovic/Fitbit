@@ -164,6 +164,7 @@ class HealthDiagrams:
         step_data = HealthDiagrams.filter_by_date_range(step_data, start_date, end_date)
         weight_data = weight_data.set_index(['Id', 'Date'])
         
+        idInData = True
         if user_id in weight_data.index.get_level_values(0):
             weight_data = weight_data.loc[user_id, ['Weight']]
             # Reindex step_data to be by date for a particular user
@@ -172,16 +173,16 @@ class HealthDiagrams:
             weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
             step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
         else:
-            return None
+            df = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+            df['Weight'] = None
+            idInData = False
         
+        if idInData:
+            # Reindex weight_data to match step_data and forward-fill missing values
+            df = weight_data.reindex(step_data.index).ffill()
+            # Join TotalSteps from step_data to df
+            df = df.merge(step_data, on='Date', how='left')
 
-        # Reindex weight_data to match step_data and forward-fill missing values
-        df = weight_data.reindex(step_data.index).ffill()
-
-        # Join TotalSteps from step_data to df
-        df = df.merge(step_data, on='Date', how='left')
-
-        
         # Create subplots (3 plots: Weight vs Steps, Weight vs Date, Steps vs Date)
         fig = make_subplots(
             rows=1, cols=2,
