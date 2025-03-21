@@ -26,7 +26,10 @@ class HealthDiagrams:
             title = f"Sleep Duration Over Time For User {user_id}"
             y_label = "Hours Slept"
 
-        return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
+        if sleep_moments.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
 
     @st.cache_data(show_spinner=False)
     def get_sedentary_hrs_to_sleep_hrs_regression(_self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
