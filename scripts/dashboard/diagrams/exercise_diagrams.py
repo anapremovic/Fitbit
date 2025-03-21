@@ -165,10 +165,10 @@ class ExerciseDiagrams:
         step_data = self.fitbit_db.get_daily_step_distribution()
 
         step_data = Util.filter_by_date_range(step_data, self.start_date, self.end_date)
-        title = "Steps Taken Per 4-Hour Time Blocks For All Users"
+        title = "Average Steps Taken Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             step_data = Util.filter_by_user(step_data, self.user)
-            title = f"Steps Taken Per 4-Hour Time Blocks For User {self.user}"
+            title = f"Average Steps Taken Per 4-Hour Time Blocks For User {self.user}"
         step_data = step_data.groupby("HourGroup", as_index=False, observed=False)["AverageSteps"].mean()  # Average over all dates
 
         fig = px.bar(

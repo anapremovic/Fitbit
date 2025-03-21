@@ -107,10 +107,10 @@ class HealthDiagrams:
         calorie_data = _self.fitbit_db.get_daily_calorie_distribution()
 
         calorie_data = Util.filter_by_date_range(calorie_data, start_date, end_date)
-        title = "Calories Burned Per 4-Hour Time Blocks For All Users"
+        title = "Average Calories Burned Per 4-Hour Time Blocks For All Users"
         if user_id != "All":
             calorie_data = Util.filter_by_user(calorie_data, user_id)
-            title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
+            title = f"Average Calories Burned Per 4-Hour Time Blocks For User {user_id}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
         fig = px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
