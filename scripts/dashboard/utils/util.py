@@ -14,15 +14,14 @@ class Util:
         return df[(df.loc[:, "UserId"] == user_id)]
 
     @staticmethod
-    def get_no_data_figure(title: str):
-        fig = go.Figure()
-        fig.add_annotation(
-            text="No Data",
-            xref="paper", yref="paper",
-            x=0.5, y=0.5,
-            showarrow=False,
-            font=dict(size=36)
-        )
-        fig.update_layout(title=title, xaxis=dict(visible=False), yaxis=dict(visible=False))
-
-        return fig
+    def overlay_no_data_on_graph_if_empty(df: pd.DataFrame, fig: go.Figure):
+        if df.empty:
+            fig.add_annotation(
+                text="No Data",
+                xref="paper", yref="paper",
+                x=0.5, y=0.5,
+                showarrow=False,
+                font=dict(size=36),
+                bgcolor="rgba(0, 0, 0, 0)",
+                opacity=0.8
+            )
