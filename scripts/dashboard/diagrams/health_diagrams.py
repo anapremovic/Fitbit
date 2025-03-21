@@ -42,8 +42,12 @@ class HealthDiagrams:
             title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {user_id}"
             sedentary_and_sleep_data = Util.filter_by_user(sedentary_and_sleep_data, user_id)
 
-        return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
-                          labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
+        if sedentary_and_sleep_data.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols",
+                              title=title, labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"),
+                              opacity=0.5)
 
     @st.cache_data(show_spinner=False)
     def get_active_hrs_to_sleep_hrs_regression(_self, user_id, start_date: datetime, end_date: datetime, week_period: str = "") -> go.Figure:
@@ -56,8 +60,12 @@ class HealthDiagrams:
             title = f"Relation Between Daily Active Time And Sleep Duration For User {user_id}"
             active_and_sleep_data = Util.filter_by_user(active_and_sleep_data, user_id)
 
-        return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
-                          labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
+        if active_and_sleep_data.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols",
+                              title=title, labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"),
+                              opacity=0.5)
 
     @st.cache_data(show_spinner=False)
     def get_sleep_duration_per_time_blocks(_self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
@@ -72,8 +80,11 @@ class HealthDiagrams:
             title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {user_id}"
         sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
-        return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
-                      labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
+        if sleep_data.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
+                          labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
 
     @st.cache_data(show_spinner=False)
     def get_calories_burned_over_time(_self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
@@ -90,7 +101,10 @@ class HealthDiagrams:
             title = f"Calories Burned Over Time For User {user_id}"
             y_label = "Calories Burned"
 
-        return px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
+        if calorie_data.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
 
     @st.cache_data(show_spinner=False)
     def get_calories_burned_per_time_blocks(_self, user_id, start_date: datetime, end_date: datetime) -> go.Figure:
@@ -105,8 +119,11 @@ class HealthDiagrams:
             title = f"Calories Burned Per 4-Hour Time Blocks For User {user_id}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
-        return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
-                      labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
+        if calorie_data.empty:
+            return Util.get_no_data_figure(title)
+        else:
+            return px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
+                          labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
 
     @st.cache_data(show_spinner=False)
     def get_heart_rate_over_time_and_average(_self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure, go.Figure):
@@ -125,19 +142,21 @@ class HealthDiagrams:
         heart_rate_data = Util.filter_by_date_range(heart_rate_data, start_date, end_date)
 
         if heart_rate_data.empty:
+            over_time_plot = Util.get_no_data_figure(over_time_plot_title)
             avg_heart_rate = "No Data"
         else:
+            heart_rate_data = heart_rate_data.sort_values(by="Date")  # Fix overlapping lines in plotly
+            over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title,
+                                     labels=dict(HeartRate=over_time_plot_y_label))
             # Average over all dates
             avg_heart_rate = "{0:.2f}".format(heart_rate_data.loc[:, "HeartRate"].mean()) + " bpm"
 
-        heart_rate_data = heart_rate_data.sort_values(by="Date") # Fix overlapping lines in plotly
-        over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title, labels=dict(HeartRate=over_time_plot_y_label))
         average_plot = go.Figure(go.Scatter(
             x=[0],
             y=[0],
             text=[avg_heart_rate],
             mode='text',
-            textfont=dict(size=50),
+            textfont=dict(size=36),
         ))
         average_plot.update_layout(
             showlegend=False,
@@ -148,7 +167,7 @@ class HealthDiagrams:
         )
 
         return over_time_plot, average_plot
-    
+
     def plot_weight_change_vs_steps(self, user_id: int, start_date: datetime, end_date: datetime):
         """Generates a plot of weight change vs daily steps for a given user"""
         weight_data = self.fitbit_db.collect_weight_data()
