@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+
 from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
 
 st.session_state["current-page"] = "exercise"
