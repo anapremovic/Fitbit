@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
 
+st.session_state["current-page"] = "exercise"
+
 @st.cache_resource
 def get_exercise_diagrams():
     return ExerciseDiagrams(st.session_state["fitbit_db"], "data/chicago_data.csv")
