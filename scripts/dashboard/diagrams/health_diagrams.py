@@ -237,6 +237,8 @@ class HealthDiagrams:
             fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=2)
-        
+
+        Util.overlay_no_data_on_graph_subplot_if_empty(df,"Weight", fig, row=1, col=1)
+        Util.overlay_no_data_on_graph_subplot_if_empty(df, "TotalSteps", fig, row=1, col=2)
 
         return fig

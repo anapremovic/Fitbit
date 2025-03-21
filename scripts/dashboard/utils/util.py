@@ -25,3 +25,19 @@ class Util:
                 bgcolor="rgba(0, 0, 0, 0)",
                 opacity=0.8
             )
+
+    @staticmethod
+    def overlay_no_data_on_graph_subplot_if_empty(df: pd.DataFrame, column_analyzed: str,
+                                                  fig: go.Figure, row: int, col: int):
+        if df[column_analyzed].dropna().empty:
+            if df[column_analyzed].dropna().empty:
+                fig.add_annotation(
+                    text="No Data",
+                    xref="x domain", yref="y domain",
+                    x=0.5, y=0.5,
+                    showarrow=False,
+                    font=dict(size=36),
+                    bgcolor="rgba(0, 0, 0, 0)",
+                    opacity=0.8,
+                    row=row, col=col
+                )
