@@ -168,10 +168,11 @@ class HealthDiagrams:
 
         return over_time_plot, average_plot
 
-    def plot_weight_change_vs_steps(self, user_id: int, start_date: datetime, end_date: datetime):
+    @st.cache_data(show_spinner=False)
+    def plot_weight_change_vs_steps(_self, user_id: int, start_date: datetime, end_date: datetime):
         """Generates a plot of weight change vs daily steps for a given user"""
-        weight_data = self.fitbit_db.collect_weight_data()
-        step_data = self.fitbit_db.get_daily_steps()
+        weight_data = _self.fitbit_db.collect_weight_data()
+        step_data = _self.fitbit_db.get_daily_steps()
         weight_data = Util.filter_by_date_range(weight_data, start_date, end_date)
         step_data = Util.filter_by_date_range(step_data, start_date, end_date)
         weight_data = weight_data.set_index(['Id', 'Date'])
