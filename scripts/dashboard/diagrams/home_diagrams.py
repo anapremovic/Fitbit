@@ -19,7 +19,7 @@ class HomeDiagrams:
         fig = go.Figure(go.Indicator(
             mode="number",
             value=duration_days,
-            title={"text": "Days Followed", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
+            title={"text": "Days Tracked", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
             number={"font": {"size": LARGE_FONT_SIZE}}
         ))
 
