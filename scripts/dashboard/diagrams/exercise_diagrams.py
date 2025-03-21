@@ -112,70 +112,49 @@ class ExerciseDiagrams:
         # Merge Fitbit and weather data
         merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="Date")
 
-        # Function to create scatter plot with best-fit line and correlation
-        def scatter_with_fit(x, y, xlabel, ylabel, color):
+        # Function to create scatter plot with best-fit line
+        def scatter_with_fit(data, x, y, xlabel, ylabel):
             """
             Purpose: Helper function for plotting best-fit line
             """
-            
-            # Compute correlation
-            correlation = x.corr(y)  # Pearson correlation
-
-            # Compute regression line
-            slope, intercept = np.polyfit(x, y, 1)
-            y_pred = slope * np.array(x) + intercept  # Predicted values
-
-            # Create figure
-            fig = go.Figure()
-
-            # Scatter plot
-            fig.add_trace(go.Scatter(
-                x=x, y=y, mode="markers", name="Data", marker=dict(color=color)
-            ))
-
-            # Best-fit line
-            fig.add_trace(go.Scatter(
-                x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
-            ))
-
             if user_id == "All":
                 title = f"Relation Between {xlabel} <br> And {ylabel} For All Users"
             else:
                 title = f"Relation Between {xlabel} <br> And {ylabel} For User {user_id}"
 
+            fig = px.scatter(data, x=x, y=y, trendline="ols", title=title, opacity=0.5)
+
             # Update layout of graph
             fig.update_layout(
-                title=title,
                 xaxis_title=xlabel,
                 yaxis_title=ylabel
             )
 
-            return fig, correlation
+            return fig
 
         figs = {}
-        correlations = {}
 
-        figs["distance_vs_temp"], correlations["distance_vs_temp"] = scatter_with_fit(
-            merged_data["temp"], merged_data["TotalDistance"],
-            xlabel="Temperature (°C)", ylabel="Total Distance (km)", color="red"
+        figs["distance_vs_temp"] = scatter_with_fit(
+            data=merged_data, x="temp", y="TotalDistance",
+            xlabel="Temperature (°C)", ylabel="Total Distance (km)"
         )
 
-        figs["calories_vs_temp"], correlations["calories_vs_temp"] = scatter_with_fit(
-            merged_data["temp"], merged_data["Calories"],
-            xlabel="Temperature (°C)", ylabel="Calories Burned", color="orange"
+        figs["calories_vs_temp"] = scatter_with_fit(
+            data=merged_data, x="temp", y="Calories",
+            xlabel="Temperature (°C)", ylabel="Calories Burned"
         )
 
-        figs["distance_vs_precip"], correlations["distance_vs_precip"] = scatter_with_fit(
-            merged_data["precip"], merged_data["TotalDistance"],
-            xlabel="Precipitation (mm)", ylabel="Total Distance (km)", color="blue"
+        figs["distance_vs_precip"] = scatter_with_fit(
+            data=merged_data, x="temp", y="TotalDistance",
+            xlabel="Precipitation (mm)", ylabel="Total Distance (km)"
         )
 
-        figs["calories_vs_precip"], correlations["calories_vs_precip"] = scatter_with_fit(
-            merged_data["precip"], merged_data["Calories"],
-            xlabel="Precipitation (mm)", ylabel="Calories Burned", color="green"
+        figs["calories_vs_precip"] = scatter_with_fit(
+            data=merged_data, x="temp", y="Calories",
+            xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
-        return figs, correlations
+        return figs
 
     def plot_daily_step_distribution_barplot(self, user_id, start_date: datetime, end_date: datetime): # Part 3: generate_daily_step_distribution_barplot
         """Divide a day into 6 4-hour blocks and compute the average amount of steps
