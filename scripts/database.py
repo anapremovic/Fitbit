@@ -81,7 +81,7 @@ class FitbitDatabase:
 	    """
 
         df = self.connection.query(query, params={"id": user_id})
-        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"], format = "%m/%d/%Y %I:%M:%S %p")
 
         return df
 
