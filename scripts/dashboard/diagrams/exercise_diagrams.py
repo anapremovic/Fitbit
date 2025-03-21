@@ -60,6 +60,7 @@ class ExerciseDiagrams:
             title=title,
             labels={'x': 'Day of the Week', 'y': 'Frequency'}
         )
+        Util.overlay_no_data_on_graph_if_empty(data, fig)
         return fig
 
     def plot_steps_to_calories_regression(self, user_id, start_date: datetime, end_date: datetime): # Part 1: generate_steps_to_calories_regression
@@ -85,6 +86,7 @@ class ExerciseDiagrams:
             labels={'x': 'Total Steps', 'y': 'Calories Burned'}
         )
         fig.add_trace(go.Scatter(x=data['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
+        Util.overlay_no_data_on_graph_if_empty(data, fig)
         return fig
 
     def plot_weather_correlation_for_chicago(self, user_id, start_date: datetime, end_date: datetime): # Part 3: display_weather_correlation_for_chicago
@@ -188,7 +190,7 @@ class ExerciseDiagrams:
             title = f"Steps Taken Per 4-Hour Time Blocks For User {user_id}"
         step_data = step_data.groupby("HourGroup", as_index=False, observed=False)["AverageSteps"].mean()  # Average over all dates
 
-        return px.bar(
+        fig = px.bar(
             step_data,
             x="HourGroup",
             y="AverageSteps",
@@ -196,6 +198,8 @@ class ExerciseDiagrams:
             title=title,
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
+        Util.overlay_no_data_on_graph_if_empty(step_data, fig)
+        return fig
 
     def plot_steps_to_heart_rate_and_avg_heart_rate(self, user_id, start_date: datetime, end_date: datetime): # Part 4
         """
@@ -214,10 +218,7 @@ class ExerciseDiagrams:
             regression_title = f"Relation Between Daily Steps and Average Heart Rate For User {user_id}"
             average_plot_title = f"Average Heart Rate <br> For User {user_id}"
 
-        if daily_steps_and_average_heart_rate.empty:
-            avg_heart_rate = "No Data"
-        else:
-            avg_heart_rate = "{0:.2f}".format(daily_steps_and_average_heart_rate["AverageHeartRate"].mean()) + " bpm"
+        avg_heart_rate = daily_steps_and_average_heart_rate["AverageHeartRate"].mean()
 
         fig1 = px.scatter(daily_steps_and_average_heart_rate, x="TotalSteps", y="AverageHeartRate", trendline="ols",
                           title=regression_title)
@@ -231,13 +232,17 @@ class ExerciseDiagrams:
         )
 
         # Display Average Heart Rate
-        fig2 = go.Figure(go.Scatter(
-            x=[0],
-            y=[0],
-            text=[avg_heart_rate],
-            mode='text',
-            textfont=dict(size=36),
-        ))
+        if np.isnan(avg_heart_rate):
+            fig2 = go.Figure()
+        else:
+            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
+            fig2 = go.Figure(go.Scatter(
+                x=[0],
+                y=[0],
+                text=[avg_heart_rate],
+                mode='text',
+                textfont=dict(size=36),
+            ))
         fig2.update_layout(
             showlegend=False,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
@@ -248,5 +253,8 @@ class ExerciseDiagrams:
             },
             title_y=0.95
         )
+
+        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, fig1)
+        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, fig2)
 
         return fig1, fig2
