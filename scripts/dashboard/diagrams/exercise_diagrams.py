@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import statsmodels.formula.api as smf
 
 from scripts.dashboard.utils.util import Util
 from scripts.database import FitbitDatabase
@@ -73,21 +72,15 @@ class ExerciseDiagrams:
         if self.user != "All":
             data = Util.filter_by_user(data, self.user)
             title = f"Relation Between Daily Steps And Calories Burned For User {self.user}"
-        
-        least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(UserId)', data=data).fit()
-        steps_coef = least_squares_model.params['TotalSteps']
-        base_intercept = least_squares_model.params['Intercept']
-        user_coef = least_squares_model.params.get(f'C(UserId)[T.{self.user}]', 0)
-
-        regression_line = [base_intercept + user_coef + steps_coef * x for x in data['TotalSteps']]
 
         fig = px.scatter(
-            x=data['TotalSteps'],
-            y=data['Calories'],
+            data,
+            x="TotalSteps",
+            y="Calories",
             title=title,
-            labels={'x': 'Total Steps', 'y': 'Calories Burned'}
+            labels={'TotalSteps': 'Total Steps', 'Calories': 'Calories Burned'},
+            trendline="ols"
         )
-        fig.add_trace(go.Scatter(x=data['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
         Util.overlay_no_data_on_graph_if_empty(data, fig)
         return fig
 
