@@ -7,7 +7,7 @@ st.session_state["current-page"] = "health"
 
 @st.cache_resource
 def get_health_diagrams():
-    return HealthDiagrams(st.session_state["fitbit_db"])
+    return HealthDiagrams(st.session_state["fitbit-db"])
 health_diagrams = get_health_diagrams()
 
 # Filters

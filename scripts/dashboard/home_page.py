@@ -6,7 +6,7 @@ st.session_state["current-page"] = "home"
 
 @st.cache_resource
 def get_home_diagrams():
-    return HomeDiagrams(st.session_state["fitbit_db"])
+    return HomeDiagrams(st.session_state["fitbit-db"])
 home_diagrams = get_home_diagrams()
 
 col1, col2, col3, col4, col5 = st.columns(5)

@@ -3,7 +3,7 @@ import streamlit as st
 from scripts.database import FitbitDatabase
 
 def display_filters(disabled: bool) -> None:
-    fitbit_db: FitbitDatabase = st.session_state["fitbit_db"]
+    fitbit_db: FitbitDatabase = st.session_state["fitbit-db"]
 
     st.sidebar.header("Filters")
 
