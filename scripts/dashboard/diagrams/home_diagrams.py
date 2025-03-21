@@ -12,6 +12,9 @@ class HomeDiagrams:
         self.fitbit_db = fitbit_db
 
     def get_number_of_days(self):
+        """Create an indicator diagram that displays the number of days over
+        which the survey took place"""
+
         duration_days = (self.fitbit_db.max_date - self.fitbit_db.min_date).days
         fig = go.Figure(go.Indicator(
             mode="number",
@@ -25,6 +28,8 @@ class HomeDiagrams:
         return fig
     
     def get_number_of_participants(self):
+        """Create an indicator diagram that displays the number of survey participants"""
+
         fig = go.Figure(go.Indicator(
             mode="number",
             value=len(self.fitbit_db.user_ids),
@@ -40,6 +45,9 @@ class HomeDiagrams:
         return fig
 
     def get_collective_metrics(self) -> tuple[go.Figure, go.Figure, go.Figure]:
+        """Create 3 indicator diagrams that display, respectively, the collective number of 
+        steps taken, distance travelled and minutes spent being active among all participants."""
+
         daily_activity = self.fitbit_db.get_daily_activity()
         collective_steps = daily_activity.loc[:, "TotalSteps"].sum()
         collective_active_minutes = (
@@ -86,6 +94,11 @@ class HomeDiagrams:
         return (fig1, fig2, fig3)
 
     def get_steps_and_active_barplot(self) -> tuple[go.Figure, go.Figure]:
+        """Create 2 bar plots which display, respectively, the average number of daily steps 
+        and the average number of daily active minutes for each user. In each diagram, the bars are
+        colored (using the same scale) to indicate the corresponding average caloric expenditure 
+        per day"""
+
         df = self.fitbit_db.get_activity_grouped_by_user()
 
         df = df.sort_values(by="AverageSteps", ascending=False)
