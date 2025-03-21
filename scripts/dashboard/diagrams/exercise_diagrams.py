@@ -149,6 +149,9 @@ class ExerciseDiagrams:
             xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
+        for fig in figs.values():
+            Util.overlay_no_data_on_graph_if_empty(merged_data, fig)
+
         return figs
 
     def plot_daily_step_distribution_barplot(self): # Part 3: generate_daily_step_distribution_barplot
