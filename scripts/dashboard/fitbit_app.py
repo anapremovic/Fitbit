@@ -31,6 +31,9 @@ st.set_page_config(
 fitbit_db = get_fitbit_db_instance()
 st.session_state["fitbit_db"] = fitbit_db
 st.session_state["project_root"] = project_root
+st.session_state.setdefault("selected-user", "All")
+st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
+st.session_state.setdefault("selected-end-date", fitbit_db.max_date)
 
 home_page = st.Page("home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("exercise_page.py", title="Exercise", icon="🏋️")
@@ -62,17 +65,15 @@ with left:
     start_date = st.date_input(
         "Start date",
         key="selected-start-date",
-        value=st.session_state.get("selected-start-date", fitbit_db.min_date),
         min_value=fitbit_db.min_date,
-        max_value=st.session_state.get("selected-end-date", fitbit_db.max_date),
+        max_value=st.session_state["selected-end-date"],
         disabled=disable_filters,
     )
 with right:
     end_date = st.date_input(
         "End date",
-        key="selected-end-date", 
-        value=st.session_state.get("selected-end-date", fitbit_db.max_date),
-        min_value=st.session_state.get("selected-start-date", fitbit_db.min_date),
+        key="selected-end-date",
+        min_value=st.session_state["selected-start-date"],
         max_value=fitbit_db.max_date,
         disabled=disable_filters,
     )
