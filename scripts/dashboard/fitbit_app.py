@@ -48,15 +48,15 @@ pg.run()
 
 st.sidebar.header("Filters")
 
-disable_filters = False
+are_filters_disabled = False
 if st.session_state.get("current-page", "home") == "home":
-    disable_filters = True
+    are_filters_disabled = True
 
 selected_user = st.sidebar.selectbox(
     "User ID",
     key="selected-user",
     options=("All",) + fitbit_db.user_ids,
-    disabled=disable_filters,
+    disabled=are_filters_disabled,
 )
 
 left, right = st.sidebar.columns(2)
@@ -66,7 +66,7 @@ with left:
         key="selected-start-date",
         min_value=fitbit_db.min_date,
         max_value=st.session_state["selected-end-date"],
-        disabled=disable_filters,
+        disabled=are_filters_disabled,
     )
 with right:
     end_date = st.date_input(
@@ -74,5 +74,5 @@ with right:
         key="selected-end-date",
         min_value=st.session_state["selected-start-date"],
         max_value=fitbit_db.max_date,
-        disabled=disable_filters,
+        disabled=are_filters_disabled,
     )
