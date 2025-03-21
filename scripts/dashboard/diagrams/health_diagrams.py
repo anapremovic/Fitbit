@@ -1,8 +1,8 @@
 import datetime as datetime
 import plotly.express as px
 import plotly.graph_objects as go
-import streamlit as st
 from plotly.subplots import make_subplots
+import streamlit as st
 
 from scripts.dashboard.utils.util import Util
 from scripts.database import FitbitDatabase
@@ -145,7 +145,7 @@ class HealthDiagrams:
         )
 
         return over_time_plot, average_plot
-
+    
     def plot_weight_change_vs_steps(self, user_id: int, start_date: datetime, end_date: datetime):
         """Generates a plot of weight change vs daily steps for a given user"""
         weight_data = self.fitbit_db.collect_weight_data()
@@ -154,6 +154,7 @@ class HealthDiagrams:
         step_data = Util.filter_by_date_range(step_data, start_date, end_date)
         weight_data = weight_data.set_index(['Id', 'Date'])
 
+        idInData = True
         if user_id in weight_data.index.get_level_values(0):
             weight_data = weight_data.loc[user_id, ['Weight']]
             # Reindex step_data to be by date for a particular user
@@ -162,15 +163,15 @@ class HealthDiagrams:
             weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
             step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
         else:
-            return None
+            df = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+            df['Weight'] = None
+            idInData = False
 
-
-        # Reindex weight_data to match step_data and forward-fill missing values
-        df = weight_data.reindex(step_data.index).ffill()
-
-        # Join TotalSteps from step_data to df
-        df = df.merge(step_data, on='Date', how='left')
-
+        if idInData:
+            # Reindex weight_data to match step_data and forward-fill missing values
+            df = weight_data.reindex(step_data.index).ffill()
+            # Join TotalSteps from step_data to df
+            df = df.merge(step_data, on='Date', how='left')
 
         # Create subplots (3 plots: Weight vs Steps, Weight vs Date, Steps vs Date)
         fig = make_subplots(
@@ -216,6 +217,6 @@ class HealthDiagrams:
             fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=2)
-
+        
 
         return fig
