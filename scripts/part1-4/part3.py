@@ -62,17 +62,16 @@ class Part3:
     def generate_sleep_data_over_time_line_plot(self, user_id: float):
         """Generates a line plot which visualizes sleep data over time for a given user."""
 
-        sleep_moments = self.db.get_sleep_moments()
-        sleep_moments_for_user = sleep_moments[sleep_moments.loc[:, "UserId"] == user_id]
+        sleep_moments_for_user = self.db.get_sleep_moments(user_id)
         if sleep_moments_for_user.empty:
             print(f"No sleep data found for User {user_id}.")
             return
 
         plt.figure(figsize=(10, 5))
-        sns.lineplot(x=sleep_moments_for_user["Date"], y=sleep_moments_for_user["SleepHours"], marker="o", color="b")
+        sns.lineplot(x=sleep_moments_for_user["Date"], y=sleep_moments_for_user["SleepMin"], marker="o", color="b")
         plt.title(f"Sleep Over Time for User {user_id}", fontsize=14)
         plt.xlabel("Date", fontsize=12)
-        plt.ylabel("Hours Slept", fontsize=12)
+        plt.ylabel("Minutes Slept", fontsize=12)
         plt.xticks(rotation=45, ha='right')
         plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True, prune='both', nbins=6))
         plt.grid(True)
@@ -175,7 +174,7 @@ class Part3:
         Author: L.D. Lee
         """
         # Connect to database and load Fitbit data
-        daily_activity_db = self.db.get_daily_activity_for_chicago_comparison()
+        daily_activity_db = self.db.get_daily_activity()
         daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
 
         # Aggregate TotalDistance and Calories per day

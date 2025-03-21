@@ -30,6 +30,7 @@ st.set_page_config(
 
 fitbit_db = get_fitbit_db_instance()
 st.session_state["fitbit_db"] = fitbit_db
+st.session_state["project_root"] = project_root
 
 st.sidebar.header("Filters")
 

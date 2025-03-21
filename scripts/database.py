@@ -70,13 +70,28 @@ class FitbitDatabase:
 
         return df
 
-    def get_heart_rate(self):
+    def get_heart_rate(self, user_id: float) -> pd.DataFrame:
         query = """
             SELECT 
                 Id AS UserId,
                 Time AS Date,
                 Value AS HeartRate
             FROM heart_rate
+            WHERE Id = :id
+	    """
+
+        df = self.connection.query(query, params={"id": user_id})
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
+
+    def get_heart_rate_averaged_over_all_users(self) -> pd.DataFrame:
+        query = """
+            SELECT 
+                SUBSTR(Time, 1, INSTR(Time, ' ') - 1) AS Date,
+                AVG(Value) AS HeartRate
+            FROM heart_rate
+            GROUP BY SUBSTR(Time, 1, INSTR(Time, ' ') - 1)
         """
 
         df = self.connection.query(query)
@@ -289,7 +304,9 @@ class FitbitDatabase:
             FROM daily_activity
         """
         
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df['ActivityDate'])
+        return df
 
     def get_hourly_steps(self):
         query = """
@@ -323,9 +340,20 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        df = self.connection.query(query)
-        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+        return self.connection.query(query)
 
+    def collect_weight_data(self) -> pd.DataFrame:
+        query = """SELECT 
+            Id,
+            substr(Date, 1, instr(Date, ' ') - 1) AS Date,
+            WeightKg AS Weight,
+            WeightPounds,
+            BMI
+        FROM weight_log"""
+        df = self.connection.query(query)
+        df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
+        df = df.drop(columns=['WeightPounds'])
+        df["Date"] = pd.to_datetime(df["Date"])
         return df
     
     def get_activity_grouped_by_user(self) -> pd.DataFrame:
