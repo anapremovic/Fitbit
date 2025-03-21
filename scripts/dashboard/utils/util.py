@@ -14,8 +14,8 @@ class Util:
         return df[(df.loc[:, "UserId"] == user_id)]
 
     @staticmethod
-    def overlay_no_data_on_graph_if_empty(df: pd.DataFrame, fig: go.Figure):
-        if df.empty:
+    def overlay_no_data_on_graph_if_empty(df: pd.DataFrame, column_analyzed: str, fig: go.Figure):
+        if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
                 xref="paper", yref="paper",

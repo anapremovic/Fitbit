@@ -61,7 +61,7 @@ class ExerciseDiagrams:
             title=title,
             labels={'x': 'Day of the Week', 'y': 'Frequency'}
         )
-        Util.overlay_no_data_on_graph_if_empty(data, fig)
+        Util.overlay_no_data_on_graph_if_empty(data, "Date", fig)
         return fig
 
     def plot_steps_to_calories_regression(self): # Part 1: generate_steps_to_calories_regression
@@ -81,7 +81,7 @@ class ExerciseDiagrams:
             labels={'TotalSteps': 'Total Steps', 'Calories': 'Calories Burned'},
             trendline="ols"
         )
-        Util.overlay_no_data_on_graph_if_empty(data, fig)
+        Util.overlay_no_data_on_graph_if_empty(data, "Calories", fig)
         return fig
 
     def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
@@ -149,8 +149,10 @@ class ExerciseDiagrams:
             xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
-        for fig in figs.values():
-            Util.overlay_no_data_on_graph_if_empty(merged_data, fig)
+        Util.overlay_no_data_on_graph_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
+        Util.overlay_no_data_on_graph_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
+        Util.overlay_no_data_on_graph_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
+        Util.overlay_no_data_on_graph_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
 
         return figs
 
@@ -175,7 +177,7 @@ class ExerciseDiagrams:
             title=title,
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
-        Util.overlay_no_data_on_graph_if_empty(step_data, fig)
+        Util.overlay_no_data_on_graph_if_empty(step_data, "AverageSteps", fig)
         return fig
 
     def plot_steps_to_heart_rate_and_avg_heart_rate(self): # Part 4
@@ -231,7 +233,7 @@ class ExerciseDiagrams:
             title_y=0.95
         )
 
-        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, fig1)
-        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, fig2)
+        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig1)
+        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig2)
 
         return fig1, fig2
