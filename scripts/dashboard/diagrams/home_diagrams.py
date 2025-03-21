@@ -20,7 +20,7 @@ class HomeDiagrams:
             mode="number",
             value=duration_days,
             title={"text": "Days Followed", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
-            number={"font": {"size": LARGE_FONT_SIZE}}#, "suffix": " days"} # Change color later
+            number={"font": {"size": LARGE_FONT_SIZE}}
         ))
 
         fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -37,7 +37,7 @@ class HomeDiagrams:
                 "text": "Participants",
                 "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}} # Change color later
+            number={"font": {"size": LARGE_FONT_SIZE}} 
         ))
 
         fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -64,7 +64,7 @@ class HomeDiagrams:
                 "text": "Steps", 
                 "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}} # Change color later
+            number={"font": {"size": LARGE_FONT_SIZE}} 
         ))
 
         fig2 = go.Figure(go.Indicator(
@@ -74,7 +74,7 @@ class HomeDiagrams:
                 "text": "Distance", 
                 "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}, "suffix": "km"} # Change color later
+            number={"font": {"size": LARGE_FONT_SIZE}, "suffix": "km"} 
         ))
 
         fig3 = go.Figure(go.Indicator(
@@ -84,7 +84,7 @@ class HomeDiagrams:
                 "text": "Active Minutes", 
                 "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}} # Change color later
+            number={"font": {"size": LARGE_FONT_SIZE}} 
         ))
 
         fig1.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -113,8 +113,6 @@ class HomeDiagrams:
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
         fig1.update_xaxes(type='category', tickangle=-45, showticklabels=False)
-        # Color scale is also given in the next barplot. Since they are same, 
-        # we can remove this one
         fig1.update_layout(coloraxis_showscale=False)
 
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
