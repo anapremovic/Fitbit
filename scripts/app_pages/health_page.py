@@ -31,9 +31,9 @@ st.subheader("Sleep Duration")
 with st.container(border=True):
     line, bar = st.columns(2)
     with line:
-        st.plotly_chart(diagrams.get_sleep_duration_over_time())
+        st.plotly_chart(diagrams.get_sleep_duration_over_time_graph())
     with bar:
-        st.plotly_chart(diagrams.get_sleep_duration_per_time_blocks())
+        st.plotly_chart(diagrams.get_sleep_duration_per_time_blocks_graph())
 
 st.subheader("What Affects Sleep")
 with st.container(border=True):
@@ -57,12 +57,12 @@ st.subheader("Calories")
 with st.container(border=True):
     line, bar = st.columns(2)
     with line:
-        st.plotly_chart(diagrams.get_calories_burned_over_time())
+        st.plotly_chart(diagrams.get_calories_burned_over_time_graph())
     with bar:
-        st.plotly_chart(diagrams.get_calories_burned_per_time_blocks())
+        st.plotly_chart(diagrams.get_calories_burned_per_time_blocks_graph())
 
 st.subheader("Heart Rate")
-heart_rate_over_time, average_heart_rate = diagrams.get_heart_rate_over_time_and_average()
+heart_rate_over_time, average_heart_rate = diagrams.get_heart_rate_over_time_and_average_graphs()
 with st.container(border=True):
     plot, number = st.columns([3, 1])
     with plot:
@@ -70,7 +70,7 @@ with st.container(border=True):
     with number:
         st.plotly_chart(average_heart_rate)
 
-weight_over_time = diagrams.plot_weight_change_vs_steps()
+weight_over_time = diagrams.get_weight_change_to_steps_regression()
 if weight_over_time:
     st.subheader("Weight")
     with st.container(border=True):
