@@ -9,14 +9,13 @@ def get_home_diagrams():
     return HomeDiagrams(st.session_state["fitbit-db"])
 home_diagrams = get_home_diagrams()
 
-col1, col2, col3, col4, col5 = st.columns(5)
 left, div, right = st.columns([2, 0.02, 3])
 with left:
     st.subheader("Survey Details")
-    col1, col2 = st.columns(2)
-    with col1:
+    days, participants = st.columns(2)
+    with days:
         st.plotly_chart(home_diagrams.get_number_of_days())
-    with col2:
+    with participants:
         st.plotly_chart(home_diagrams.get_number_of_participants())
 with div:
     st.html(
@@ -33,18 +32,18 @@ with div:
     )
 with right:
     st.subheader("Collective Metrics")
-    col3, col4, col5 = st.columns(3)
+    steps, distance, active_min = st.columns(3)
     collective_metrics = home_diagrams.get_collective_metrics()
-    with col3:
+    with steps:
         st.plotly_chart(collective_metrics[0])
-    with col4:
+    with distance:
         st.plotly_chart(collective_metrics[1])
-    with col5:
+    with active_min:
         st.plotly_chart(collective_metrics[2])
 
-left, right = st.columns([0.9, 1.1])
+steps, active_time = st.columns([0.9, 1.1])
 bar_plots = home_diagrams.get_steps_and_active_barplot()
-with left:
+with steps:
     st.plotly_chart(bar_plots[0])
-with right:
+with active_time:
     st.plotly_chart(bar_plots[1])
