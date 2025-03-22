@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from scripts.dashboard.diagrams.health_diagrams import HealthDiagrams
+from scripts.diagrams.health_diagrams import HealthDiagrams
 
 @st.cache_resource
 def get_health_diagrams():

@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-from scripts.dashboard.utils.util import Util
+from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
 class ExerciseDiagrams:

@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
-from scripts.dashboard.utils.util import Util
+from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
 class HealthDiagrams:
