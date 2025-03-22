@@ -15,6 +15,10 @@ class Util:
 
     @staticmethod
     def show_no_data_if_empty(df: pd.DataFrame, column_analyzed: str, fig: go.Figure):
+        """
+        Helper function to check if the relevant data column has data entries available.
+        If no entries, overlay "No Data" on top of the corresponding (empty) dashboard figure.
+        """
         if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
@@ -29,6 +33,10 @@ class Util:
     @staticmethod
     def show_no_data_if_empty_subplot(df: pd.DataFrame, column_analyzed: str,
                                       fig: go.Figure, row: int, col: int):
+        """
+        Helper function to check if the relevant data column has data entries available.
+        If no entries, overlay "No Data" on top of the corresponding (empty) dashboard subplot.
+        """
         if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
