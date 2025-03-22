@@ -112,11 +112,11 @@ class HomeDiagrams:
         df = df.sort_values(by="AverageSteps", ascending=False)
         steps_fig = px.bar(
             df,
-            x="Id",
+            x="UserId",
             y="AverageSteps",
             title="Average Daily Steps",
             subtitle="Color indicates average caloric expenditure per day",
-            labels={"Id": "User", "AverageSteps": "Steps", "AverageCalories": "Calories"},
+            labels={"UserId": "User", "AverageSteps": "Steps", "AverageCalories": "Calories"},
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
@@ -126,11 +126,11 @@ class HomeDiagrams:
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
         active_min_fig = px.bar(
             df,
-            x="Id",
+            x="UserId",
             y="AverageActiveMinutes",
             title="Average Daily Active Time",
             subtitle="Color indicates average caloric expenditure per day",
-            labels={"Id": "User", "AverageActiveMinutes": "Active Minutes", "AverageCalories": "Calories"},
+            labels={"UserId": "User", "AverageActiveMinutes": "Active Minutes", "AverageCalories": "Calories"},
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )

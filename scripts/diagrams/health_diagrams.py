@@ -19,7 +19,7 @@ class HealthDiagrams:
         Create a line plot that displays the amount of sleep over time.
         """
 
-        sleep_data = self.fitbit_db.get_sleep_moments()
+        sleep_data = self.fitbit_db.get_sleep_durations()
 
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
         if self.user == "All":
@@ -191,23 +191,23 @@ class HealthDiagrams:
         Create a regression of weight change to daily steps.
         """
 
-        weight_data = self.fitbit_db.collect_weight_data()
+        weight_data = self.fitbit_db.get_weight_data()
         step_data = self.fitbit_db.get_daily_steps()
 
         weight_data = Util.filter_by_date_range(weight_data, self.start_date, self.end_date)
         step_data = Util.filter_by_date_range(step_data, self.start_date, self.end_date)
-        weight_data = weight_data.set_index(["Id", "Date"])
+        weight_data = weight_data.set_index(["UserId", "Date"])
 
         has_data_available = True
         if self.user in weight_data.index.get_level_values(0):
             weight_data = weight_data.loc[self.user, ["Weight"]]
             # Reindex step_data to be by date for a particular user
-            step_data = step_data.loc[step_data.loc[:, "Id"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
+            step_data = step_data.loc[step_data.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
         elif self.user == "All":
             weight_data = weight_data.groupby(level=1)["Weight"].mean().reset_index().set_index("Date")
             step_data = step_data.groupby("Date")["TotalSteps"].mean().reset_index().set_index("Date")
         else:
-            df = step_data.loc[step_data.loc[:, "Id"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
+            df = step_data.loc[step_data.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
             df["Weight"] = None
             has_data_available = False
 
