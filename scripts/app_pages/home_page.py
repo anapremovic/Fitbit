@@ -42,7 +42,7 @@ with right:
         st.plotly_chart(collective_metrics[2])
 
 steps, active_time = st.columns([0.9, 1.1])
-bar_plots = home_diagrams.get_steps_and_active_barplot()
+bar_plots = home_diagrams.get_steps_and_active_bar_plot()
 with steps:
     st.plotly_chart(bar_plots[0])
 with active_time:

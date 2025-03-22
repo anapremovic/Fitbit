@@ -7,14 +7,15 @@ PRIMARY_COLOR = "#06B0B8"
 MEDIUM_FONT_SIZE = 25
 LARGE_FONT_SIZE = 50
 
-
 class HomeDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
 
-    def get_number_of_days(self):
-        """Create an indicator diagram that displays the number of days over
-        which the survey took place"""
+    def get_number_of_days(self) -> go.Figure:
+        """
+        Create an indicator diagram that displays the number of days over
+        which the survey took place.
+        """
 
         duration_days = (self.fitbit_db.max_date - self.fitbit_db.min_date).days
         fig = go.Figure(go.Indicator(
@@ -28,8 +29,10 @@ class HomeDiagrams:
 
         return fig
 
-    def get_number_of_participants(self):
-        """Create an indicator diagram that displays the number of survey participants"""
+    def get_number_of_participants(self) -> go.Figure:
+        """
+        Create an indicator diagram that displays the number of survey participants.
+        """
 
         fig = go.Figure(go.Indicator(
             mode="number",
@@ -46,8 +49,10 @@ class HomeDiagrams:
         return fig
 
     def get_collective_metrics(self) -> tuple[go.Figure, go.Figure, go.Figure]:
-        """Create 3 indicator diagrams that display, respectively, the collective number of
-        steps taken, distance travelled and minutes spent being active among all participants."""
+        """
+        Create 3 indicator diagrams that display, respectively, the collective number of
+        steps taken, distance travelled and minutes spent being active among all participants.
+        """
 
         daily_activity = self.fitbit_db.get_daily_activity()
         collective_steps = daily_activity.loc[:, "TotalSteps"].sum()
@@ -58,7 +63,7 @@ class HomeDiagrams:
         ).sum()
         collective_distance = round(daily_activity.loc[:, "TotalDistance"].sum(), -2)
 
-        fig1 = go.Figure(go.Indicator(
+        steps_fig = go.Figure(go.Indicator(
             mode="number",
             value=collective_steps,
             title={
@@ -68,7 +73,7 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}}
         ))
 
-        fig2 = go.Figure(go.Indicator(
+        distance_fig = go.Figure(go.Indicator(
             mode="number",
             value=collective_distance,
             title={
@@ -78,7 +83,7 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}, "suffix": "km"}
         ))
 
-        fig3 = go.Figure(go.Indicator(
+        active_min_fig = go.Figure(go.Indicator(
             mode="number",
             value=collective_active_minutes,
             title={
@@ -88,22 +93,24 @@ class HomeDiagrams:
             number={"font": {"size": LARGE_FONT_SIZE}}
         ))
 
-        fig1.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
-        fig2.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
-        fig3.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
+        steps_fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
+        distance_fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
+        active_min_fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
 
-        return (fig1, fig2, fig3)
+        return steps_fig, distance_fig, active_min_fig
 
-    def get_steps_and_active_barplot(self) -> tuple[go.Figure, go.Figure]:
-        """Create 2 bar plots which display, respectively, the average number of daily steps
+    def get_steps_and_active_bar_plot(self) -> tuple[go.Figure, go.Figure]:
+        """
+        Create 2 bar plots which display, respectively, the average number of daily steps
         and the average number of daily active minutes for each user. In each diagram, the bars are
         colored (using the same scale) to indicate the corresponding average caloric expenditure
-        per day"""
+        per day
+        """
 
         df = self.fitbit_db.get_activity_grouped_by_user()
 
         df = df.sort_values(by="AverageSteps", ascending=False)
-        fig1 = px.bar(
+        steps_fig = px.bar(
             df,
             x="Id",
             y="AverageSteps",
@@ -113,11 +120,11 @@ class HomeDiagrams:
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
-        fig1.update_xaxes(type='category', tickangle=-45, showticklabels=False)
-        fig1.update_layout(coloraxis_showscale=False)
+        steps_fig.update_xaxes(type='category', tickangle=-45, showticklabels=False)
+        steps_fig.update_layout(coloraxis_showscale=False)
 
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
-        fig2 = px.bar(
+        active_min_fig = px.bar(
             df,
             x="Id",
             y="AverageActiveMinutes",
@@ -127,6 +134,6 @@ class HomeDiagrams:
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
-        fig2.update_xaxes(type='category', showticklabels=False)
+        active_min_fig.update_xaxes(type='category', showticklabels=False)
 
-        return (fig1, fig2)
+        return steps_fig, active_min_fig
