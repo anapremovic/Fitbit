@@ -13,7 +13,7 @@ end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
 @st.cache_resource
 def get_health_diagrams(user_id, start: datetime, end: datetime):
-    return HealthDiagrams(st.session_state["fitbit_db"], user_id, start, end)
+    return HealthDiagrams(st.session_state["fitbit-db"], user_id, start, end)
 health_diagrams = get_health_diagrams(user, start_date, end_date)
 
 # Toggles

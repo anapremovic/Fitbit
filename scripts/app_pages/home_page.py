@@ -1,6 +1,6 @@
 import streamlit as st
  
-from scripts.dashboard.diagrams.home_diagrams import HomeDiagrams
+from scripts.diagrams.home_diagrams import HomeDiagrams
 
 st.session_state["current-page"] = "home"
 
