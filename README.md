@@ -23,6 +23,7 @@
 			<ul><li><a href="#part-4">Part 4</a></li></ul>
 		</ul>
     </li>
+    <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -81,6 +82,10 @@ This folder contains the functions for each individual graph listed in the bulle
 * Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
 * Visualize relationship between the number of steps in a day and the average daily heart rate.
 * Numerically see the average daily heart rate for a given step range.
+
+## Notes
+
+- The daily step data isn't completely correct as it does not match the hourly step data
 
 ## Contributors
 
