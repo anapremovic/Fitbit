@@ -20,7 +20,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
@@ -33,7 +33,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df["Date"])
 
         min_date = df["Date"].min().to_pydatetime()
@@ -51,7 +51,7 @@ class FitbitDatabase:
             GROUP BY logId
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
@@ -65,7 +65,7 @@ class FitbitDatabase:
             FROM daily_activity;
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
@@ -80,7 +80,7 @@ class FitbitDatabase:
             WHERE Id = :id
 	    """
 
-        df = self.connection.query(query, params={"id": user_id})
+        df = self.connection.query(query, params={"id": user_id}, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"], format = "%m/%d/%Y %I:%M:%S %p")
 
         return df
@@ -94,7 +94,7 @@ class FitbitDatabase:
             GROUP BY SUBSTR(Time, 1, INSTR(Time, ' ') - 1)
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
@@ -106,7 +106,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df.rename(columns={"ActivityDate": "Date"}, inplace=True)
         df.rename(columns={"Id": "UserId"}, inplace=True)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
@@ -135,7 +135,7 @@ class FitbitDatabase:
             GROUP BY daily_activity.Id, daily_activity.ActivityDate
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         if day_filter == "weekdays":
@@ -160,7 +160,7 @@ class FitbitDatabase:
             GROUP BY logId
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
@@ -199,7 +199,7 @@ class FitbitDatabase:
             GROUP BY UserId, Date, HourGroup;
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
 
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
@@ -241,7 +241,7 @@ class FitbitDatabase:
             GROUP BY UserId, Date, HourGroup;
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
 
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
@@ -286,7 +286,7 @@ class FitbitDatabase:
             GROUP BY UserId, SleepDate, HourGroup;
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
 
         df.rename(columns={"SleepDate": "Date"}, inplace=True)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
@@ -304,7 +304,7 @@ class FitbitDatabase:
             FROM daily_activity
         """
         
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df['ActivityDate'])
         return df
 
@@ -329,7 +329,7 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df
@@ -342,7 +342,7 @@ class FitbitDatabase:
             WeightPounds,
             BMI
         FROM weight_log"""
-        df = self.connection.query(query)
+        df = self.connection.query(query, show_spinner=False)
         df.loc[df.loc[:, 'Weight'].isnull(), 'Weight'] = df.loc[df.loc[:, 'Weight'].isnull(), 'WeightPounds'] / 2.205
         df = df.drop(columns=['WeightPounds'])
         df["Date"] = pd.to_datetime(df["Date"])

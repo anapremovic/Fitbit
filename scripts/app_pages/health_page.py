@@ -1,17 +1,18 @@
+import datetime as datetime
 import streamlit as st
 import pandas as pd
 
 from scripts.diagrams.health_diagrams import HealthDiagrams
 
-@st.cache_resource
-def get_health_diagrams():
-    return HealthDiagrams(st.session_state["fitbit_db"])
-health_diagrams = get_health_diagrams()
-
 # Filters
 user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
+
+@st.cache_resource
+def get_health_diagrams(user_id, start: datetime, end: datetime):
+    return HealthDiagrams(st.session_state["fitbit_db"], user_id, start, end)
+health_diagrams = get_health_diagrams(user, start_date, end_date)
 
 # Toggles
 if "weekdays-only" not in st.session_state:
@@ -37,19 +38,19 @@ st.markdown("""
             </style>
             """, unsafe_allow_html=True)
 with st.spinner("Loading Data"):
-    sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time(user, start_date, end_date)
-    sleep_duration_per_time_blocks = health_diagrams.get_sleep_duration_per_time_blocks(user, start_date, end_date)
-    calories_burned_over_time = health_diagrams.get_calories_burned_over_time(user, start_date, end_date)
-    calories_burned_per_time_blocks = health_diagrams.get_calories_burned_per_time_blocks(user, start_date, end_date)
+    sleep_duration_over_time = health_diagrams.get_sleep_duration_over_time()
+    sleep_duration_per_time_blocks = health_diagrams.get_sleep_duration_per_time_blocks()
+    calories_burned_over_time = health_diagrams.get_calories_burned_over_time()
+    calories_burned_per_time_blocks = health_diagrams.get_calories_burned_per_time_blocks()
     if st.session_state["weekdays-only"]:
-        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date, "weekdays")
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression("weekdays")
     elif st.session_state["weekends-only"]:
-        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date, "weekends")
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression("weekends")
     else:
-        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression(user, start_date, end_date)
-    sedentary_hrs_to_sleep_hrs = health_diagrams.get_sedentary_hrs_to_sleep_hrs_regression(user, start_date, end_date)
-    heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_time_and_average(user, start_date, end_date)
-    weight_over_time = health_diagrams.plot_weight_change_vs_steps(user, start_date, end_date)
+        active_hrs_to_sleep_hrs = health_diagrams.get_active_hrs_to_sleep_hrs_regression()
+    sedentary_hrs_to_sleep_hrs = health_diagrams.get_sedentary_hrs_to_sleep_hrs_regression()
+    heart_rate_over_time, average_heart_rate = health_diagrams.get_heart_rate_over_time_and_average()
+    weight_over_time = health_diagrams.plot_weight_change_vs_steps()
 
 # Show on dashboard
 
