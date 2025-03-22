@@ -99,16 +99,6 @@ class FitbitDatabase:
 
         return df
 
-    def get_intensity(self, user_id: int):
-        query = """
-            SELECT 
-                * 
-            FROM hourly_intensity 
-            WHERE Id = :id
-        """
-
-        return self.connection.query(query, params={"id": user_id})
-
     def get_daily_activity(self):
         query = """
             SELECT
@@ -317,17 +307,6 @@ class FitbitDatabase:
         df = self.connection.query(query)
         df["Date"] = pd.to_datetime(df['ActivityDate'])
         return df
-
-    def get_hourly_steps(self):
-        query = """
-            SELECT 
-                Id, 
-                substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS ActivityDate, 
-                StepTotal AS TotalSteps 
-            FROM hourly_steps
-        """
-        
-        return self.connection.query(query)
 
     def get_daily_steps_and_average_heart_rate(self) -> pd.DataFrame:
         query = """

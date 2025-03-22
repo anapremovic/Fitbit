@@ -15,7 +15,7 @@ from database import FitbitDatabase
 def get_fitbit_db_instance() -> FitbitDatabase:
     """Creates an instance of FitbitDatabase and, with that, establishes a connection
     to fitbit_database.db. The result should be saved to st.session_state so that 
-    other app_pages can easily access this same instance.
+    all pages can easily access this same instance.
 
     The decorator @st.cache_resource ensures the result is cached, so that this code is 
     only run once on startup.
