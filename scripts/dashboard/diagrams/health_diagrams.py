@@ -116,7 +116,7 @@ class HealthDiagrams:
                       labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
 
     @st.cache_data(show_spinner=False)
-    def get_heart_rate_over_time_and_average(_self, user_id, start_date: datetime, end_date: datetime) -> (go.Figure, go.Figure):
+    def get_heart_rate_over_time_and_average(_self, user_id, start_date: datetime, end_date: datetime) -> tuple[go.Figure, go.Figure]:
         """Returns a Plotly figure that visualizes the heart rate each day."""
         if user_id == "All":
             heart_rate_data = _self.fitbit_db.get_heart_rate_averaged_over_all_users()
@@ -173,7 +173,7 @@ class HealthDiagrams:
             weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
             step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
         else:
-            df = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+            df = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
             df['Weight'] = None
             idInData = False
         
