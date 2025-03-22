@@ -102,13 +102,18 @@ class FitbitDatabase:
     def get_daily_activity(self):
         query = """
             SELECT
-                *
+                Id AS UserId,
+                ActivityDate AS Date,
+                TotalDistance,
+                TotalSteps,
+                Calories,
+                VeryActiveMinutes,
+                FairlyActiveMinutes,
+                LightlyActiveMinutes
             FROM daily_activity
         """
 
         df = self.connection.query(query, show_spinner=False)
-        df.rename(columns={"ActivityDate": "Date"}, inplace=True)
-        df.rename(columns={"Id": "UserId"}, inplace=True)
         df["Date"] = pd.to_datetime(df.loc[:, "Date"])
 
         return df

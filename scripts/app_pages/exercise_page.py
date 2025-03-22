@@ -21,15 +21,15 @@ st.title("Exercise")
 
 density, bar = st.columns(2)
 with density:
-    st.plotly_chart(diagrams.plot_distance_walked_density())
+    st.plotly_chart(diagrams.get_distance_walked_density_graph())
 with bar:
-    st.plotly_chart(diagrams.plot_day_of_week_frequency())
+    st.plotly_chart(diagrams.get_day_of_week_frequency_graph())
 
-st.plotly_chart(diagrams.plot_steps_to_calories_regression())
+st.plotly_chart(diagrams.get_steps_to_calories_regression())
 
 st.subheader("Correlations Between Distance, Calories, Temperature, and Precipitation")
 
-weather_figures = diagrams.plot_weather_correlation_for_chicago()
+weather_figures = diagrams.get_weather_regressions()
 temp, precip = st.columns(2)
 with temp:
     st.plotly_chart(weather_figures["distance_vs_temp"])
@@ -40,9 +40,9 @@ with precip:
 
 st.subheader("Daily Distributions")
 
-st.plotly_chart(diagrams.plot_daily_step_distribution_barplot())
+st.plotly_chart(diagrams.get_daily_steps_per_time_blocks_graph())
 
-steps_to_heart_rate, avg_heart_rate_diagram = diagrams.plot_steps_to_heart_rate_and_avg_heart_rate()
+steps_to_heart_rate, avg_heart_rate_diagram = diagrams.get_steps_to_heart_rate_and_avg_heart_rate_graphs()
 graph, numerical = st.columns([4, 1])
 with graph:
     st.plotly_chart(steps_to_heart_rate)
