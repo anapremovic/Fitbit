@@ -25,23 +25,23 @@ class ExerciseDiagrams:
 
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
 
-        users = pd.unique(daily_activity.loc[:,'UserId'])
-        distances = [daily_activity.loc[daily_activity.loc[:, 'UserId'] == user, 'TotalDistance'].sum() for user in users]
+        users = pd.unique(daily_activity.loc[:, "UserId"])
+        distances = [daily_activity.loc[daily_activity.loc[:, "UserId"] == user, "TotalDistance"].sum() for user in users]
 
         fig = px.histogram(
             x=distances,
             nbins=30, 
-            marginal='box', 
-            histnorm='density',
+            marginal="box",
+            histnorm="density",
             title="Distribution Of Distances Walked For All Users",
-            labels={'x': 'Distance Walked (km)', 'y': 'Density'}
+            labels={"x": "Distance Walked (km)", "y": "Density"}
         )
 
         return fig
 
     def get_day_of_week_frequency_graph(self):
         """
-        Create bar plot that displays the frequency of workouts per day of week
+        Create bar plot that displays the frequency of workouts per day of week.
         """
 
         daily_activity = self.fitbit_db.get_daily_activity()
@@ -60,7 +60,7 @@ class ExerciseDiagrams:
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
             title=title,
-            labels={'x': 'Day of the Week', 'y': 'Frequency'}
+            labels={"x": "Day of the Week", "y": "Frequency"}
         )
 
         Util.show_no_data_if_empty(daily_activity, "Date", fig)
@@ -84,7 +84,7 @@ class ExerciseDiagrams:
             x="TotalSteps",
             y="Calories",
             title=title,
-            labels={'TotalSteps': 'Total Steps', 'Calories': 'Calories Burned'},
+            labels={"TotalSteps": "Total Steps", "Calories": "Calories Burned"},
             trendline="ols"
         )
 
@@ -179,7 +179,8 @@ class ExerciseDiagrams:
 
     def get_steps_to_heart_rate_and_avg_heart_rate_graphs(self) -> tuple[go.Figure, go.Figure]:
         """
-        Create regression between daily steps and heart rate.
+        Create regression between daily steps and average heart rate.
+        Also add a numerical value for the average heart rate.
         """
 
         daily_steps_and_average_heart_rate = self.fitbit_db.get_daily_steps_and_average_heart_rate()
