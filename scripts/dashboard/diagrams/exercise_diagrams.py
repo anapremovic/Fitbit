@@ -100,8 +100,8 @@ class ExerciseDiagrams:
 
         # Aggregate TotalDistance and Calories per day
         activity_agg = daily_activity_db.groupby("Date").agg(
-            TotalDistance=("TotalDistance", "sum"),
-            Calories=("Calories", "sum")
+            TotalDistance=("TotalDistance", "mean"),
+            Calories=("Calories", "mean")
         ).reset_index()
 
         # Merge Fitbit and weather data
