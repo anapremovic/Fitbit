@@ -140,12 +140,12 @@ class ExerciseDiagrams:
         )
 
         figs["distance_vs_precip"] = scatter_with_fit(
-            data=merged_data, x="temp", y="TotalDistance",
+            data=merged_data, x="precip", y="TotalDistance",
             xlabel="Precipitation (mm)", ylabel="Total Distance (km)"
         )
 
         figs["calories_vs_precip"] = scatter_with_fit(
-            data=merged_data, x="temp", y="Calories",
+            data=merged_data, x="precip", y="Calories",
             xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
