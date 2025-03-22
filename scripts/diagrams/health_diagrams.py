@@ -177,7 +177,7 @@ class HealthDiagrams:
             weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
             step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
         else:
-            df = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
+            df = step_data.loc[step_data.loc[:, 'Id'] == self.user].set_index('Date').loc[:, ['TotalSteps']]
             df['Weight'] = None
             idInData = False
 
