@@ -12,8 +12,8 @@ end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
 @st.cache_resource
 def get_exercise_diagrams(user_id, start: datetime, end: datetime):
-    project_root = st.session_state["project_root"]
-    return ExerciseDiagrams(st.session_state["fitbit_db"], f"{project_root}/data/chicago_data.csv",
+    project_root = st.session_state["project-root"]
+    return ExerciseDiagrams(st.session_state["fitbit-db"], f"{project_root}/data/chicago_data.csv",
                             user_id, start, end)
 diagrams = get_exercise_diagrams(user, start_date, end_date)
 
