@@ -88,15 +88,15 @@ class ExerciseDiagrams:
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
-        daily_activity_db = self.fitbit_db.get_daily_activity()
+        daily_activity = self.fitbit_db.get_daily_activity()
 
         self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
-        daily_activity_db = Util.filter_by_date_range(daily_activity_db, self.start_date, self.end_date)
+        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         if self.user != "All":
-            daily_activity_db = Util.filter_by_user(daily_activity_db, self.user)
+            daily_activity = Util.filter_by_user(daily_activity, self.user)
 
         # Aggregate TotalDistance and Calories per day
-        activity_agg = daily_activity_db.groupby("Date").agg(
+        activity_agg = daily_activity.groupby("Date").agg(
             TotalDistance=("TotalDistance", "mean"),
             Calories=("Calories", "mean")
         ).reset_index()
