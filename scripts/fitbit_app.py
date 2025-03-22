@@ -13,8 +13,8 @@ from database import FitbitDatabase
 
 @st.cache_resource
 def get_fitbit_db_instance() -> FitbitDatabase:
-    """Creates an instance of FitbitDatabase and, with that, establishes a connection
-    to fitbit_database.db. The result should be saved to st.session_state so that 
+    """Creates an instance of FitbitDatabase and establishes a connection
+    to fitbit_database.db. The result should be saved to st.session_state so that
     all pages can easily access this same instance.
 
     The decorator @st.cache_resource ensures the result is cached, so that this code is 
