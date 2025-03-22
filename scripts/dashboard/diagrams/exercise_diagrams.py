@@ -11,7 +11,7 @@ class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str, user, start_date: datetime, end_date: datetime):
         self.fitbit_db = fitbit_db
         self.chicago_data = pd.read_csv(chicago_csv)
-        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
+        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
         self.user = user
         self.start_date = start_date
         self.end_date = end_date
@@ -88,9 +88,6 @@ class ExerciseDiagrams:
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
-        self.chicago_data.rename(columns={"datetime": "Date"}, inplace=True)
-        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
-        
         daily_activity_db = self.fitbit_db.get_daily_activity()
 
         self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
