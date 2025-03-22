@@ -368,3 +368,20 @@ class FitbitDatabase:
         df = df.drop(columns=['WeightPounds'])
         df["Date"] = pd.to_datetime(df["Date"])
         return df
+    
+    def get_activity_grouped_by_user(self) -> pd.DataFrame:
+        query = """
+            SELECT
+                Id,
+                AVG(TotalSteps) AS AverageSteps,
+                AVG(Calories) AS AverageCalories,
+                AVG(VeryActiveMinutes + FairlyActiveMinutes + LightlyActiveMinutes) AS AverageActiveMinutes
+            FROM daily_activity
+            GROUP BY Id
+        """
+
+        df = self.connection.query(query) 
+
+        df["Id"] = pd.Categorical(df["Id"], categories=df["Id"])
+
+        return df

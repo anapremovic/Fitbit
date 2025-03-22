@@ -1,7 +1,10 @@
 import datetime as datetime
 import streamlit as st
 import pandas as pd
+
 from scripts.dashboard.diagrams.exercise_diagrams import ExerciseDiagrams
+
+st.session_state["current-page"] = "exercise"
 
 user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
