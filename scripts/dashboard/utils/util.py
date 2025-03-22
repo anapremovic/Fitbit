@@ -14,7 +14,7 @@ class Util:
         return df[(df.loc[:, "UserId"] == user_id)]
 
     @staticmethod
-    def overlay_no_data_on_graph_if_empty(df: pd.DataFrame, column_analyzed: str, fig: go.Figure):
+    def show_no_data_if_empty(df: pd.DataFrame, column_analyzed: str, fig: go.Figure):
         if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
@@ -27,17 +27,16 @@ class Util:
             )
 
     @staticmethod
-    def overlay_no_data_on_graph_subplot_if_empty(df: pd.DataFrame, column_analyzed: str,
-                                                  fig: go.Figure, row: int, col: int):
+    def show_no_data_if_empty_subplot(df: pd.DataFrame, column_analyzed: str,
+                                      fig: go.Figure, row: int, col: int):
         if df[column_analyzed].dropna().empty:
-            if df[column_analyzed].dropna().empty:
-                fig.add_annotation(
-                    text="No Data",
-                    xref="x domain", yref="y domain",
-                    x=0.5, y=0.5,
-                    showarrow=False,
-                    font=dict(size=36),
-                    bgcolor="rgba(0, 0, 0, 0)",
-                    opacity=0.8,
-                    row=row, col=col
-                )
+            fig.add_annotation(
+                text="No Data",
+                xref="x domain", yref="y domain",
+                x=0.5, y=0.5,
+                showarrow=False,
+                font=dict(size=36),
+                bgcolor="rgba(0, 0, 0, 0)",
+                opacity=0.8,
+                row=row, col=col
+            )

@@ -28,7 +28,7 @@ class HealthDiagrams:
             y_label = "Hours Slept"
 
         fig = px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
-        Util.overlay_no_data_on_graph_if_empty(sleep_moments, "SleepHours", fig)
+        Util.show_no_data_if_empty(sleep_moments, "SleepHours", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -44,7 +44,7 @@ class HealthDiagrams:
 
         fig = px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
                          labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
-        Util.overlay_no_data_on_graph_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
+        Util.show_no_data_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -60,7 +60,7 @@ class HealthDiagrams:
 
         fig = px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
                          labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
-        Util.overlay_no_data_on_graph_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
+        Util.show_no_data_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -78,7 +78,7 @@ class HealthDiagrams:
 
         fig = px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
                      labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
-        Util.overlay_no_data_on_graph_if_empty(sleep_data, "HoursSlept", fig)
+        Util.show_no_data_if_empty(sleep_data, "HoursSlept", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -97,7 +97,7 @@ class HealthDiagrams:
             y_label = "Calories Burned"
 
         fig = px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
-        Util.overlay_no_data_on_graph_if_empty(calorie_data, "Calories", fig)
+        Util.show_no_data_if_empty(calorie_data, "Calories", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -115,7 +115,7 @@ class HealthDiagrams:
 
         fig = px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
                      labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
-        Util.overlay_no_data_on_graph_if_empty(calorie_data, "AverageCalories", fig)
+        Util.show_no_data_if_empty(calorie_data, "AverageCalories", fig)
         return fig
 
     @st.cache_data(show_spinner=False)
@@ -160,8 +160,8 @@ class HealthDiagrams:
             title_y=0.95
         )
 
-        Util.overlay_no_data_on_graph_if_empty(heart_rate_data, "HeartRate", over_time_plot)
-        Util.overlay_no_data_on_graph_if_empty(heart_rate_data, "HeartRate", average_plot)
+        Util.show_no_data_if_empty(heart_rate_data, "HeartRate", over_time_plot)
+        Util.show_no_data_if_empty(heart_rate_data, "HeartRate", average_plot)
 
         return over_time_plot, average_plot
 
@@ -238,7 +238,7 @@ class HealthDiagrams:
 
         fig.update_xaxes(title_text="Date", row=1, col=2)
 
-        Util.overlay_no_data_on_graph_subplot_if_empty(df,"Weight", fig, row=1, col=1)
-        Util.overlay_no_data_on_graph_subplot_if_empty(df, "TotalSteps", fig, row=1, col=2)
+        Util.show_no_data_if_empty_subplot(df, "Weight", fig, row=1, col=1)
+        Util.show_no_data_if_empty_subplot(df, "TotalSteps", fig, row=1, col=2)
 
         return fig
