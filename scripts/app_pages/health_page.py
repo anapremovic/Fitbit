@@ -4,6 +4,8 @@ import pandas as pd
 
 from scripts.diagrams.health_diagrams import HealthDiagrams
 
+st.session_state["current-page"] = "health"
+
 # Filters
 user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])

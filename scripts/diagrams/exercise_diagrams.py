@@ -11,7 +11,7 @@ class ExerciseDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str, user, start_date: datetime, end_date: datetime):
         self.fitbit_db = fitbit_db
         self.chicago_data = pd.read_csv(chicago_csv)
-        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
+        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
         self.user = user
         self.start_date = start_date
         self.end_date = end_date
@@ -61,7 +61,7 @@ class ExerciseDiagrams:
             title=title,
             labels={'x': 'Day of the Week', 'y': 'Frequency'}
         )
-        Util.overlay_no_data_on_graph_if_empty(data, "Date", fig)
+        Util.show_no_data_if_empty(data, "Date", fig)
         return fig
 
     def plot_steps_to_calories_regression(self): # Part 1: generate_steps_to_calories_regression
@@ -81,16 +81,13 @@ class ExerciseDiagrams:
             labels={'TotalSteps': 'Total Steps', 'Calories': 'Calories Burned'},
             trendline="ols"
         )
-        Util.overlay_no_data_on_graph_if_empty(data, "Calories", fig)
+        Util.show_no_data_if_empty(data, "Calories", fig)
         return fig
 
     def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
-        self.chicago_data.rename(columns={"datetime": "Date"}, inplace=True)
-        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
-        
         daily_activity_db = self.fitbit_db.get_daily_activity()
 
         self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
@@ -100,8 +97,8 @@ class ExerciseDiagrams:
 
         # Aggregate TotalDistance and Calories per day
         activity_agg = daily_activity_db.groupby("Date").agg(
-            TotalDistance=("TotalDistance", "sum"),
-            Calories=("Calories", "sum")
+            TotalDistance=("TotalDistance", "mean"),
+            Calories=("Calories", "mean")
         ).reset_index()
 
         # Merge Fitbit and weather data
@@ -140,19 +137,19 @@ class ExerciseDiagrams:
         )
 
         figs["distance_vs_precip"] = scatter_with_fit(
-            data=merged_data, x="temp", y="TotalDistance",
+            data=merged_data, x="precip", y="TotalDistance",
             xlabel="Precipitation (mm)", ylabel="Total Distance (km)"
         )
 
         figs["calories_vs_precip"] = scatter_with_fit(
-            data=merged_data, x="temp", y="Calories",
+            data=merged_data, x="precip", y="Calories",
             xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
-        Util.overlay_no_data_on_graph_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
-        Util.overlay_no_data_on_graph_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
-        Util.overlay_no_data_on_graph_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
-        Util.overlay_no_data_on_graph_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
+        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
+        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
+        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
+        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
 
         return figs
 
@@ -177,7 +174,7 @@ class ExerciseDiagrams:
             title=title,
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
-        Util.overlay_no_data_on_graph_if_empty(step_data, "AverageSteps", fig)
+        Util.show_no_data_if_empty(step_data, "AverageSteps", fig)
         return fig
 
     def plot_steps_to_heart_rate_and_avg_heart_rate(self): # Part 4
@@ -233,7 +230,7 @@ class ExerciseDiagrams:
             title_y=0.95
         )
 
-        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig1)
-        Util.overlay_no_data_on_graph_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig2)
+        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig1)
+        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig2)
 
         return fig1, fig2

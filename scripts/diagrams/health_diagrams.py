@@ -29,7 +29,7 @@ class HealthDiagrams:
             y_label = "Hours Slept"
 
         fig = px.line(sleep_moments, x="Date", y="SleepHours", title=title, labels=dict(SleepHours=y_label))
-        Util.overlay_no_data_on_graph_if_empty(sleep_moments, "SleepHours", fig)
+        Util.show_no_data_if_empty(sleep_moments, "SleepHours", fig)
         return fig
 
     def get_sedentary_hrs_to_sleep_hrs_regression(self) -> go.Figure:
@@ -44,7 +44,7 @@ class HealthDiagrams:
 
         fig = px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
                          labels=dict(SedentaryHours="Sedentary Hours", HoursSlept="Hours Slept"), opacity=0.5)
-        Util.overlay_no_data_on_graph_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
+        Util.show_no_data_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
         return fig
 
     def get_active_hrs_to_sleep_hrs_regression(self, week_period: str = "") -> go.Figure:
@@ -59,7 +59,7 @@ class HealthDiagrams:
 
         fig = px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
                          labels=dict(TotalActiveHours="Active Hours", TotalSleepHours="Hours Slept"), opacity=0.5)
-        Util.overlay_no_data_on_graph_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
+        Util.show_no_data_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
         return fig
 
     def get_sleep_duration_per_time_blocks(self) -> go.Figure:
@@ -76,7 +76,7 @@ class HealthDiagrams:
 
         fig = px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
                      labels=dict(HourGroup="Time", HoursSlept="Average Hours Slept"))
-        Util.overlay_no_data_on_graph_if_empty(sleep_data, "HoursSlept", fig)
+        Util.show_no_data_if_empty(sleep_data, "HoursSlept", fig)
         return fig
 
     def get_calories_burned_over_time(self) -> go.Figure:
@@ -94,7 +94,7 @@ class HealthDiagrams:
             y_label = "Calories Burned"
 
         fig = px.line(calorie_data, x="Date", y="Calories", title=title, labels=dict(Calories=y_label))
-        Util.overlay_no_data_on_graph_if_empty(calorie_data, "Calories", fig)
+        Util.show_no_data_if_empty(calorie_data, "Calories", fig)
         return fig
 
     def get_calories_burned_per_time_blocks(self) -> go.Figure:
@@ -111,10 +111,10 @@ class HealthDiagrams:
 
         fig = px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
                      labels=dict(HourGroup="Time", AverageCalories="Average Calories Burned"))
-        Util.overlay_no_data_on_graph_if_empty(calorie_data, "AverageCalories", fig)
+        Util.show_no_data_if_empty(calorie_data, "AverageCalories", fig)
         return fig
 
-    def get_heart_rate_over_time_and_average(self) -> (go.Figure, go.Figure):
+    def get_heart_rate_over_time_and_average(self) -> tuple[go.Figure, go.Figure]:
         """Returns a Plotly figure that visualizes the heart rate each day."""
         if self.user == "All":
             heart_rate_data = self.fitbit_db.get_heart_rate_averaged_over_all_users()
@@ -155,8 +155,8 @@ class HealthDiagrams:
             title_y=0.95
         )
 
-        Util.overlay_no_data_on_graph_if_empty(heart_rate_data, "HeartRate", over_time_plot)
-        Util.overlay_no_data_on_graph_if_empty(heart_rate_data, "HeartRate", average_plot)
+        Util.show_no_data_if_empty(heart_rate_data, "HeartRate", over_time_plot)
+        Util.show_no_data_if_empty(heart_rate_data, "HeartRate", average_plot)
 
         return over_time_plot, average_plot
 
@@ -177,7 +177,7 @@ class HealthDiagrams:
             weight_data = weight_data.groupby(level=1)['Weight'].mean().reset_index().set_index("Date")
             step_data = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
         else:
-            df = step_data.groupby('Date')['TotalSteps'].mean().reset_index().set_index("Date")
+            df = step_data.loc[step_data.loc[:, 'Id'] == user_id].set_index('Date').loc[:, ['TotalSteps']]
             df['Weight'] = None
             idInData = False
 
@@ -232,7 +232,7 @@ class HealthDiagrams:
 
         fig.update_xaxes(title_text="Date", row=1, col=2)
 
-        Util.overlay_no_data_on_graph_subplot_if_empty(df,"Weight", fig, row=1, col=1)
-        Util.overlay_no_data_on_graph_subplot_if_empty(df, "TotalSteps", fig, row=1, col=2)
+        Util.show_no_data_if_empty_subplot(df, "Weight", fig, row=1, col=1)
+        Util.show_no_data_if_empty_subplot(df, "TotalSteps", fig, row=1, col=2)
 
         return fig

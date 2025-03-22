@@ -29,34 +29,11 @@ st.set_page_config(
 )
 
 fitbit_db = get_fitbit_db_instance()
-st.session_state["fitbit_db"] = fitbit_db
-st.session_state["project_root"] = project_root
-
-st.sidebar.header("Filters")
-
-selected_user = st.sidebar.selectbox(
-    "User ID",
-    key="selected-user",
-    options=("All",) + fitbit_db.user_ids
-)
-
-left, right = st.sidebar.columns(2)
-with left: 
-    start_date = st.date_input(
-        "Start date",
-        key="selected-start-date",
-        value=st.session_state.get("selected-start-date", fitbit_db.min_date),
-        min_value=fitbit_db.min_date,
-        max_value=st.session_state.get("selected-end-date", fitbit_db.max_date),
-    )
-with right:
-    end_date = st.date_input(
-        "End date",
-        key="selected-end-date", 
-        value=st.session_state.get("selected-end-date", fitbit_db.max_date),
-        min_value=st.session_state.get("selected-start-date", fitbit_db.min_date),
-        max_value=fitbit_db.max_date
-    )
+st.session_state["fitbit-db"] = fitbit_db
+st.session_state["project-root"] = project_root
+st.session_state.setdefault("selected-user", "All")
+st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
+st.session_state.setdefault("selected-end-date", fitbit_db.max_date)
 
 home_page = st.Page("app_pages/home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise", icon="🏋️")
@@ -69,3 +46,34 @@ pg = st.navigation([
 ])
 
 pg.run()
+
+st.sidebar.header("Filters")
+
+are_filters_disabled = False
+if st.session_state.get("current-page", "home") == "home":
+    are_filters_disabled = True
+
+selected_user = st.sidebar.selectbox(
+    "User ID",
+    key="selected-user",
+    options=("All",) + fitbit_db.user_ids,
+    disabled=are_filters_disabled,
+)
+
+left, right = st.sidebar.columns(2)
+with left: 
+    start_date = st.date_input(
+        "Start date",
+        key="selected-start-date",
+        min_value=fitbit_db.min_date,
+        max_value=st.session_state["selected-end-date"],
+        disabled=are_filters_disabled,
+    )
+with right:
+    end_date = st.date_input(
+        "End date",
+        key="selected-end-date",
+        min_value=st.session_state["selected-start-date"],
+        max_value=fitbit_db.max_date,
+        disabled=are_filters_disabled,
+    )
