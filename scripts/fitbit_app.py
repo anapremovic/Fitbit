@@ -97,6 +97,9 @@ def update_selected_dates():
     st.session_state["selected-start-date"] = st.session_state["selected-date-range"][0]
     st.session_state["selected-end-date"] = st.session_state["selected-date-range"][1]
 
+def update_selected_user():
+    st.session_state["selected-user"] = st.session_state["selected-user-dropdown"]
+
 are_filters_disabled = st.session_state["current-page"] == "home"
 date_filter, padding, user_filter = st.columns([2, 0.1, 1])
 
@@ -112,10 +115,14 @@ date_filter.slider(
     disabled=are_filters_disabled,
 )
 
+options = ("All",) + fitbit_db.user_ids
 user_filter.selectbox(
     "User ID",
-    key="selected-user",
-    options=("All",) + fitbit_db.user_ids,
+    options=options,
+    index=0 if st.session_state["current-page"] == "home" else
+    options.index(st.session_state["selected-user"]),
+    key="selected-user-dropdown",
+    on_change=update_selected_user,
     disabled=are_filters_disabled,
 )
 
