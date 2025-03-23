@@ -186,9 +186,9 @@ class HealthDiagrams:
         Util.show_no_data_if_empty(heart_rate_data, "HeartRate", average_plot)
         return over_time_plot, average_plot
 
-    def get_weight_change_to_steps_regression(self) -> go.Figure:
+    def get_weight_and_steps_over_time_graphs(self) -> go.Figure:
         """
-        Create a regression of weight change to daily steps.
+        Create line plots that display weight and steps over time.
         """
 
         weight_data = self.fitbit_db.get_weight_data()
@@ -248,16 +248,12 @@ class HealthDiagrams:
 
         if self.user == "All":
             fig.update_yaxes(title_text="Average weight for all users (kg)", row=1, col=1)
-        else:
-            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
-
-        fig.update_xaxes(title_text="Date", row=1, col=1)
-
-        if self.user == "All":
             fig.update_yaxes(title_text="Average steps for all users ", row=1, col=2)
         else:
+            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
             fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
 
+        fig.update_xaxes(title_text="Date", row=1, col=1)
         fig.update_xaxes(title_text="Date", row=1, col=2)
 
         Util.show_no_data_if_empty_subplot(df, "Weight", fig, row=1, col=1)

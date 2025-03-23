@@ -70,7 +70,7 @@ with st.container(border=True):
     with number:
         st.plotly_chart(average_heart_rate)
 
-weight_over_time = diagrams.get_weight_change_to_steps_regression()
+weight_over_time = diagrams.get_weight_and_steps_over_time_graphs()
 if weight_over_time:
     st.subheader("Weight")
     with st.container(border=True):
