@@ -11,7 +11,7 @@
 		<a href="#installation">Installation</a>
     </li>
     <li>
-		<a href="#usage">Usage</a>
+		<a href="#project-structure">Project Structure</a>
         <!-- <ul>
         	<li><a href='#folder-dashboard'>Folder: Dashboard</a></li>
 		</ul>
@@ -55,11 +55,11 @@ If you want to run this dashboard on your local device, please follow these step
   - [Plotly][Plotly-url]
 3) Once you've completed the steps above, change your directory to the root folder and run the command ``streamlit run scripts/fitbit_app.py``. This will start the dashboard and open it up on your local machine.
 
-## Usage
+## Project Structure
 
-This folder contains the visualizations and Streamlit code to display our Fitbit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
-
-The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
+- The `scripts` directory contains `database.py` which contains database connection and all SQL queries, and fitbit_app.py which contains the global configuration for the Streamlit dashboard.
+- The `scripts/diagrams` directory contains functions which generate Plotly diagrams pertaining to each dashboard page.
+- The `scripts/app_pages` directory contains files to place the Plotly diagrams on each dashboard page.
 
 ## Notes
 
