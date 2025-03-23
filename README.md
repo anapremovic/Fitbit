@@ -37,6 +37,12 @@
 
 This is a study of data from an Amazon survey from 2016 of 30 respondents. We perform an analysis and visualize our results in a dashboard.
 
+Our data can be found at [Kaggle](https://www.kaggle.com/datasets/salihobaid/fitbit-datasets-0312201605122016/data) which is based on a research article called [Establishing Linkages Between Distributed Survey Responses and Consumer Wearable Device Datasets: A Pilot Protocol](https://doi.org/10.2196/resprot.6513) that aims to find a link between fitness trackers and an individual's physical activity.
+
+> The dashboard is built for business analysts working for the manufacturer of FitBits. Participants of said study above are also able to view the dashboard.
+
+Furthermore, all participants in this study are said to live in Chicago hence why some other weather data is retrieved from Chicago on the same dates the study was conducted.  
+
 ### Built With
 [![Python][Python.org]][Python-url]
 [![Streamlit][Streamlit.io]][Streamlit-url]
@@ -70,7 +76,7 @@ If you want to set up this dashboard yourself, please follow these steps:
 
 This folder contains the visualizations and Streamlit code to display our FitBit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
 
-The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our home screen can be found in the ``fitbit_app.py`` file.
+The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
 
 ### Folder: Part1-4
 
