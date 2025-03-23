@@ -4,8 +4,6 @@ import streamlit as st
 
 from scripts.diagrams.health_diagrams import HealthDiagrams
 
-st.session_state["current-page"] = "health"
-
 user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
