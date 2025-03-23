@@ -10,9 +10,11 @@ def get_home_diagrams():
 # If you see this in the PR it means i forgot to change it back so leave a comment
 home_diagrams = HomeDiagrams(st.session_state["fitbit-db"])
 
+st.header("Fitbit Survey Results")
+st.markdown("##### 📍 Chicago, OH")
+
 left, div, right = st.columns([2, 0.02, 3])
 with left:
-    st.subheader("Survey Details")
     days, participants = st.columns(2)
     with days:
         st.plotly_chart(home_diagrams.get_number_of_days())
@@ -25,21 +27,20 @@ with div:
             <style>
                 .divider-vertical-line {
                     border-left: 2px solid rgba(49, 51, 63, 1);
-                    height: 170px;
+                    height: 100px;
                     margin: auto;
                 }
             </style>
         '''
     )
 with right:
-    st.subheader("Collective Metrics")
-    steps, distance, active_min = st.columns(3)
+    active_min, steps, distance = st.columns(3)
     collective_metrics = home_diagrams.get_collective_metrics()
-    with steps:
-        st.plotly_chart(collective_metrics[0])
-    with distance:
-        st.plotly_chart(collective_metrics[1])
     with active_min:
+        st.plotly_chart(collective_metrics[0])
+    with steps:
+        st.plotly_chart(collective_metrics[1])
+    with distance:
         st.plotly_chart(collective_metrics[2])
 
 steps, distance, active_time = st.columns([0.9, 0.9, 1.1])

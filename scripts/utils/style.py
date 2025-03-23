@@ -4,5 +4,5 @@ class Colors:
     TEXT_COLOR = "#DDDDDD"
 
 class Fonts:
-    MEDIUM_FONT_SIZE = 25
-    LARGE_FONT_SIZE = 50
+    MEDIUM_FONT_SIZE = 20
+    LARGE_FONT_SIZE = 40
