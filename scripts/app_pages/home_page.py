@@ -9,7 +9,7 @@ def get_home_diagrams():
 home_diagrams = HomeDiagrams(st.session_state["fitbit-db"])
 
 st.header("Fitbit Survey Results")
-st.markdown("##### 📍 Chicago, OH")
+st.markdown("##### 📍 Chicago, IL")
 
 left, div, right = st.columns([2, 0.02, 3])
 with left:
