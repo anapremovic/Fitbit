@@ -92,6 +92,7 @@ The ``[page_name]_page.py`` files contain the pages the user can navigate to on 
 ## Acknowledgments
 
 * <a href="https://github.com/othneildrew/Best-README-Template">README Template</a>
+* [FitBit logo](https://iconscout.com/free-icon/fitbit-3521429_2944873)
 
 [Python-url]: https://www.python.org/
 
