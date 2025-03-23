@@ -5,12 +5,18 @@ import plotly.graph_objects as go
 class Util:
     @staticmethod
     def filter_by_date_range(df: pd.DataFrame, start_date: datetime, end_date: datetime) -> pd.DataFrame:
-        """Helper function to filter DataFrame by user selected date range from dashboard."""
+        """
+        Helper function to filter DataFrame by user selected date range from dashboard.
+        """
+
         return df[(df.loc[:, "Date"] >= start_date) & (df.loc[:, "Date"] <= end_date)]
 
     @staticmethod
     def filter_by_user(df: pd.DataFrame, user_id: float) -> pd.DataFrame:
-        """Helper function to filter DataFrame by user selected user ID from dashboard."""
+        """
+        Helper function to filter DataFrame by user selected user ID from dashboard.
+        """
+
         return df[(df.loc[:, "UserId"] == user_id)]
 
     @staticmethod
@@ -19,6 +25,7 @@ class Util:
         Helper function to check if the relevant data column has data entries available.
         If no entries, overlay "No Data" on top of the corresponding (empty) dashboard figure.
         """
+
         if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
@@ -37,6 +44,7 @@ class Util:
         Helper function to check if the relevant data column has data entries available.
         If no entries, overlay "No Data" on top of the corresponding (empty) dashboard subplot.
         """
+
         if df[column_analyzed].dropna().empty:
             fig.add_annotation(
                 text="No Data",
