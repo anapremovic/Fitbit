@@ -99,12 +99,12 @@ class HomeDiagrams:
 
         return steps_fig, distance_fig, active_min_fig
 
-    def get_steps_and_active_bar_plot(self) -> tuple[go.Figure, go.Figure]:
+    def get_steps_distance_active_barplots(self) -> tuple[go.Figure, go.Figure, go.Figure]:
         """
-        Create 2 bar plots which display, respectively, the average number of daily steps
-        and the average number of daily active minutes for each user. In each diagram, the bars are
-        colored (using the same scale) to indicate the corresponding average caloric expenditure
-        per day
+        Create 3 bar plots which display, respectively, the average number of daily steps, 
+        the average distance walked and the average number of daily active minutes for each user. 
+        In each diagram, the bars are colored (using the same scale) to indicate the corresponding 
+        average caloric expenditure per day
         """
 
         df = self.fitbit_db.get_activity_grouped_by_user()
@@ -116,12 +116,34 @@ class HomeDiagrams:
             y="AverageSteps",
             title="Average Daily Steps",
             subtitle="Color indicates average caloric expenditure per day",
-            labels={"UserId": "User", "AverageSteps": "Steps", "AverageCalories": "Calories"},
+            labels={
+                "Id": "User", 
+                "AverageSteps": "Steps", 
+                "AverageCalories": "Calories"
+            },
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
-        steps_fig.update_xaxes(type='category', tickangle=-45, showticklabels=False)
+        steps_fig.update_xaxes(type='category', showticklabels=False)
         steps_fig.update_layout(coloraxis_showscale=False)
+
+        df = df.sort_values(by="AverageDistance", ascending=False)
+        distance_fig = px.bar(
+            df, 
+            x="UserId", 
+            y="AverageDistance",
+            title="Average Total Distance",
+            subtitle="Color indicates average caloric expenditure per day",
+            labels={
+                "Id": "User", 
+                "AverageSteps": "Steps", 
+                "AverageDistance": "Distance",
+            },
+            color="AverageCalories",
+            color_continuous_scale=["#FFFFFF", "#06B0B8"],
+        )
+        distance_fig.update_xaxes(type='category', showticklabels=False)
+        distance_fig.update_layout(coloraxis_showscale=False)
 
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
         active_min_fig = px.bar(
@@ -130,10 +152,14 @@ class HomeDiagrams:
             y="AverageActiveMinutes",
             title="Average Daily Active Time",
             subtitle="Color indicates average caloric expenditure per day",
-            labels={"UserId": "User", "AverageActiveMinutes": "Active Minutes", "AverageCalories": "Calories"},
+            labels={
+                "Id": "User", 
+                "AverageActiveMinutes": "Active Minutes", 
+                "AverageCalories": "Calories",
+            },
             color="AverageCalories",
             color_continuous_scale=["#FFFFFF", "#06B0B8"],
         )
         active_min_fig.update_xaxes(type='category', showticklabels=False)
 
-        return steps_fig, active_min_fig
+        return (steps_fig, distance_fig, active_min_fig)

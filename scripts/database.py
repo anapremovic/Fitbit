@@ -371,6 +371,7 @@ class FitbitDatabase:
             SELECT
                 Id AS UserId,
                 AVG(TotalSteps) AS AverageSteps,
+                AVG(TotalDistance) AS AverageDistance,
                 AVG(Calories) AS AverageCalories,
                 AVG(VeryActiveMinutes + FairlyActiveMinutes + LightlyActiveMinutes) AS AverageActiveMinutes
             FROM daily_activity
