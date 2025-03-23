@@ -39,6 +39,12 @@ class HealthDiagrams:
             markers=True
         )
         fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sleep_data, "SleepHours", fig)
         return fig
@@ -64,6 +70,12 @@ class HealthDiagrams:
             opacity=0.6
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
         return fig
@@ -89,6 +101,12 @@ class HealthDiagrams:
             opacity=0.6
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
         return fig
@@ -110,11 +128,17 @@ class HealthDiagrams:
             sleep_data,
             x="HourGroup",
             y="HoursSlept",
-            title="Average Sleep Duration Per 4-Hour Time Blocks",
+            title="Average Sleep Duration<br>Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
-        fig.update_layout(xaxis=dict(tickangle=-45))
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sleep_data, "HoursSlept", fig)
         return fig
@@ -143,6 +167,12 @@ class HealthDiagrams:
             markers=True
         )
         fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(daily_activity, "Calories", fig)
         return fig
@@ -163,11 +193,17 @@ class HealthDiagrams:
             calorie_data,
             x="HourGroup",
             y="AverageCalories",
-            title="Average Calories Burned Per 4-Hour Time Blocks",
+            title="Average Calories Burned<br>Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
-        fig.update_layout(xaxis=dict(tickangle=-45))
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(calorie_data, "AverageCalories", fig)
         return fig
@@ -197,6 +233,13 @@ class HealthDiagrams:
             markers=True
         )
         over_time_plot.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        over_time_plot.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
+        )
 
         # Average over all dates
         avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean()
@@ -213,8 +256,10 @@ class HealthDiagrams:
             showlegend=False,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            title="Average Heart Rate <br> Over Date Range",
-            title_y=0.95
+            title="Average Heart Rate<br>Over Date Range",
+            title_y=0.95,
+            title_x=0.55,
+            title_xanchor="center"
         )
 
         Util.show_no_data_if_empty(heart_rate_data, "HeartRate", over_time_plot)
@@ -282,7 +327,11 @@ class HealthDiagrams:
 
         fig.update_layout(
             title_text="Weight And Steps Over Time",
-            showlegend=False
+            showlegend=False,
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
         )
 
         if self.user == "All":
