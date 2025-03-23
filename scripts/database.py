@@ -284,6 +284,7 @@ class FitbitDatabase:
             )
             SELECT 
 				Id AS UserId,
+                logId,
 				substr(date, 1, instr(date, ' ') - 1) AS SleepDate,
                 COUNT(*) / 60.0 AS HoursSlept,
                 CASE 
