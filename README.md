@@ -8,16 +8,22 @@
         <ul><li><a href="#built-with">Built With</a></li></ul>
     </li>
     <li>
-        <a href="#getting-started">Getting Started</a>
-        <ul><li><a href="#prerequisites">Prerequisites</a></li></ul>
-        <ul><li><a href="#run">Run</a></li></ul>
+		<a href="#installation">Installation</a>
     </li>
     <li>
-        <a href="#usage">Usage</a>
-        <ul><li><a href="#part-1">Part 1</a></li></ul>
-        <ul><li><a href="#part-2">Part 2</a></li></ul>
-        <ul><li><a href="#part-3">Part 3</a></li></ul>
+		<a href="#usage">Usage</a>
+        <!-- <ul>
+        	<li><a href='#folder-dashboard'>Folder: Dashboard</a></li>
+		</ul>
+        <ul>
+			<li><a href='#folder-part1-4'>Folder: Parts 1 - 4</a></li>
+			<ul><li><a href="#part-1">Part 1</a></li></ul>
+			<ul><li><a href="#part-2">Part 2</a></li></ul>
+			<ul><li><a href="#part-3">Part 3</a></li></ul>
+			<ul><li><a href="#part-4">Part 4</a></li></ul>
+        </ul> -->
     </li>
+    <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -25,60 +31,63 @@
 
 ## About The Project
 
-This is a study of data from an Amazon survey from 2016 of 30 respondents. We perform an analysis and visualize our results in a dashboard.
+This is a study of data from an Amazon survey from 2016 of 35 respondents. We perform an analysis and visualize our results in a dashboard.
+
+Our data can be found at [Kaggle](https://www.kaggle.com/datasets/salihobaid/fitbit-datasets-0312201605122016/data) which is based on a research article called [Establishing Linkages Between Distributed Survey Responses and Consumer Wearable Device Datasets: A Pilot Protocol](https://doi.org/10.2196/resprot.6513) that aims to find a link between fitness trackers and an individual's physical activity.
+
+The goal of our dashboard is to aid business analysts working for the manufacturer of Fitbit to improve their product. Participants of the study are also welcome to view the dashboard.
 
 ### Built With
 [![Python][Python.org]][Python-url]
 [![Streamlit][Streamlit.io]][Streamlit-url]
+[![Plotly][Plotly.io]][Plotly-url]
 
+## Installation
 
-## Getting Started
+If you want to run this dashboard on your local device, please follow these steps:
 
-### Prerequisites
-
-* Python is installed
-
-### Run
-* Run `main.py` to see visualizations from Part 1 and 3
-
-TODO: Fill getting started section to tell user how to run scripts + use dashboard
+1) Download [Python][Python-url] using version 3.10 at the minimum
+2) This project uses a variety of Python libraries to run it. We recommend using [pip](https://packaging.python.org/en/latest/key_projects/#pip) to get these packages onto your computer. A pip package is installed in the format: ``pip install package_name``. Please install the following:
+  - [NumPy][NumPy-url]
+  - [Pandas][Pandas-url]
+  - [Streamlit][Streamlit-url]
+  - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
+  - [Plotly][Plotly-url]
+3) Once you've completed the steps above, change your directory to the root folder and run the command ``streamlit run scripts/fitbit_app.py``. This will start the dashboard and open it up on your local machine.
 
 ## Usage
 
-### Part 1
-* Visualize distance travelled by users.
-* Visualize calories burnt per user.
-* Visualize frequency of workout per day of week.
-* Visualize relationship between the amount of steps taken and the amount of calories burnt.
+This folder contains the visualizations and Streamlit code to display our Fitbit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
 
-### Part 2
-* View repository and README.
+The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
 
-### Part 3
-* Verify correctness of hourly steps vs daily steps data.
-* Visualize sleep data over time for a user.
-* Visualize relationship between the amount of sleep and the number of active minutes the next day.
-* Visualize a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity.
-* Visualize the correlation of the rate of activity between temperature, precipitation, total distance and calories burned.
+## Notes
 
-### Part 4
-* Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
-* Visualize relationship between the number of steps in a day and the average daily heart rate.
-* Numerically see the average daily heart rate for a given step range.
+- Due to inconsistencies with the dataset we were given, the daily step data does not match the hourly step data
 
 ## Contributors
 
+* Alec Rothkowitz
+* Ana Premovic
 * Lucas Lee
 * Luke Olender
-* Ana Premovic
-* Alec Rothkowitz
-
 
 ## Acknowledgments
 
 * <a href="https://github.com/othneildrew/Best-README-Template">README Template</a>
+* [Favicon](https://iconscout.com/free-icon/fitbit-3521429_2944873)
+* [Logo](https://www.sherwoods.ie/fitbit/)
 
 [Python-url]: https://www.python.org/
+
+<!-- Shields.io badges -->
 [Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54&size=150
-[Streamlit-url]: https://streamlit.io/
 [Streamlit.io]: https://img.shields.io/badge/-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white&size=150
+[Plotly.io]: https://img.shields.io/badge/Plotly-3F4F75?logo=plotly&logoColor=fff&style=for-the-badge
+
+<!-- Python libraries -->
+[NumPy-url]: https://numpy.org/
+[Pandas-url]: https://pandas.pydata.org/
+[Streamlit-url]: https://streamlit.io/
+[Streamlit-SQLAlchemy-url]: https://docs.streamlit.io/develop/concepts/connections/connecting-to-data
+[Plotly-url]: https://plotly.com/
