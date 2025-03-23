@@ -1,5 +1,4 @@
 import datetime as datetime
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -184,13 +183,15 @@ class ExerciseDiagrams:
         merged_data = pd.merge(daily_activity, self.chicago_data, on="Date", how="inner")
         merged_data["conditions"] = merged_data["conditions"].str.split(", ") # Split conditions column into list
         merged_data = merged_data.explode("conditions")  # Each condition becomes its own row
+        merged_data["conditions"] = merged_data["conditions"].str.replace("Partially cloudy", "Partially Cloudy")
 
+        weather_conditions = ["Rain", "Partially Cloudy", "Overcast", "Snow", "Clear"]
         condition_counts = merged_data["conditions"].value_counts()
-        condition_counts.index = condition_counts.index.str.title()
+        condition_counts = [condition_counts.get(condition, 0) for condition in weather_conditions]
 
         fig = px.bar(
-            x=condition_counts.index,
-            y=condition_counts.values,
+            x=weather_conditions,
+            y=condition_counts,
             title="Number Of Workouts Per Weather Condition",
             labels={"x": "Weather Condition", "y": "Frequency"}
         )
