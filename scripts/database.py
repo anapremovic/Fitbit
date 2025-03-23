@@ -35,7 +35,7 @@ class FitbitDatabase:
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
-    def _get_date_range(self) -> tuple[datetime, datetime]:
+    def _get_date_range(self) -> tuple[datetime.datetime, datetime.datetime]:
         """
         Get full date range of dashboard. To be run once on startup and stored in session state.
         """
