@@ -50,6 +50,7 @@ If you want to run this dashboard on your local device, please follow these step
 2) This project uses a variety of Python libraries to run it. We recommend using [pip](https://packaging.python.org/en/latest/key_projects/#pip) to get these packages onto your computer. A pip package is installed in the format: ``pip install package_name``. Please install the following:
   - [NumPy][NumPy-url]
   - [Pandas][Pandas-url]
+  - [Statsmodels][Statsmodels-url]
   - [Streamlit][Streamlit-url]
   - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
   - [Plotly][Plotly-url]
@@ -88,6 +89,7 @@ If you want to run this dashboard on your local device, please follow these step
 <!-- Python libraries -->
 [NumPy-url]: https://numpy.org/
 [Pandas-url]: https://pandas.pydata.org/
+[Statsmodels-url]: https://www.statsmodels.org/stable/index.html
 [Streamlit-url]: https://streamlit.io/
 [Streamlit-SQLAlchemy-url]: https://docs.streamlit.io/develop/concepts/connections/connecting-to-data
 [Plotly-url]: https://plotly.com/
