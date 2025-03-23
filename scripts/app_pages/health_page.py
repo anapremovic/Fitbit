@@ -8,7 +8,7 @@ user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_health_diagrams(user_id, start: datetime, end: datetime):
     return HealthDiagrams(st.session_state["fitbit-db"], user_id, start, end)
 diagrams = get_health_diagrams(user, start_date, end_date)

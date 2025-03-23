@@ -11,7 +11,7 @@ import streamlit as st
 
 from database import FitbitDatabase
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_fitbit_db_instance() -> FitbitDatabase:
     """Creates an instance of FitbitDatabase and establishes a connection
     to fitbit_database.db. The result should be saved to st.session_state so that

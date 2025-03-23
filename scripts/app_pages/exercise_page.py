@@ -8,7 +8,7 @@ user = st.session_state["selected-user"]
 start_date = pd.to_datetime(st.session_state["selected-start-date"])
 end_date = pd.to_datetime(st.session_state["selected-end-date"])
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_exercise_diagrams(user_id, start: datetime, end: datetime):
     project_root = st.session_state["project-root"]
     return ExerciseDiagrams(st.session_state["fitbit-db"], f"{project_root}/data/chicago_data.csv",

@@ -2,7 +2,7 @@ import streamlit as st
  
 from scripts.diagrams.home_diagrams import HomeDiagrams 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_home_diagrams():
     return HomeDiagrams(st.session_state["fitbit-db"])
 # If you see this in the PR it means i forgot to change it back so leave a comment
