@@ -162,6 +162,7 @@ class ExerciseDiagrams:
         merged_data = merged_data.explode("conditions")  # Each condition becomes its own row
 
         condition_counts = merged_data["conditions"].value_counts()
+        condition_counts.index = condition_counts.index.str.title()
 
         fig = px.bar(
             x=condition_counts.index,
