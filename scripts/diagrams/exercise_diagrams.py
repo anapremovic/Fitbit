@@ -238,7 +238,7 @@ class ExerciseDiagrams:
         Util.show_no_data_if_empty(step_data, "AverageSteps", fig)
         return fig
 
-    def get_steps_to_heart_rate_and_avg_heart_rate_graphs(self) -> tuple[go.Figure, go.Figure]:
+    def get_steps_to_heart_rate_regression(self) -> go.Figure:
         """
         Create regression between daily steps and average heart rate.
         Also add a numerical value for the average heart rate.
@@ -249,15 +249,10 @@ class ExerciseDiagrams:
         daily_steps_and_average_heart_rate = (
             Util.filter_by_date_range(daily_steps_and_average_heart_rate, self.start_date, self.end_date))
 
-        average_plot_title = f"Average Heart Rate <br> For All Users"
         if self.user != "All":
-            daily_steps_and_average_heart_rate = (
-                Util.filter_by_user(daily_steps_and_average_heart_rate, self.user))
-            average_plot_title = f"Average Heart Rate <br> For User {self.user}"
+            daily_steps_and_average_heart_rate = Util.filter_by_user(daily_steps_and_average_heart_rate, self.user)
 
-        avg_heart_rate = daily_steps_and_average_heart_rate["AverageHeartRate"].mean()
-
-        graph = px.scatter(
+        fig = px.scatter(
             daily_steps_and_average_heart_rate, 
             x="TotalSteps", 
             y="AverageHeartRate", 
@@ -265,7 +260,7 @@ class ExerciseDiagrams:
             title="Relation Between Daily Steps and Average Heart Rate",
             opacity=0.6,
         )
-        graph.update_layout(
+        fig.update_layout(
             xaxis_title="Daily Steps",
             yaxis_title="Average Daily Heart Rate (bpm)",
             template="plotly_white",
@@ -274,35 +269,8 @@ class ExerciseDiagrams:
                 xanchor="center"
             )
         )
-        graph.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
-        if np.isnan(avg_heart_rate):
-            numerical = go.Figure()
-        else:
-            numerical = go.Figure(go.Scatter(
-                x=[0],
-                y=[0],
-                text=[avg_heart_rate],
-                mode='text',
-                textfont=dict(size=36),
-            ))
-            numerical = go.Figure(go.Indicator(
-                mode="number",
-                value=round(avg_heart_rate, 2),
-                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": "bpm"}
-            ))
-            numerical.update_layout(
-                showlegend=False,
-                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                title={
-                    "text": average_plot_title,
-                    "font": {"size": 16}
-                },
-                title_y=0.95,
-            )
+        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig)
 
-        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", graph)
-        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", numerical)
-
-        return graph, numerical
+        return fig
