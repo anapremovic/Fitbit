@@ -260,16 +260,14 @@ class HealthDiagrams:
             average_plot = go.Figure(go.Indicator(
                 mode="number",
                 value=round(avg_heart_rate, 2),
-                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": "bpm"}
+                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": " bpm"},
             ))
         average_plot.update_layout(
-            showlegend=False,
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            title="Average Heart Rate<br>Over Date Range",
-            title_y=0.95,
-            title_x=0.55,
-            title_xanchor="center"
+            title=dict(
+                text=f"Average Heart Rate<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT}'>Over Date Range</span>",
+                x=0.5,
+                xanchor="center"
+            )
         )
 
         Util.show_no_data_if_empty(heart_rate_data, "HeartRate", over_time_plot)
