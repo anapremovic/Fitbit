@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from scripts.utils.style import Colors, Fonts
+from scripts.utils.style import Colors
 from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
@@ -34,7 +34,8 @@ class ExerciseDiagrams:
         fig = px.bar(
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
-            title="Number Of Workouts Per Day Of Week",
+            title="Number Of Workouts",
+            subtitle="Per Day Of Week",
             labels={"x": "Day of the Week", "y": "Frequency"},
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -64,7 +65,8 @@ class ExerciseDiagrams:
             data,
             x="TotalSteps",
             y="Calories",
-            title="Relation Between Daily Steps And Calories Burned",
+            title="Calories Burned",
+            subtitle="Relation With Daily Steps",
             labels={"TotalSteps": "Total Steps", "Calories": "Calories Burned"},
             trendline="ols",
             opacity=0.6,
@@ -99,21 +101,22 @@ class ExerciseDiagrams:
 
         merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="Date")
 
-        def scatter_with_fit(data, x, y, x_label, y_label):
+        def scatter_with_fit(data, title, y, y_label):
             """
             Helper function for plotting best-fit line
             """
 
             fig = px.scatter(
                 data,
-                x=x,
+                x="temp",
                 y=y,
                 trendline="ols",
-                title=f"Relation Between {x_label} <br> And {y_label}",
+                title=title,
+                subtitle="Relation With Temperature",
                 opacity=0.6
             )
             fig.update_layout(
-                xaxis_title=x_label,
+                xaxis_title="Temperature (°C)",
                 yaxis_title=y_label,
                 title=dict(
                     x=0.55,
@@ -125,11 +128,9 @@ class ExerciseDiagrams:
             return fig
 
         figs = {"distance_vs_temp": scatter_with_fit(
-            data=merged_data, x="temp", y="TotalDistance",
-            x_label="Temperature (°C)", y_label="Average Distance (km)"
+            data=merged_data, y="TotalDistance", title="Average Distance", y_label="Average Distance (Km)"
         ), "calories_vs_temp": scatter_with_fit(
-            data=merged_data, x="temp", y="Calories",
-            x_label="Temperature (°C)", y_label="Average Calories Burned"
+            data=merged_data, y="Calories", title="Average Calories Burned", y_label="Average Calories Burned"
         )}
 
         Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
@@ -162,7 +163,8 @@ class ExerciseDiagrams:
         fig = px.bar(
             x=weather_conditions,
             y=condition_counts,
-            title="Number Of Workouts Per Weather Condition",
+            title="Number Of Workouts",
+            subtitle="Per Weather Condition",
             labels={"x": "Weather Condition", "y": "Frequency"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -195,7 +197,8 @@ class ExerciseDiagrams:
             x="HourGroup",
             y="AverageSteps",
             color_discrete_sequence=["green"],
-            title="Average Steps Taken Per 4-Hour Time Blocks",
+            title="Average Steps Taken",
+            subtitle="Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -229,7 +232,8 @@ class ExerciseDiagrams:
             x="TotalSteps", 
             y="AverageHeartRate", 
             trendline="ols",
-            title="Relation Between Daily Steps and Average Heart Rate",
+            title="Average Heart Rate",
+            subtitle="Relation With Daily Steps",
             opacity=0.6,
         )
         fig.update_layout(

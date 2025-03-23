@@ -1,7 +1,6 @@
 class Colors:
     PRIMARY_COLOR = "#06B0B8"
     SECONDARY_COLOR = "#DDDDDD"
-    TEXT_COLOR = "#DDDDDD"
 
 class Fonts:
     SMALL_FONT_SIZE = 11
