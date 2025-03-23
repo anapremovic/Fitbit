@@ -264,7 +264,7 @@ class HealthDiagrams:
             ))
         average_plot.update_layout(
             title=dict(
-                text=f"Average Heart Rate<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT}'>Over Date Range</span>",
+                text=f"Average Heart Rate<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT};color:{Colors.SECONDARY_COLOR}'>Over Date Range</span>",
                 x=0.5,
                 xanchor="center"
             )
@@ -334,19 +334,19 @@ class HealthDiagrams:
         )
 
         fig.update_layout(
-            title_text="Weight And Steps Over Time",
             showlegend=False,
             title=dict(
+                text=f"Weight And Steps<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT};color:{Colors.SECONDARY_COLOR}'>Over Time</span>",
                 x=0.5,
                 xanchor="center"
             )
         )
 
         if self.user == "All":
-            fig.update_yaxes(title_text="Average Weight (kg)", row=1, col=1)
+            fig.update_yaxes(title_text="Average Weight (Kg)", row=1, col=1)
             fig.update_yaxes(title_text="Average Daily Steps", row=1, col=2)
         else:
-            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
+            fig.update_yaxes(title_text="Weight (Kg)", row=1, col=1)
             fig.update_yaxes(title_text="Daily Steps", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=1)
