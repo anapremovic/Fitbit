@@ -29,6 +29,8 @@ st.set_page_config(
     page_icon=os.path.join(project_root, "assets/favicon.png")
 )
 
+st.logo("assets/Fitbit-Logo.png", size="large")
+
 home_page = st.Page("app_pages/home_page.py", title="Home")
 exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise")
 health_page = st.Page("app_pages/health_page.py", title="Health")
@@ -118,5 +120,7 @@ user_filter.selectbox(
     options=("All",) + fitbit_db.user_ids,
     disabled=are_filters_disabled,
 )
+
+st.divider()
 
 pg.run()
