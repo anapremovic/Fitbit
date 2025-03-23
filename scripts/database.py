@@ -10,7 +10,7 @@ class FitbitDatabase:
         self.user_ids = self._get_all_user_ids()
         self.min_date, self.max_date = self._get_date_range() # Min and max of our DB's data range
 
-    def _query(self, sql_query: str):
+    def _query(self, sql_query: str) -> pd.DataFrame:
         """
         Helper function to run a SQL query on our database and ensure
         the Date column is converted to a useful format.
@@ -104,7 +104,7 @@ class FitbitDatabase:
         df = self._query(query)
         return df
 
-    def get_daily_activity(self):
+    def get_daily_activity(self) -> pd.DataFrame:
         """
         Get all relevant daily activity data.
         """
@@ -161,7 +161,7 @@ class FitbitDatabase:
 
         return df
 
-    def get_sedentary_sleep_activity(self):
+    def get_sedentary_sleep_activity(self) -> pd.DataFrame:
         """
         Get sleep and sedentary duration, in hours, per day.
         """
@@ -313,18 +313,6 @@ class FitbitDatabase:
         hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
         df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
         return df.sort_values("HourGroup")
-        
-    def get_daily_steps(self):
-        query = """
-            SELECT 
-                Id AS UserId, 
-                ActivityDate AS Date, 
-                TotalSteps 
-            FROM daily_activity
-        """
-        
-        df = self._query(query)
-        return df
 
     def get_daily_steps_and_average_heart_rate(self) -> pd.DataFrame:
         """

@@ -192,30 +192,30 @@ class HealthDiagrams:
         """
 
         weight_data = self.fitbit_db.get_weight_data()
-        step_data = self.fitbit_db.get_daily_steps()
+        daily_activity = self.fitbit_db.get_daily_activity()
 
         weight_data = Util.filter_by_date_range(weight_data, self.start_date, self.end_date)
-        step_data = Util.filter_by_date_range(step_data, self.start_date, self.end_date)
+        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         weight_data = weight_data.set_index(["UserId", "Date"])
 
         has_data_available = True
         if self.user in weight_data.index.get_level_values(0):
             weight_data = weight_data.loc[self.user, ["Weight"]]
-            # Reindex step_data to be by date for a particular user
-            step_data = step_data.loc[step_data.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
+            # Reindex daily_activity to be by date for a particular user
+            daily_activity = daily_activity.loc[daily_activity.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
         elif self.user == "All":
             weight_data = weight_data.groupby(level=1)["Weight"].mean().reset_index().set_index("Date")
-            step_data = step_data.groupby("Date")["TotalSteps"].mean().reset_index().set_index("Date")
+            daily_activity = daily_activity.groupby("Date")["TotalSteps"].mean().reset_index().set_index("Date")
         else:
-            df = step_data.loc[step_data.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
+            df = daily_activity.loc[daily_activity.loc[:, "UserId"] == self.user].set_index("Date").loc[:, ["TotalSteps"]]
             df["Weight"] = None
             has_data_available = False
 
         if has_data_available:
             # Reindex weight_data to match step_data and forward-fill missing values
-            df = weight_data.reindex(step_data.index).ffill()
+            df = weight_data.reindex(daily_activity.index).ffill()
             # Join TotalSteps from step_data to df
-            df = df.merge(step_data, on="Date", how="left")
+            df = df.merge(daily_activity, on="Date", how="left")
 
         fig = make_subplots(
             rows=1, cols=2,
