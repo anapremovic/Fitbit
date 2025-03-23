@@ -28,13 +28,6 @@ st.set_page_config(
     layout="wide",
 )
 
-fitbit_db = get_fitbit_db_instance()
-st.session_state["fitbit-db"] = fitbit_db
-st.session_state["project-root"] = project_root
-st.session_state.setdefault("selected-user", "All")
-st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
-st.session_state.setdefault("selected-end-date", fitbit_db.max_date)
-
 home_page = st.Page("app_pages/home_page.py", title="Home", icon="📌")
 exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise", icon="🏋️")
 health_page = st.Page("app_pages/health_page.py", title="Health", icon="❤️")
@@ -43,37 +36,80 @@ pg = st.navigation([
     home_page, 
     exercise_page, 
     health_page
-])
+], position="hidden")
 
-pg.run()
+fitbit_db = get_fitbit_db_instance()
+st.session_state["fitbit-db"] = fitbit_db
+st.session_state["project-root"] = project_root
+st.session_state.setdefault("selected-user", "All")
+st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
+st.session_state.setdefault("selected-end-date", fitbit_db.max_date)
+st.session_state.setdefault("current-page", "home")
+# if "current-page" not in st.session_state:
+#     st.session_state["current-page"] = "home"
 
-st.sidebar.header("Filters")
+def switch_page(page: str):
+    st.session_state["change-page"] = True
+    st.session_state["current-page"] = page
 
-are_filters_disabled = False
-if st.session_state.get("current-page", "home") == "home":
-    are_filters_disabled = True
+pad1, home, pad2, exercise, pad3, health, pad4 = st.columns([1, 2, 1, 2, 1, 2, 1], vertical_alignment='center')
+pad1.divider()
+home.button(
+    "Home", 
+    on_click=switch_page,
+    args=["home"],
+    type="primary" if st.session_state["current-page"] == "home" else "secondary",
+    use_container_width=True,
+)
+pad2.divider()
+exercise.button(
+    "Exercise",
+    on_click=switch_page,
+    args=["exercise"],
+    type="primary" if st.session_state["current-page"] == "exercise" else "secondary",
+    use_container_width=True,
+)
+pad3.divider()
+health.button(
+    "Health", 
+    on_click=switch_page,
+    args=["health"],
+    type="primary" if st.session_state["current-page"] == "health" else "secondary",
+    use_container_width=True,
+)
+pad4.divider()
 
-selected_user = st.sidebar.selectbox(
+if st.session_state.get("change-page"):
+    st.session_state["change-page"] = False
+    match st.session_state["current-page"]:
+        case "home":
+            st.switch_page(home_page)
+        case "exercise":
+            st.switch_page(exercise_page)
+        case "health":
+            st.switch_page(health_page)
+
+are_filters_disabled = st.session_state["current-page"] == "home"
+start_filter, user_filter, end_filter = st.columns(3)
+user_filter.selectbox(
     "User ID",
     key="selected-user",
     options=("All",) + fitbit_db.user_ids,
     disabled=are_filters_disabled,
 )
+start_filter.date_input(
+    "Start date",
+    key="selected-start-date",
+    min_value=fitbit_db.min_date,
+    max_value=st.session_state["selected-end-date"],
+    disabled=are_filters_disabled,
+)
+end_filter.date_input(
+    "End date",
+    key="selected-end-date",
+    min_value=st.session_state["selected-start-date"],
+    max_value=fitbit_db.max_date,
+    disabled=are_filters_disabled,
+)
 
-left, right = st.sidebar.columns(2)
-with left: 
-    start_date = st.date_input(
-        "Start date",
-        key="selected-start-date",
-        min_value=fitbit_db.min_date,
-        max_value=st.session_state["selected-end-date"],
-        disabled=are_filters_disabled,
-    )
-with right:
-    end_date = st.date_input(
-        "End date",
-        key="selected-end-date",
-        min_value=st.session_state["selected-start-date"],
-        max_value=fitbit_db.max_date,
-        disabled=are_filters_disabled,
-    )
+pg.run()

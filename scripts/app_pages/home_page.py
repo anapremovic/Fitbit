@@ -1,8 +1,6 @@
 import streamlit as st
  
-from scripts.diagrams.home_diagrams import HomeDiagrams
-
-st.session_state["current-page"] = "home"
+from scripts.diagrams.home_diagrams import HomeDiagrams 
 
 @st.cache_resource
 def get_home_diagrams():
