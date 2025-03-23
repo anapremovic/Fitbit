@@ -38,6 +38,12 @@ class ExerciseDiagrams:
             labels={"x": "Distance Walked (km)", "y": "Density"},
             color=Colors.PRIMARY_COLOR,
         )
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         return fig
 
@@ -49,10 +55,8 @@ class ExerciseDiagrams:
         daily_activity = self.fitbit_db.get_daily_activity()
 
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
-        title = "Number Of Workouts Per Day Of Week Over All Users"
         if self.user != "All":
             daily_activity = Util.filter_by_user(daily_activity, self.user)
-            title = f"Number Of Workouts Per Day Of Week For User {self.user}"
 
         day_of_week_counts = daily_activity.loc[:, "Date"].dt.dayofweek.value_counts().sort_index()
         # ensure y has 7 elements even if date range is under 7 days
@@ -61,12 +65,17 @@ class ExerciseDiagrams:
         fig = px.bar(
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
-            title=title,
+            title="Number Of Workouts Per Day Of Week",
             labels={"x": "Day of the Week", "y": "Frequency"},
         )
-
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
-        fig.update_layout(xaxis=dict(tickangle=-45))
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(daily_activity, "Date", fig)
         return fig
@@ -79,21 +88,25 @@ class ExerciseDiagrams:
         data = self.fitbit_db.get_daily_activity()
 
         data = Util.filter_by_date_range(data, self.start_date, self.end_date)
-        title = f"Relation Between Daily Steps And Calories Burned For All Users"
         if self.user != "All":
             data = Util.filter_by_user(data, self.user)
-            title = f"Relation Between Daily Steps And Calories Burned For User {self.user}"
 
         fig = px.scatter(
             data,
             x="TotalSteps",
             y="Calories",
-            title=title,
+            title="Relation Between Daily Steps And Calories Burned",
             labels={"TotalSteps": "Total Steps", "Calories": "Calories Burned"},
             trendline="ols",
             opacity=0.6,
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(data, "Calories", fig)
         return fig
@@ -122,17 +135,21 @@ class ExerciseDiagrams:
             Helper function for plotting best-fit line
             """
 
-            if self.user == "All":
-                title = f"Relation Between {x_label} <br> And {y_label} For All Users"
-            else:
-                title = f"Relation Between {x_label} <br> And {y_label} For User {self.user}"
-
-            title = "Average "
-            fig = px.scatter(data, x=x, y=y, trendline="ols", title=title, opacity=0.6)
-
+            fig = px.scatter(
+                data,
+                x=x,
+                y=y,
+                trendline="ols",
+                title=f"Relation Between {x_label} <br> And {y_label}",
+                opacity=0.6
+            )
             fig.update_layout(
                 xaxis_title=x_label,
-                yaxis_title=y_label
+                yaxis_title=y_label,
+                title=dict(
+                    x=0.55,
+                    xanchor="center"
+                )
             )
             fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
@@ -160,11 +177,9 @@ class ExerciseDiagrams:
 
         self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
 
-        title = "Number Of Workouts Per Weather Condition Over All Users"
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         if self.user != "All":
             daily_activity = Util.filter_by_user(daily_activity, self.user)
-            title = f"Number Of Workouts Per Weather Condition For User {self.user}"
 
         merged_data = pd.merge(daily_activity, self.chicago_data, on="Date", how="inner")
         merged_data["conditions"] = merged_data["conditions"].str.split(", ") # Split conditions column into list
@@ -175,12 +190,17 @@ class ExerciseDiagrams:
         fig = px.bar(
             x=condition_counts.index,
             y=condition_counts.values,
-            title=title,
+            title="Number Of Workouts Per Weather Condition",
             labels={"x": "Weather Condition", "y": "Frequency"}
         )
-
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
-        fig.update_layout(xaxis=dict(tickangle=-45))
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(merged_data, "conditions", fig)
         return fig
@@ -194,10 +214,8 @@ class ExerciseDiagrams:
         step_data = self.fitbit_db.get_daily_step_distribution()
 
         step_data = Util.filter_by_date_range(step_data, self.start_date, self.end_date)
-        title = "Average Steps Taken Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             step_data = Util.filter_by_user(step_data, self.user)
-            title = f"Average Steps Taken Per 4-Hour Time Blocks For User {self.user}"
         step_data = step_data.groupby("HourGroup", as_index=False, observed=False)["AverageSteps"].mean()  # Average over all dates
 
         fig = px.bar(
@@ -205,12 +223,17 @@ class ExerciseDiagrams:
             x="HourGroup",
             y="AverageSteps",
             color_discrete_sequence=["green"],
-            title=title,
+            title="Average Steps Taken Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
-
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
-        fig.update_layout(xaxis=dict(tickangle=-45))
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(step_data, "AverageSteps", fig)
         return fig
@@ -226,12 +249,10 @@ class ExerciseDiagrams:
         daily_steps_and_average_heart_rate = (
             Util.filter_by_date_range(daily_steps_and_average_heart_rate, self.start_date, self.end_date))
 
-        regression_title = "Relation Between Daily Steps and Average Heart Rate For All Users"
         average_plot_title = f"Average Heart Rate <br> For All Users"
         if self.user != "All":
             daily_steps_and_average_heart_rate = (
                 Util.filter_by_user(daily_steps_and_average_heart_rate, self.user))
-            regression_title = f"Relation Between Daily Steps and Average Heart Rate For User {self.user}"
             average_plot_title = f"Average Heart Rate <br> For User {self.user}"
 
         avg_heart_rate = daily_steps_and_average_heart_rate["AverageHeartRate"].mean()
@@ -241,15 +262,17 @@ class ExerciseDiagrams:
             x="TotalSteps", 
             y="AverageHeartRate", 
             trendline="ols",
-            title=regression_title,
+            title="Relation Between Daily Steps and Average Heart Rate",
             opacity=0.6,
         )
-
         graph.update_layout(
-            title=regression_title,
             xaxis_title="Daily Steps",
             yaxis_title="Average Daily Heart Rate (bpm)",
-            template="plotly_white"
+            template="plotly_white",
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
         )
         graph.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
