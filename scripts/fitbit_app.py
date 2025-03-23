@@ -29,7 +29,7 @@ st.set_page_config(
     page_icon=os.path.join(project_root, "assets/favicon.png")
 )
 
-st.logo("assets/Fitbit-Logo.png", size="large")
+st.logo("assets/fitbit-logo.png", size="large")
 
 home_page = st.Page("app_pages/home_page.py", title="Home")
 exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise")
