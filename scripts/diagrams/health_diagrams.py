@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from scripts.utils.style import Colors, Fonts
 from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
@@ -24,14 +25,27 @@ class HealthDiagrams:
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
         if self.user == "All":
             sleep_data = sleep_data.groupby("Date", as_index=False)["SleepHours"].mean() # Average over all users
-            title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
             sleep_data = Util.filter_by_user(sleep_data, self.user)
-            title = f"Sleep Duration Over Time For User {self.user}"
             y_label = "Hours Slept"
 
-        fig = px.line(sleep_data, x="Date", y="SleepHours", title=title, labels={"SleepHours": y_label})
+        fig = px.line(
+            sleep_data,
+            x="Date",
+            y="SleepHours",
+            title="Sleep Duration",
+            subtitle="Over Time",
+            labels={"SleepHours": y_label},
+            markers=True
+        )
+        fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sleep_data, "SleepHours", fig)
         return fig
@@ -44,13 +58,26 @@ class HealthDiagrams:
         sedentary_and_sleep_data = self.fitbit_db.get_sedentary_sleep_activity()
 
         sedentary_and_sleep_data = Util.filter_by_date_range(sedentary_and_sleep_data, self.start_date, self.end_date)
-        title = "Relation Between Daily Sedentary Time And Sleep Duration For All Users"
         if self.user != "All":
-            title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {self.user}"
             sedentary_and_sleep_data = Util.filter_by_user(sedentary_and_sleep_data, self.user)
 
-        fig = px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
-                         labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"}, opacity=0.5)
+        fig = px.scatter(
+            sedentary_and_sleep_data,
+            x="SedentaryHours",
+            y="HoursSlept",
+            trendline="ols",
+            title="Sleep Duration",
+            subtitle="Relation With Daily Sedentary Time",
+            labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"},
+            opacity=0.6
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
         return fig
@@ -63,13 +90,26 @@ class HealthDiagrams:
         active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs(week_period)
 
         active_and_sleep_data = Util.filter_by_date_range(active_and_sleep_data, self.start_date, self.end_date)
-        title = "Relation Between Daily Active Time And Sleep Duration For All Users"
         if self.user != "All":
-            title = f"Relation Between Daily Active Time And Sleep Duration For User {self.user}"
             active_and_sleep_data = Util.filter_by_user(active_and_sleep_data, self.user)
 
-        fig = px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
-                         labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"}, opacity=0.5)
+        fig = px.scatter(
+            active_and_sleep_data,
+            x="TotalActiveHours",
+            y="TotalSleepHours",
+            trendline="ols",
+            title="Sleep Duration",
+            subtitle="Relation With Daily Active Time",
+            labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"},
+            opacity=0.6
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
         return fig
@@ -83,14 +123,29 @@ class HealthDiagrams:
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
-        title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             sleep_data = Util.filter_by_user(sleep_data, self.user)
-            title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {self.user}"
-        sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
-        fig = px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
-                     labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"})
+        num_distinct_sleep_sessions = sleep_data["logId"].nunique()
+        sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].sum()
+        sleep_data["HoursSlept"] = np.divide(sleep_data["HoursSlept"], num_distinct_sleep_sessions)
+
+        fig = px.bar(
+            sleep_data,
+            x="HourGroup",
+            y="HoursSlept",
+            title="Average Sleep Duration",
+            subtitle="Per 4-Hour Time Blocks",
+            labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"}
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(sleep_data, "HoursSlept", fig)
         return fig
@@ -105,14 +160,27 @@ class HealthDiagrams:
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         if self.user == "All":
             daily_activity = daily_activity.groupby("Date", as_index=False)["Calories"].mean() # Average over all users
-            title = "Calories Burned Over Time For All Users"
             y_label = "Average Calories Burned"
         else:
             daily_activity = Util.filter_by_user(daily_activity, self.user)
-            title = f"Calories Burned Over Time For User {self.user}"
             y_label = "Calories Burned"
 
-        fig = px.line(daily_activity, x="Date", y="Calories", title=title, labels={"Calories": y_label})
+        fig = px.line(
+            daily_activity,
+            x="Date",
+            y="Calories",
+            title="Calories Burned",
+            subtitle="Over Time",
+            labels={"Calories": y_label},
+            markers=True
+        )
+        fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(daily_activity, "Calories", fig)
         return fig
@@ -125,14 +193,26 @@ class HealthDiagrams:
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
 
         calorie_data = Util.filter_by_date_range(calorie_data, self.start_date, self.end_date)
-        title = "Average Calories Burned Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             calorie_data = Util.filter_by_user(calorie_data, self.user)
-            title = f"Average Calories Burned Per 4-Hour Time Blocks For User {self.user}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
-        fig = px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
-                     labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"})
+        fig = px.bar(
+            calorie_data,
+            x="HourGroup",
+            y="AverageCalories",
+            title="Average Calories Burned",
+            subtitle="Per 4-Hour Time Blocks",
+            labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"}
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.55,
+                xanchor="center"
+            )
+        )
 
         Util.show_no_data_if_empty(calorie_data, "AverageCalories", fig)
         return fig
@@ -145,20 +225,31 @@ class HealthDiagrams:
 
         if self.user == "All":
             heart_rate_data = self.fitbit_db.get_heart_rate_averaged_over_all_users()
-            over_time_plot_title = "Heart Rate Over Time For All Users"
             over_time_plot_y_label = "Average Heart Rate (bpm)"
-            average_plot_title = "Average Heart Rate" + "<br>" + "For All Users" + "<br>" + "Over Date Range"
         else:
             heart_rate_data = self.fitbit_db.get_heart_rate(self.user)
-            over_time_plot_title = f"Heart Rate Over Time For User {self.user}"
             over_time_plot_y_label = "Heart Rate (bpm)"
-            average_plot_title = "Average Heart Rate" + "<br>" + f"For User {self.user}" + "<br>" + "Over Date Range"
 
         heart_rate_data = Util.filter_by_date_range(heart_rate_data, self.start_date, self.end_date)
         heart_rate_data = heart_rate_data.sort_values(by="Date")  # Fix overlapping lines in plotly
 
-        over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title,
-                                 labels={"HeartRate": over_time_plot_y_label})
+        over_time_plot = px.line(
+            heart_rate_data,
+            x="Date",
+            y="HeartRate",
+            title="Heart Rate",
+            subtitle="Over Time",
+            labels={"HeartRate": over_time_plot_y_label},
+            markers=True
+        )
+        over_time_plot.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
+        over_time_plot.update_layout(
+            xaxis=dict(tickangle=-45),
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
+        )
 
         # Average over all dates
         avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean()
@@ -166,20 +257,17 @@ class HealthDiagrams:
         if np.isnan(avg_heart_rate):
             average_plot = go.Figure()
         else:
-            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
-            average_plot = go.Figure(go.Scatter(
-                x=[0],
-                y=[0],
-                text=[avg_heart_rate],
-                mode='text',
-                textfont=dict(size=36),
+            average_plot = go.Figure(go.Indicator(
+                mode="number",
+                value=round(avg_heart_rate, 2),
+                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": " bpm"},
             ))
         average_plot.update_layout(
-            showlegend=False,
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            title=average_plot_title,
-            title_y=0.95
+            title=dict(
+                text=f"Average Heart Rate<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT};color:{Colors.SECONDARY_COLOR}'>Over Date Range</span>",
+                x=0.5,
+                xanchor="center"
+            )
         )
 
         Util.show_no_data_if_empty(heart_rate_data, "HeartRate", over_time_plot)
@@ -219,39 +307,47 @@ class HealthDiagrams:
 
         fig = make_subplots(
             rows=1, cols=2,
-            subplot_titles=["Weight Over Time", "Steps Over Time"]
+            subplot_titles=["Weight", "Steps"]
         )
 
         # Line plot: Weight over time
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["Weight"], mode="lines+markers",
-                    line=dict(color="red"), name="Weight vs Date"),
+            go.Scatter(
+                x=df.index, y=df["Weight"],
+                mode="lines+markers",
+                line=dict(color=Colors.PRIMARY_COLOR),
+                name="Weight"
+            ),
             row=1, col=1
         )
 
         # Line plot: Steps over time
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["TotalSteps"], mode="lines+markers",
-                    line=dict(color="green"), name="Steps vs Date"),
+            go.Scatter(
+                x=df.index,
+                y=df["TotalSteps"],
+                mode="lines+markers",
+                line=dict(color=Colors.PRIMARY_COLOR),
+                name="Steps"
+            ),
             row=1, col=2
         )
 
-        if self.user == "All":
-            title_text = "Average weight and step analysis for all users"
-        else:
-            title_text = f"Weight & Steps Analysis for User {self.user}"
-
         fig.update_layout(
-            title_text=title_text,
-            showlegend=False
+            showlegend=False,
+            title=dict(
+                text=f"Weight And Steps<br><span style='font-size:{Fonts.SMALL_FONT_SIZE};font-weight:{Fonts.NORMAL_WEIGHT};color:{Colors.SECONDARY_COLOR}'>Over Time</span>",
+                x=0.5,
+                xanchor="center"
+            )
         )
 
         if self.user == "All":
-            fig.update_yaxes(title_text="Average weight for all users (kg)", row=1, col=1)
-            fig.update_yaxes(title_text="Average steps for all users ", row=1, col=2)
+            fig.update_yaxes(title_text="Average Weight (Kg)", row=1, col=1)
+            fig.update_yaxes(title_text="Average Daily Steps", row=1, col=2)
         else:
-            fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
-            fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
+            fig.update_yaxes(title_text="Weight (Kg)", row=1, col=1)
+            fig.update_yaxes(title_text="Daily Steps", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=1)
         fig.update_xaxes(title_text="Date", row=1, col=2)

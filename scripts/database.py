@@ -155,9 +155,9 @@ class FitbitDatabase:
         df = self._query(query)
 
         if day_filter == "weekdays":
-            return df[df["Date"].datetime.weekday < 5]
+            return df[df["Date"].dt.weekday < 5]
         elif day_filter == "weekends":
-            return df[df["Date"].datetime.weekday >= 5]
+            return df[df["Date"].dt.weekday >= 5]
 
         return df
 
@@ -284,6 +284,7 @@ class FitbitDatabase:
             )
             SELECT 
 				Id AS UserId,
+                logId,
 				substr(date, 1, instr(date, ' ') - 1) AS SleepDate,
                 COUNT(*) / 60.0 AS HoursSlept,
                 CASE 
@@ -371,6 +372,7 @@ class FitbitDatabase:
             SELECT
                 Id AS UserId,
                 AVG(TotalSteps) AS AverageSteps,
+                AVG(TotalDistance) AS AverageDistance,
                 AVG(Calories) AS AverageCalories,
                 AVG(VeryActiveMinutes + FairlyActiveMinutes + LightlyActiveMinutes) AS AverageActiveMinutes
             FROM daily_activity

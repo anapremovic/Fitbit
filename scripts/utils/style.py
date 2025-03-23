@@ -1,0 +1,9 @@
+class Colors:
+    PRIMARY_COLOR = "#06B0B8"
+    SECONDARY_COLOR = "#DDDDDD"
+
+class Fonts:
+    SMALL_FONT_SIZE = 11
+    MEDIUM_FONT_SIZE = 20
+    LARGE_FONT_SIZE = 40
+    NORMAL_WEIGHT = "normal"
