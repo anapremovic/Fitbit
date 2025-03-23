@@ -16,36 +16,6 @@ class ExerciseDiagrams:
         self.start_date = start_date
         self.end_date = end_date
 
-    def get_distance_walked_density_graph(self) -> go.Figure:
-        """
-        Create a density plot of the total distance walked by individuals
-        """
-
-        daily_activity = self.fitbit_db.get_daily_activity()
-
-        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
-
-        users = pd.unique(daily_activity.loc[:, "UserId"])
-        distances = [daily_activity.loc[daily_activity.loc[:, "UserId"] == user, "TotalDistance"].sum() for user in users]
-
-        fig = px.histogram(
-            x=distances,
-            nbins=30, 
-            marginal="box",
-            histnorm="density",
-            title="Distribution Of Distances Walked For All Users",
-            labels={"x": "Distance Walked (km)", "y": "Density"},
-            color=Colors.PRIMARY_COLOR,
-        )
-        fig.update_layout(
-            title=dict(
-                x=0.55,
-                xanchor="center"
-            )
-        )
-
-        return fig
-
     def get_day_of_week_frequency_graph(self):
         """
         Create bar plot that displays the frequency of workouts per day of week.
