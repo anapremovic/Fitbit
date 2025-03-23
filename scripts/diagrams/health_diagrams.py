@@ -125,7 +125,10 @@ class HealthDiagrams:
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
         if self.user != "All":
             sleep_data = Util.filter_by_user(sleep_data, self.user)
-        sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
+
+        num_distinct_sleep_sessions = sleep_data["logId"].nunique()
+        sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].sum()
+        sleep_data["HoursSlept"] = np.divide(sleep_data["HoursSlept"], num_distinct_sleep_sessions)
 
         fig = px.bar(
             sleep_data,

@@ -102,7 +102,9 @@ date_filter, padding, user_filter = st.columns([2, 0.1, 1])
 
 date_filter.slider(
     label="Date range",
-    value=(fitbit_db.min_date, fitbit_db.max_date),
+    value=
+        (fitbit_db.min_date, fitbit_db.max_date) if st.session_state["current-page"] == "home" 
+        else (st.session_state["selected-start-date"], st.session_state["selected-end-date"]),
     on_change=update_selected_dates,
     key="selected-date-range",
     min_value=fitbit_db.min_date, 
