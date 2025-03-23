@@ -5,6 +5,8 @@ from scripts.database import FitbitDatabase
 from scripts.utils.style import Colors, Fonts
 
 class HomeDiagrams:
+    INDICATOR_HEIGHT = 170
+
     def __init__(self, fitbit_db: FitbitDatabase):
         self.fitbit_db = fitbit_db
 
@@ -22,7 +24,7 @@ class HomeDiagrams:
             number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": " days"}
         ))
 
-        fig.update_layout(height=160, margin=dict(l=0, r=0, t=0, b=0))
+        fig.update_layout(height=self.INDICATOR_HEIGHT, margin=dict(l=0, r=0, t=40, b=0))
 
         return fig
 
@@ -41,7 +43,7 @@ class HomeDiagrams:
             number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}}
         ))
 
-        fig.update_layout(height=160, margin=dict(l=0, r=0, t=0, b=0))
+        fig.update_layout(height=self.INDICATOR_HEIGHT, margin=dict(l=0, r=0, t=40, b=0))
 
         return fig
 
@@ -91,9 +93,9 @@ class HomeDiagrams:
             number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": "km"}
         ))
 
-        active_min_fig.update_layout(height=160, margin=dict(l=0, r=0, t=0, b=0))
-        steps_fig.update_layout(height=160, margin=dict(l=0, r=0, t=0, b=0))
-        distance_fig.update_layout(height=160, margin=dict(l=0, r=0, t=0, b=0))
+        active_min_fig.update_layout(height=self.INDICATOR_HEIGHT, margin=dict(l=0, r=0, t=40, b=0))
+        steps_fig.update_layout(height=self.INDICATOR_HEIGHT, margin=dict(l=0, r=0, t=40, b=0))
+        distance_fig.update_layout(height=self.INDICATOR_HEIGHT, margin=dict(l=0, r=0, t=40, b=0))
 
         return active_min_fig, steps_fig, distance_fig
 
