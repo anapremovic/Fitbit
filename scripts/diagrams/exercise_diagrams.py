@@ -131,24 +131,46 @@ class ExerciseDiagrams:
 
         figs = {"distance_vs_temp": scatter_with_fit(
             data=merged_data, x="temp", y="TotalDistance",
-            x_label="Temperature (°C)", y_label="Total Distance (km)"
+            x_label="Temperature (°C)", y_label="Average Distance (km)"
         ), "calories_vs_temp": scatter_with_fit(
             data=merged_data, x="temp", y="Calories",
-            x_label="Temperature (°C)", y_label="Calories Burned"
-        ), "distance_vs_precip": scatter_with_fit(
-            data=merged_data, x="precip", y="TotalDistance",
-            x_label="Precipitation (mm)", y_label="Total Distance (km)"
-        ), "calories_vs_precip": scatter_with_fit(
-            data=merged_data, x="precip", y="Calories",
-            x_label="Precipitation (mm)", y_label="Calories Burned"
+            x_label="Temperature (°C)", y_label="Average Calories Burned"
         )}
 
         Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
         Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
-        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
-        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
 
         return figs
+
+    def get_workout_frequency_by_weather_condition_graph(self) -> go.Figure:
+        """
+        Create a bar plot that displays the frequency of workout per weather condition in the city of Chicago.
+        """
+
+        daily_activity = self.fitbit_db.get_daily_activity()
+
+        self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
+
+        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
+        if self.user != "All":
+            daily_activity = Util.filter_by_user(daily_activity, self.user)
+
+        merged_data = pd.merge(daily_activity, self.chicago_data, on="Date", how="inner")
+        merged_data["conditions"] = merged_data["conditions"].str.split(", ") # Split conditions column into list
+        merged_data = merged_data.explode("conditions")  # Each condition becomes its own row
+
+        condition_counts = merged_data["conditions"].value_counts()
+        condition_counts.index = condition_counts.index.str.title()
+
+        fig = px.bar(
+            x=condition_counts.index,
+            y=condition_counts.values,
+            title="Number Of Workouts Per Weather Condition",
+            labels={"x": "Weather Condition", "y": "Frequency"}
+        )
+
+        Util.show_no_data_if_empty(merged_data, "conditions", fig)
+        return fig
 
     def get_daily_steps_per_time_blocks_graph(self) -> go.Figure:
         """
