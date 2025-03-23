@@ -52,32 +52,34 @@ def switch_page(page: str):
     st.session_state["change-page"] = True
     st.session_state["current-page"] = page
 
-pad1, home, pad2, exercise, pad3, health, pad4 = st.columns([1, 2, 1, 2, 1, 2, 1], vertical_alignment='center')
-pad1.divider()
-home.button(
-    "Home", 
-    on_click=switch_page,
-    args=["home"],
-    type="primary" if st.session_state["current-page"] == "home" else "secondary",
-    use_container_width=True,
-)
-pad2.divider()
-exercise.button(
-    "Exercise",
-    on_click=switch_page,
-    args=["exercise"],
-    type="primary" if st.session_state["current-page"] == "exercise" else "secondary",
-    use_container_width=True,
-)
-pad3.divider()
-health.button(
-    "Health", 
-    on_click=switch_page,
-    args=["health"],
-    type="primary" if st.session_state["current-page"] == "health" else "secondary",
-    use_container_width=True,
-)
-pad4.divider()
+button_placeholder = st.empty()
+with button_placeholder.container(): # This container fixes visual bug where the nav row shows twice the first time the user switches pages 
+    pad1, home, pad2, exercise, pad3, health, pad4 = st.columns([1, 2, 1, 2, 1, 2, 1], vertical_alignment='center')
+    pad1.divider()
+    home.button(
+        "Home", 
+        on_click=switch_page,
+        args=["home"],
+        type="primary" if st.session_state["current-page"] == "home" else "secondary",
+        use_container_width=True,
+    )
+    pad2.divider()
+    exercise.button(
+        "Exercise",
+        on_click=switch_page,
+        args=["exercise"],
+        type="primary" if st.session_state["current-page"] == "exercise" else "secondary",
+        use_container_width=True,
+    )
+    pad3.divider()
+    health.button(
+        "Health", 
+        on_click=switch_page,
+        args=["health"],
+        type="primary" if st.session_state["current-page"] == "health" else "secondary",
+        use_container_width=True,
+    )
+    pad4.divider()
 
 if st.session_state.get("change-page"):
     st.session_state["change-page"] = False
