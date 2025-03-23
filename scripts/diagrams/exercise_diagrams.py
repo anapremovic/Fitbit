@@ -150,6 +150,35 @@ class ExerciseDiagrams:
 
         return figs
 
+    def get_workout_frequency_by_weather_condition_graph(self) -> go.Figure:
+        """
+        Create a bar plot that displays the frequency of workout per weather condition in the city of Chicago.
+        """
+
+        daily_activity = self.fitbit_db.get_daily_activity()
+
+        self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
+        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
+        if self.user != "All":
+            daily_activity = Util.filter_by_user(daily_activity, self.user)
+
+        merged_data = pd.merge(daily_activity, chicago_data, on="Date", how="inner")
+        merged_data["conditions"] = merged_data["conditions"].str.split(", ") # Split conditions column into list
+        merged_data = merged_data.explode("conditions")  # Each condition becomes its own row
+
+        condition_counts = merged_data["conditions"].value_counts()
+
+        # Plot bar chart
+        fig = px.bar(
+            x=condition_counts.index,
+            y=condition_counts.values,
+            title=title,
+            labels={"x": "Weather Condition", "y": "Frequency"}
+        )
+
+        Util.show_no_data_if_empty(merged_data, "conditions", fig)
+        return fig
+
     def get_daily_steps_per_time_blocks_graph(self) -> go.Figure:
         """
         Create a bar plot that divides a day into 6 4-hour blocks
