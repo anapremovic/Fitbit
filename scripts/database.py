@@ -35,7 +35,7 @@ class FitbitDatabase:
         df["Id"] = df["Id"].astype(int)
         return tuple(df.loc[:, "Id"])
 
-    def _get_date_range(self) -> tuple[datetime.datetime, datetime.datetime]:
+    def _get_date_range(self) -> tuple[datetime, datetime]:
         """
         Get full date range of dashboard. To be run once on startup and stored in session state.
         """
@@ -155,9 +155,9 @@ class FitbitDatabase:
         df = self._query(query)
 
         if day_filter == "weekdays":
-            return df[df["Date"].datetime.weekday < 5]
+            return df[df["Date"].dt.weekday < 5]
         elif day_filter == "weekends":
-            return df[df["Date"].datetime.weekday >= 5]
+            return df[df["Date"].dt.weekday >= 5]
 
         return df
 
