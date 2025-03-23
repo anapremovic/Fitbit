@@ -8,12 +8,16 @@
         <ul><li><a href="#built-with">Built With</a></li></ul>
     </li>
     <li>
-        <a href="#installation">Installation</a>
+		<a href="#installation">Installation</a>
+		<ul>
+			<li><a href="#manually">Manually</a></li>
+			<li><a href="#automatically">Automatically</a></li>
+		</ul>
     </li>
     <li>
-        <a href="#usage">Usage</a>
+		<a href="#usage">Usage</a>
         <ul>
-			<li><a href='#folder-dashboard'>Folder: Dashboard</a></li>
+        	<li><a href='#folder-dashboard'>Folder: Dashboard</a></li>
 		</ul>
         <ul>
 			<li><a href='#folder-part1-4'>Folder: Parts 1 - 4</a></li>
@@ -21,7 +25,7 @@
 			<ul><li><a href="#part-2">Part 2</a></li></ul>
 			<ul><li><a href="#part-3">Part 3</a></li></ul>
 			<ul><li><a href="#part-4">Part 4</a></li></ul>
-		</ul>
+        </ul>
     </li>
     <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
@@ -40,15 +44,25 @@ This is a study of data from an Amazon survey from 2016 of 30 respondents. We pe
 
 ## Installation
 
+### Manually
+
 1) Download [Python][Python-url] using version 3.10 at the minimum
 2) This project uses a variety of Python libraries to run it. Please install the following:
   - [NumPy][NumPy-url]
   - [Pandas][Pandas-url]
-  - [Sklearn][Sklearn-url]
   - [Streamlit][Streamlit-url]
+  - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
   - [Plotly][Plotly-url]
 3) Once you've completed the steps above, change your directory to the ***dashboard*** folder and run the command ``streamlit run fitbit_app.py``. This will start the dashboard and open it up on your local machine.
 4) If you want to see the diagrams by themselves, navigate to the ***part1-4*** folder and run the command ``python main.py`` to see our visualizations from parts 1 to 4.
+
+### Automatically
+
+If you want to set up this dashboard yourself, please follow these steps:
+
+1) Join Streamlit's [Community Cloud](https://streamlit.io/cloud?ref=blog.streamlit.io)
+2) Create an account in the Community Cloud using your GitHub account
+3) Once you're in the cloud's home page, press the **Create app** button to start this project as your dashboard.
 
 ## Usage
 
@@ -108,6 +122,6 @@ This folder contains the functions for each individual graph listed in the bulle
 <!-- Python libraries -->
 [NumPy-url]: https://numpy.org/
 [Pandas-url]: https://pandas.pydata.org/
-[Sklearn-url]: https://scikit-learn.org/stable/
 [Streamlit-url]: https://streamlit.io/
+[Streamlit-SQLAlchemy-url]: https://docs.streamlit.io/develop/concepts/connections/connecting-to-data
 [Plotly-url]: https://plotly.com/
