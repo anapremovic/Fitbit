@@ -131,22 +131,14 @@ class ExerciseDiagrams:
 
         figs = {"distance_vs_temp": scatter_with_fit(
             data=merged_data, x="temp", y="TotalDistance",
-            x_label="Temperature (°C)", y_label="Total Distance (km)"
+            x_label="Temperature (°C)", y_label="Average Distance (km)"
         ), "calories_vs_temp": scatter_with_fit(
             data=merged_data, x="temp", y="Calories",
-            x_label="Temperature (°C)", y_label="Calories Burned"
-        ), "distance_vs_precip": scatter_with_fit(
-            data=merged_data, x="precip", y="TotalDistance",
-            x_label="Precipitation (mm)", y_label="Total Distance (km)"
-        ), "calories_vs_precip": scatter_with_fit(
-            data=merged_data, x="precip", y="Calories",
-            x_label="Precipitation (mm)", y_label="Calories Burned"
+            x_label="Temperature (°C)", y_label="Average Calories Burned"
         )}
 
         Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
         Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
-        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
-        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
 
         return figs
 
