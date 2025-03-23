@@ -25,18 +25,16 @@ class HealthDiagrams:
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
         if self.user == "All":
             sleep_data = sleep_data.groupby("Date", as_index=False)["SleepHours"].mean() # Average over all users
-            title = "Sleep Duration Over Time For All Users"
             y_label = "Average Hours Slept"
         else:
             sleep_data = Util.filter_by_user(sleep_data, self.user)
-            title = f"Sleep Duration Over Time For User {self.user}"
             y_label = "Hours Slept"
 
         fig = px.line(
             sleep_data,
             x="Date",
             y="SleepHours",
-            title=title,
+            title="Sleep Duration Over Time",
             labels={"SleepHours": y_label},
             markers=True
         )
@@ -53,9 +51,7 @@ class HealthDiagrams:
         sedentary_and_sleep_data = self.fitbit_db.get_sedentary_sleep_activity()
 
         sedentary_and_sleep_data = Util.filter_by_date_range(sedentary_and_sleep_data, self.start_date, self.end_date)
-        title = "Relation Between Daily Sedentary Time And Sleep Duration For All Users"
         if self.user != "All":
-            title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {self.user}"
             sedentary_and_sleep_data = Util.filter_by_user(sedentary_and_sleep_data, self.user)
 
         fig = px.scatter(
@@ -63,7 +59,7 @@ class HealthDiagrams:
             x="SedentaryHours",
             y="HoursSlept",
             trendline="ols",
-            title=title,
+            title="Relation Between Daily Sedentary Time And Sleep Duration",
             labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"},
             opacity=0.6
         )
@@ -80,9 +76,7 @@ class HealthDiagrams:
         active_and_sleep_data = self.fitbit_db.get_active_and_sleep_hrs(week_period)
 
         active_and_sleep_data = Util.filter_by_date_range(active_and_sleep_data, self.start_date, self.end_date)
-        title = "Relation Between Daily Active Time And Sleep Duration For All Users"
         if self.user != "All":
-            title = f"Relation Between Daily Active Time And Sleep Duration For User {self.user}"
             active_and_sleep_data = Util.filter_by_user(active_and_sleep_data, self.user)
 
         fig = px.scatter(
@@ -90,7 +84,7 @@ class HealthDiagrams:
             x="TotalActiveHours",
             y="TotalSleepHours",
             trendline="ols",
-            title=title,
+            title="Relation Between Daily Active Time And Sleep Duration",
             labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"},
             opacity=0.6
         )
@@ -108,17 +102,15 @@ class HealthDiagrams:
         sleep_data = self.fitbit_db.get_daily_sleep_distribution()
 
         sleep_data = Util.filter_by_date_range(sleep_data, self.start_date, self.end_date)
-        title = "Average Sleep Duration Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             sleep_data = Util.filter_by_user(sleep_data, self.user)
-            title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {self.user}"
         sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
         fig = px.bar(
             sleep_data,
             x="HourGroup",
             y="HoursSlept",
-            title=title,
+            title="Average Sleep Duration Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -137,18 +129,16 @@ class HealthDiagrams:
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         if self.user == "All":
             daily_activity = daily_activity.groupby("Date", as_index=False)["Calories"].mean() # Average over all users
-            title = "Calories Burned Over Time For All Users"
             y_label = "Average Calories Burned"
         else:
             daily_activity = Util.filter_by_user(daily_activity, self.user)
-            title = f"Calories Burned Over Time For User {self.user}"
             y_label = "Calories Burned"
 
         fig = px.line(
             daily_activity,
             x="Date",
             y="Calories",
-            title=title,
+            title="Calories Burned Over Time",
             labels={"Calories": y_label},
             markers=True
         )
@@ -165,17 +155,15 @@ class HealthDiagrams:
         calorie_data = self.fitbit_db.get_daily_calorie_distribution()
 
         calorie_data = Util.filter_by_date_range(calorie_data, self.start_date, self.end_date)
-        title = "Average Calories Burned Per 4-Hour Time Blocks For All Users"
         if self.user != "All":
             calorie_data = Util.filter_by_user(calorie_data, self.user)
-            title = f"Average Calories Burned Per 4-Hour Time Blocks For User {self.user}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
         fig = px.bar(
             calorie_data,
             x="HourGroup",
             y="AverageCalories",
-            title=title,
+            title="Average Calories Burned Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -192,14 +180,10 @@ class HealthDiagrams:
 
         if self.user == "All":
             heart_rate_data = self.fitbit_db.get_heart_rate_averaged_over_all_users()
-            over_time_plot_title = "Heart Rate Over Time For All Users"
             over_time_plot_y_label = "Average Heart Rate (bpm)"
-            average_plot_title = "Average Heart Rate" + "<br>" + "For All Users" + "<br>" + "Over Date Range"
         else:
             heart_rate_data = self.fitbit_db.get_heart_rate(self.user)
-            over_time_plot_title = f"Heart Rate Over Time For User {self.user}"
             over_time_plot_y_label = "Heart Rate (bpm)"
-            average_plot_title = "Average Heart Rate" + "<br>" + f"For User {self.user}" + "<br>" + "Over Date Range"
 
         heart_rate_data = Util.filter_by_date_range(heart_rate_data, self.start_date, self.end_date)
         heart_rate_data = heart_rate_data.sort_values(by="Date")  # Fix overlapping lines in plotly
@@ -208,7 +192,7 @@ class HealthDiagrams:
             heart_rate_data,
             x="Date",
             y="HeartRate",
-            title=over_time_plot_title,
+            title="Heart Rate Over Time",
             labels={"HeartRate": over_time_plot_y_label},
             markers=True
         )
@@ -229,7 +213,7 @@ class HealthDiagrams:
             showlegend=False,
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            title=average_plot_title,
+            title="Average Heart Rate <br> Over Date Range",
             title_y=0.95
         )
 
@@ -279,7 +263,8 @@ class HealthDiagrams:
                 x=df.index, y=df["Weight"],
                 mode="lines+markers",
                 line=dict(color=Colors.PRIMARY_COLOR),
-                name="Weight vs Date"),
+                name="Weight"
+            ),
             row=1, col=1
         )
 
@@ -290,26 +275,22 @@ class HealthDiagrams:
                 y=df["TotalSteps"],
                 mode="lines+markers",
                 line=dict(color=Colors.PRIMARY_COLOR),
-                name="Steps vs Date"),
+                name="Steps"
+            ),
             row=1, col=2
         )
 
-        if self.user == "All":
-            title_text = "Average weight and step analysis for all users"
-        else:
-            title_text = f"Weight & Steps Analysis for User {self.user}"
-
         fig.update_layout(
-            title_text=title_text,
+            title_text="Weight And Steps Over Time",
             showlegend=False
         )
 
         if self.user == "All":
-            fig.update_yaxes(title_text="Average weight for all users (kg)", row=1, col=1)
-            fig.update_yaxes(title_text="Average steps for all users ", row=1, col=2)
+            fig.update_yaxes(title_text="Average Weight (kg)", row=1, col=1)
+            fig.update_yaxes(title_text="Average Daily Steps", row=1, col=2)
         else:
             fig.update_yaxes(title_text="Weight (kg)", row=1, col=1)
-            fig.update_yaxes(title_text="Steps per Day", row=1, col=2)
+            fig.update_yaxes(title_text="Daily Steps", row=1, col=2)
 
         fig.update_xaxes(title_text="Date", row=1, col=1)
         fig.update_xaxes(title_text="Date", row=1, col=2)
