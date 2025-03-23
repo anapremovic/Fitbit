@@ -66,7 +66,7 @@ If you want to run the dashboard on your local device, please follow these steps
 
 ## Notes
 
-- Due to inconsistencies with the dataset we were given, the daily step data does not match the hourly step data.
+- Due to slight inconsistencies with the dataset we were given, the daily step data does not exactly match the hourly step data.
 
 ## Contributors
 
