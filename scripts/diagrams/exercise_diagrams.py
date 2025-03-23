@@ -163,7 +163,6 @@ class ExerciseDiagrams:
 
         condition_counts = merged_data["conditions"].value_counts()
 
-        # Plot bar chart
         fig = px.bar(
             x=condition_counts.index,
             y=condition_counts.values,
