@@ -23,6 +23,7 @@
 			<ul><li><a href="#part-4">Part 4</a></li></ul>
         </ul> -->
     </li>
+    <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -59,6 +60,10 @@ If you want to run this dashboard on your local device, please follow these step
 This folder contains the visualizations and Streamlit code to display our Fitbit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
 
 The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
+
+## Notes
+
+- Due to inconsistencies with the dataset we were given, the daily step data does not match the hourly step data
 
 ## Contributors
 
