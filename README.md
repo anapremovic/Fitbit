@@ -61,7 +61,7 @@ Lastly, our project structure before we started the dashboard contained the indi
   - [Streamlit][Streamlit-url]
   - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
   - [Plotly][Plotly-url]
-3) Once you've completed the steps above, change your directory to the ***scripts*** folder and run the command ``streamlit run fitbit_app.py``. This will start the dashboard and open it up on your local machine. Alternatively, you can run ``streamlit run scripts/fitbit_app.py`` in the root folder.
+3) Once you've completed the steps above, change your directory to the root folder and run the command ``streamlit run scripts/fitbit_app.py``. This will start the dashboard and open it up on your local machine.
 4) If you want to see the diagrams by themselves, navigate to the ***part1-4*** folder and run the command ``python main.py`` to see our visualizations from parts 1 to 4.
 
 ### Automatically
