@@ -62,11 +62,11 @@ If you want to run the dashboard on your local device, please follow these steps
 
 - The `scripts` directory contains `database.py` which contains database connection and all SQL queries, and fitbit_app.py which contains the global configuration for the Streamlit dashboard.
 - The `scripts/diagrams` directory contains functions which generate Plotly diagrams pertaining to each dashboard page.
-- The `scripts/app_pages` directory contains files to place the Plotly diagrams on each dashboard page.
+- The `scripts/app_pages` directory contains files to configure the Plotly diagrams on each dashboard page.
 
 ## Notes
 
-- Due to inconsistencies with the dataset we were given, the daily step data does not match the hourly step data
+- Due to inconsistencies with the dataset we were given, the daily step data does not match the hourly step data.
 
 ## Contributors
 
