@@ -35,7 +35,7 @@
 
 ## About The Project
 
-This is a study of data from an Amazon survey from 2016 of 30 respondents. We perform an analysis and visualize our results in a dashboard.
+This is a study of data from an Amazon survey from 2016 of 35 respondents. We perform an analysis and visualize our results in a dashboard.
 
 Our data can be found at [Kaggle](https://www.kaggle.com/datasets/salihobaid/fitbit-datasets-0312201605122016/data) which is based on a research article called [Establishing Linkages Between Distributed Survey Responses and Consumer Wearable Device Datasets: A Pilot Protocol](https://doi.org/10.2196/resprot.6513) that aims to find a link between fitness trackers and an individual's physical activity.
 
@@ -54,19 +54,20 @@ Lastly, our project structure before we started the dashboard contained the indi
 
 ### Manually
 
+If you want to run this dashboard on your local device, please follow these steps:
+
 1) Download [Python][Python-url] using version 3.10 at the minimum
-2) This project uses a variety of Python libraries to run it. Please install the following:
+2) This project uses a variety of Python libraries to run it. We recommend using [pip](https://packaging.python.org/en/latest/key_projects/#pip) to get these packages onto your computer. A pip package is installed in the format: ``pip install package_name``. Please install the following:
   - [NumPy][NumPy-url]
   - [Pandas][Pandas-url]
   - [Streamlit][Streamlit-url]
   - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
   - [Plotly][Plotly-url]
 3) Once you've completed the steps above, change your directory to the root folder and run the command ``streamlit run scripts/fitbit_app.py``. This will start the dashboard and open it up on your local machine.
-4) If you want to see the diagrams by themselves, navigate to the ***part1-4*** folder and run the command ``python main.py`` to see our visualizations from parts 1 to 4.
 
 ### Automatically
 
-If you want to set up this dashboard yourself, please follow these steps:
+If you want to set up this dashboard yourself on Streamlit, please follow these steps:
 
 1) Join Streamlit's [Community Cloud](https://streamlit.io/cloud?ref=blog.streamlit.io)
 2) Create an account in the Community Cloud using your GitHub account
