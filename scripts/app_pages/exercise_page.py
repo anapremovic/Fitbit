@@ -1,6 +1,6 @@
 import datetime as datetime
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
 from scripts.diagrams.exercise_diagrams import ExerciseDiagrams
 
