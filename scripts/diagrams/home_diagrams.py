@@ -123,7 +123,13 @@ class HomeDiagrams:
             color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         steps_fig.update_xaxes(type='category', showticklabels=False)
-        steps_fig.update_layout(coloraxis_showscale=False)
+        steps_fig.update_layout(
+            coloraxis_showscale=False, 
+            title=dict(
+                x=0.55,
+                xanchor="center",
+            ),
+        )
 
         df = df.sort_values(by="AverageDistance", ascending=False)
         distance_fig = px.bar(
@@ -135,13 +141,19 @@ class HomeDiagrams:
             labels={
                 "UserId": "User", 
                 "AverageSteps": "Steps", 
-                "AverageDistance": "Distance",
+                "AverageDistance": "Distance (km)",
             },
             color="AverageCalories",
             color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         distance_fig.update_xaxes(type='category', showticklabels=False)
-        distance_fig.update_layout(coloraxis_showscale=False)
+        distance_fig.update_layout(
+            coloraxis_showscale=False, 
+            title=dict(
+                x=0.55,
+                xanchor="center",
+            ),
+        )
 
         df = df.sort_values(by="AverageActiveMinutes", ascending=False)
         active_min_fig = px.bar(
@@ -159,5 +171,11 @@ class HomeDiagrams:
             color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         active_min_fig.update_xaxes(type='category', showticklabels=False)
+        active_min_fig.update_layout(
+            title=dict(
+                x=0.55,
+                xanchor="center",
+            ),
+        )
 
         return (steps_fig, distance_fig, active_min_fig)
