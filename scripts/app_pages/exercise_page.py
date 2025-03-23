@@ -18,7 +18,7 @@ project_root = st.session_state["project-root"]
 diagrams = ExerciseDiagrams(st.session_state["fitbit-db"], f"{project_root}/data/chicago_data.csv",
                             user, start_date, end_date)
 
-st.subheader("Workout Frequency")
+st.subheader("Workouts")
 
 with st.container(border=True):
     week, weather = st.columns(2)
