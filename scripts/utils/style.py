@@ -1,0 +1,8 @@
+class Colors:
+    PRIMARY_COLOR = "#06B0B8"
+    SECONDARY_COLOR = "#DDDDDD"
+    TEXT_COLOR = "#DDDDDD"
+
+class Fonts:
+    MEDIUM_FONT_SIZE = 25
+    LARGE_FONT_SIZE = 50

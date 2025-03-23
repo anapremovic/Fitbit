@@ -2,10 +2,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 from scripts.database import FitbitDatabase
-
-PRIMARY_COLOR = "#06B0B8"
-MEDIUM_FONT_SIZE = 25
-LARGE_FONT_SIZE = 50
+from scripts.utils.style import Colors, Fonts
 
 class HomeDiagrams:
     def __init__(self, fitbit_db: FitbitDatabase):
@@ -21,8 +18,8 @@ class HomeDiagrams:
         fig = go.Figure(go.Indicator(
             mode="number",
             value=duration_days,
-            title={"text": "Days Tracked", "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}},
-            number={"font": {"size": LARGE_FONT_SIZE}}
+            title={"text": "Days Tracked", "font": {"size": Fonts.MEDIUM_FONT_SIZE, "color": Colors.PRIMARY_COLOR}},
+            number={"font": {"size": Fonts.LARGE_FONT_SIZE}}
         ))
 
         fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -39,9 +36,9 @@ class HomeDiagrams:
             value=len(self.fitbit_db.user_ids),
             title={
                 "text": "Participants",
-                "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
+                "font": {"size": Fonts.MEDIUM_FONT_SIZE, "color": Colors.PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}}
+            number={"font": {"size": Fonts.LARGE_FONT_SIZE}}
         ))
 
         fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -68,9 +65,9 @@ class HomeDiagrams:
             value=collective_steps,
             title={
                 "text": "Steps",
-                "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
+                "font": {"size": Fonts.MEDIUM_FONT_SIZE, "color": Colors.PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}}
+            number={"font": {"size": Fonts.LARGE_FONT_SIZE}}
         ))
 
         distance_fig = go.Figure(go.Indicator(
@@ -78,9 +75,9 @@ class HomeDiagrams:
             value=collective_distance,
             title={
                 "text": "Distance",
-                "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
+                "font": {"size": Fonts.MEDIUM_FONT_SIZE, "color": Colors.PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}, "suffix": "km"}
+            number={"font": {"size": Fonts.LARGE_FONT_SIZE}, "suffix": "km"}
         ))
 
         active_min_fig = go.Figure(go.Indicator(
@@ -88,9 +85,9 @@ class HomeDiagrams:
             value=collective_active_minutes,
             title={
                 "text": "Active Minutes",
-                "font": {"size": MEDIUM_FONT_SIZE, "color": PRIMARY_COLOR}
+                "font": {"size": Fonts.MEDIUM_FONT_SIZE, "color": Colors.PRIMARY_COLOR}
             },
-            number={"font": {"size": LARGE_FONT_SIZE}}
+            number={"font": {"size": Fonts.LARGE_FONT_SIZE}}
         ))
 
         steps_fig.update_layout(height=150, margin=dict(l=0, r=0, t=0, b=0))
@@ -122,7 +119,7 @@ class HomeDiagrams:
                 "AverageCalories": "Calories"
             },
             color="AverageCalories",
-            color_continuous_scale=["#FFFFFF", "#06B0B8"],
+            color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         steps_fig.update_xaxes(type='category', showticklabels=False)
         steps_fig.update_layout(coloraxis_showscale=False)
@@ -140,7 +137,7 @@ class HomeDiagrams:
                 "AverageDistance": "Distance",
             },
             color="AverageCalories",
-            color_continuous_scale=["#FFFFFF", "#06B0B8"],
+            color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         distance_fig.update_xaxes(type='category', showticklabels=False)
         distance_fig.update_layout(coloraxis_showscale=False)
@@ -158,7 +155,7 @@ class HomeDiagrams:
                 "AverageCalories": "Calories",
             },
             color="AverageCalories",
-            color_continuous_scale=["#FFFFFF", "#06B0B8"],
+            color_continuous_scale=[Colors.SECONDARY_COLOR, Colors.PRIMARY_COLOR],
         )
         active_min_fig.update_xaxes(type='category', showticklabels=False)
 
