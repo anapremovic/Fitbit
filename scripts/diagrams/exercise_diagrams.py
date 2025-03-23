@@ -158,11 +158,14 @@ class ExerciseDiagrams:
         daily_activity = self.fitbit_db.get_daily_activity()
 
         self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
+
+        title = "Number Of Workouts Per Weather Condition Over All Users"
         daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
         if self.user != "All":
             daily_activity = Util.filter_by_user(daily_activity, self.user)
+            title = f"Number Of Workouts Per Weather Condition For User {self.user}"
 
-        merged_data = pd.merge(daily_activity, chicago_data, on="Date", how="inner")
+        merged_data = pd.merge(daily_activity, self.chicago_data, on="Date", how="inner")
         merged_data["conditions"] = merged_data["conditions"].str.split(", ") # Split conditions column into list
         merged_data = merged_data.explode("conditions")  # Each condition becomes its own row
 
