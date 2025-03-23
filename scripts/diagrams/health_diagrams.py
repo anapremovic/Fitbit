@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from scripts.utils.style import Colors, Fonts
 from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
@@ -31,7 +32,15 @@ class HealthDiagrams:
             title = f"Sleep Duration Over Time For User {self.user}"
             y_label = "Hours Slept"
 
-        fig = px.line(sleep_data, x="Date", y="SleepHours", title=title, labels={"SleepHours": y_label})
+        fig = px.line(
+            sleep_data,
+            x="Date",
+            y="SleepHours",
+            title=title,
+            labels={"SleepHours": y_label},
+            markers=True
+        )
+        fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
 
         Util.show_no_data_if_empty(sleep_data, "SleepHours", fig)
         return fig
@@ -49,8 +58,16 @@ class HealthDiagrams:
             title = f"Relation Between Daily Sedentary Time and Sleep Duration For User {self.user}"
             sedentary_and_sleep_data = Util.filter_by_user(sedentary_and_sleep_data, self.user)
 
-        fig = px.scatter(sedentary_and_sleep_data, x="SedentaryHours", y="HoursSlept", trendline="ols", title=title,
-                         labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"}, opacity=0.5)
+        fig = px.scatter(
+            sedentary_and_sleep_data,
+            x="SedentaryHours",
+            y="HoursSlept",
+            trendline="ols",
+            title=title,
+            labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"},
+            opacity=0.6
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
         Util.show_no_data_if_empty(sedentary_and_sleep_data, "HoursSlept", fig)
         return fig
@@ -68,8 +85,16 @@ class HealthDiagrams:
             title = f"Relation Between Daily Active Time And Sleep Duration For User {self.user}"
             active_and_sleep_data = Util.filter_by_user(active_and_sleep_data, self.user)
 
-        fig = px.scatter(active_and_sleep_data, x="TotalActiveHours", y="TotalSleepHours", trendline="ols", title=title,
-                         labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"}, opacity=0.5)
+        fig = px.scatter(
+            active_and_sleep_data,
+            x="TotalActiveHours",
+            y="TotalSleepHours",
+            trendline="ols",
+            title=title,
+            labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"},
+            opacity=0.6
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
         Util.show_no_data_if_empty(active_and_sleep_data, "TotalSleepHours", fig)
         return fig
@@ -89,8 +114,15 @@ class HealthDiagrams:
             title = f"Average Sleep Duration Per 4-Hour Time Blocks For User {self.user}"
         sleep_data = sleep_data.groupby("HourGroup", as_index=False, observed=False)["HoursSlept"].mean() # Average over all dates
 
-        fig = px.bar(sleep_data, x="HourGroup", y="HoursSlept", title=title,
-                     labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"})
+        fig = px.bar(
+            sleep_data,
+            x="HourGroup",
+            y="HoursSlept",
+            title=title,
+            labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"}
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(xaxis=dict(tickangle=-45))
 
         Util.show_no_data_if_empty(sleep_data, "HoursSlept", fig)
         return fig
@@ -112,7 +144,15 @@ class HealthDiagrams:
             title = f"Calories Burned Over Time For User {self.user}"
             y_label = "Calories Burned"
 
-        fig = px.line(daily_activity, x="Date", y="Calories", title=title, labels={"Calories": y_label})
+        fig = px.line(
+            daily_activity,
+            x="Date",
+            y="Calories",
+            title=title,
+            labels={"Calories": y_label},
+            markers=True
+        )
+        fig.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
 
         Util.show_no_data_if_empty(daily_activity, "Calories", fig)
         return fig
@@ -131,8 +171,15 @@ class HealthDiagrams:
             title = f"Average Calories Burned Per 4-Hour Time Blocks For User {self.user}"
         calorie_data = calorie_data.groupby("HourGroup", as_index=False, observed=False)["AverageCalories"].mean()  # Average over all dates
 
-        fig = px.bar(calorie_data, x="HourGroup", y="AverageCalories", title=title,
-                     labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"})
+        fig = px.bar(
+            calorie_data,
+            x="HourGroup",
+            y="AverageCalories",
+            title=title,
+            labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"}
+        )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(xaxis=dict(tickangle=-45))
 
         Util.show_no_data_if_empty(calorie_data, "AverageCalories", fig)
         return fig
@@ -157,8 +204,15 @@ class HealthDiagrams:
         heart_rate_data = Util.filter_by_date_range(heart_rate_data, self.start_date, self.end_date)
         heart_rate_data = heart_rate_data.sort_values(by="Date")  # Fix overlapping lines in plotly
 
-        over_time_plot = px.line(heart_rate_data, x="Date", y="HeartRate", title=over_time_plot_title,
-                                 labels={"HeartRate": over_time_plot_y_label})
+        over_time_plot = px.line(
+            heart_rate_data,
+            x="Date",
+            y="HeartRate",
+            title=over_time_plot_title,
+            labels={"HeartRate": over_time_plot_y_label},
+            markers=True
+        )
+        over_time_plot.update_traces(line=dict(color=Colors.PRIMARY_COLOR))
 
         # Average over all dates
         avg_heart_rate = heart_rate_data.loc[:, "HeartRate"].mean()
@@ -166,13 +220,10 @@ class HealthDiagrams:
         if np.isnan(avg_heart_rate):
             average_plot = go.Figure()
         else:
-            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
-            average_plot = go.Figure(go.Scatter(
-                x=[0],
-                y=[0],
-                text=[avg_heart_rate],
-                mode='text',
-                textfont=dict(size=36),
+            average_plot = go.Figure(go.Indicator(
+                mode="number",
+                value=round(avg_heart_rate, 2),
+                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": "bpm"}
             ))
         average_plot.update_layout(
             showlegend=False,
@@ -224,15 +275,22 @@ class HealthDiagrams:
 
         # Line plot: Weight over time
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["Weight"], mode="lines+markers",
-                    line=dict(color="red"), name="Weight vs Date"),
+            go.Scatter(
+                x=df.index, y=df["Weight"],
+                mode="lines+markers",
+                line=dict(color=Colors.PRIMARY_COLOR),
+                name="Weight vs Date"),
             row=1, col=1
         )
 
         # Line plot: Steps over time
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["TotalSteps"], mode="lines+markers",
-                    line=dict(color="green"), name="Steps vs Date"),
+            go.Scatter(
+                x=df.index,
+                y=df["TotalSteps"],
+                mode="lines+markers",
+                line=dict(color=Colors.PRIMARY_COLOR),
+                name="Steps vs Date"),
             row=1, col=2
         )
 
