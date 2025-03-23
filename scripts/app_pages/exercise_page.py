@@ -27,7 +27,7 @@ with bar:
 
 st.plotly_chart(diagrams.get_steps_to_calories_regression())
 
-st.subheader("Correlations Between Distance, Calories, and Temperature")
+st.subheader("Weather")
 
 weather_figures = diagrams.get_weather_regressions()
 distance, calories = st.columns(2)
@@ -35,6 +35,8 @@ with distance:
     st.plotly_chart(weather_figures["distance_vs_temp"])
 with calories:
     st.plotly_chart(weather_figures["calories_vs_temp"])
+
+st.plotly_chart(diagrams.get_workout_frequency_by_weather_condition_graph())
 
 st.subheader("Daily Distributions")
 
