@@ -45,11 +45,11 @@ st.session_state.setdefault("selected-user", "All")
 st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
 st.session_state.setdefault("selected-end-date", fitbit_db.max_date)
 st.session_state.setdefault("current-page", "home")
-# if "current-page" not in st.session_state:
-#     st.session_state["current-page"] = "home"
+st.session_state.setdefault("change-page-on-next-run", False)
 
+# Navigation
 def switch_page(page: str):
-    st.session_state["change-page"] = True
+    st.session_state["change-page-on-next-run"] = True
     st.session_state["current-page"] = page
 
 button_placeholder = st.empty()
@@ -81,8 +81,8 @@ with button_placeholder.container(): # This container fixes visual bug where the
     )
     pad4.divider()
 
-if st.session_state.get("change-page"):
-    st.session_state["change-page"] = False
+if st.session_state.get("change-page-on-next-run"):
+    st.session_state["change-page-on-next-run"] = False
     match st.session_state["current-page"]:
         case "home":
             st.switch_page(home_page)
@@ -91,26 +91,28 @@ if st.session_state.get("change-page"):
         case "health":
             st.switch_page(health_page)
 
+# Filters
+def update_selected_dates():
+    st.session_state["selected-start-date"] = st.session_state["selected-date-range"][0]
+    st.session_state["selected-end-date"] = st.session_state["selected-date-range"][1]
+
 are_filters_disabled = st.session_state["current-page"] == "home"
-start_filter, user_filter, end_filter = st.columns(3)
+date_filter, padding, user_filter = st.columns([2, 0.1, 1])
+
+date_filter.slider(
+    label="Date range",
+    value=(fitbit_db.min_date, fitbit_db.max_date),
+    on_change=update_selected_dates,
+    key="selected-date-range",
+    min_value=fitbit_db.min_date, 
+    max_value=fitbit_db.max_date,
+    disabled=are_filters_disabled,
+)
+
 user_filter.selectbox(
     "User ID",
     key="selected-user",
     options=("All",) + fitbit_db.user_ids,
-    disabled=are_filters_disabled,
-)
-start_filter.date_input(
-    "Start date",
-    key="selected-start-date",
-    min_value=fitbit_db.min_date,
-    max_value=st.session_state["selected-end-date"],
-    disabled=are_filters_disabled,
-)
-end_filter.date_input(
-    "End date",
-    key="selected-end-date",
-    min_value=st.session_state["selected-start-date"],
-    max_value=fitbit_db.max_date,
     disabled=are_filters_disabled,
 )
 
