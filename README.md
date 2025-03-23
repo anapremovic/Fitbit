@@ -9,10 +9,6 @@
     </li>
     <li>
 		<a href="#installation">Installation</a>
-		<ul>
-			<li><a href="#manually">Manually</a></li>
-			<li><a href="#automatically">Automatically</a></li>
-		</ul>
     </li>
     <li>
 		<a href="#usage">Usage</a>
@@ -27,7 +23,6 @@
 			<ul><li><a href="#part-4">Part 4</a></li></ul>
         </ul> -->
     </li>
-    <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -39,11 +34,7 @@ This is a study of data from an Amazon survey from 2016 of 35 respondents. We pe
 
 Our data can be found at [Kaggle](https://www.kaggle.com/datasets/salihobaid/fitbit-datasets-0312201605122016/data) which is based on a research article called [Establishing Linkages Between Distributed Survey Responses and Consumer Wearable Device Datasets: A Pilot Protocol](https://doi.org/10.2196/resprot.6513) that aims to find a link between fitness trackers and an individual's physical activity.
 
-> The dashboard is built for business analysts working for the manufacturer of FitBits. Participants of said study above are also able to view the dashboard.
-
-Furthermore, all participants in this study are said to live in Chicago hence why some other weather data is retrieved from Chicago on the same dates the study was conducted.
-
-Lastly, our project structure before we started the dashboard contained the individual functions for each bullet point in a folder labelled *part1-4*. However, we do not have that folder anymore as it has been integrated into our dashboard. The folder contained visualizations of physical activity metrics between users, verifications and correlations of multiple sets of data to find a certain conclusion, and relationships between two sets of data to name a few.
+The goal of our dashboard is to aid business analysts working for the manufacturer of Fitbit to improve their product. Participants of the study are also welcome to view the dashboard.
 
 ### Built With
 [![Python][Python.org]][Python-url]
@@ -51,8 +42,6 @@ Lastly, our project structure before we started the dashboard contained the indi
 [![Plotly][Plotly.io]][Plotly-url]
 
 ## Installation
-
-### Manually
 
 If you want to run this dashboard on your local device, please follow these steps:
 
@@ -65,23 +54,11 @@ If you want to run this dashboard on your local device, please follow these step
   - [Plotly][Plotly-url]
 3) Once you've completed the steps above, change your directory to the root folder and run the command ``streamlit run scripts/fitbit_app.py``. This will start the dashboard and open it up on your local machine.
 
-### Automatically
-
-If you want to set up this dashboard yourself on Streamlit, please follow these steps:
-
-1) Join Streamlit's [Community Cloud](https://streamlit.io/cloud?ref=blog.streamlit.io)
-2) Create an account in the Community Cloud using your GitHub account
-3) Once you're in the cloud's home page, press the **Create app** button to start this project as your dashboard.
-
 ## Usage
 
-This folder contains the visualizations and Streamlit code to display our FitBit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
+This folder contains the visualizations and Streamlit code to display our Fitbit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
 
 The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
-
-## Notes
-
-- The daily step data isn't completely correct as it does not match the hourly step data
 
 ## Contributors
 
@@ -93,7 +70,8 @@ The ``[page_name]_page.py`` files contain the pages the user can navigate to on 
 ## Acknowledgments
 
 * <a href="https://github.com/othneildrew/Best-README-Template">README Template</a>
-* [FitBit logo](https://iconscout.com/free-icon/fitbit-3521429_2944873)
+* [Favicon](https://iconscout.com/free-icon/fitbit-3521429_2944873)
+* [Logo](https://www.sherwoods.ie/fitbit/)
 
 [Python-url]: https://www.python.org/
 
