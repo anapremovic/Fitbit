@@ -16,7 +16,7 @@
     </li>
     <li>
 		<a href="#usage">Usage</a>
-        <ul>
+        <!-- <ul>
         	<li><a href='#folder-dashboard'>Folder: Dashboard</a></li>
 		</ul>
         <ul>
@@ -25,7 +25,7 @@
 			<ul><li><a href="#part-2">Part 2</a></li></ul>
 			<ul><li><a href="#part-3">Part 3</a></li></ul>
 			<ul><li><a href="#part-4">Part 4</a></li></ul>
-        </ul>
+        </ul> -->
     </li>
     <li><a href="#notes">Notes</a></li>
     <li><a href="#contributors">Contributors</a></li>
@@ -41,7 +41,9 @@ Our data can be found at [Kaggle](https://www.kaggle.com/datasets/salihobaid/fit
 
 > The dashboard is built for business analysts working for the manufacturer of FitBits. Participants of said study above are also able to view the dashboard.
 
-Furthermore, all participants in this study are said to live in Chicago hence why some other weather data is retrieved from Chicago on the same dates the study was conducted.  
+Furthermore, all participants in this study are said to live in Chicago hence why some other weather data is retrieved from Chicago on the same dates the study was conducted.
+
+Lastly, our project structure before we started the dashboard contained the individual functions for each bullet point in a folder labelled *part1-4*. However, we do not have that folder anymore as it has been integrated into our dashboard. The folder contained visualizations of physical activity metrics between users, verifications and correlations of multiple sets of data to find a certain conclusion, and relationships between two sets of data to name a few.
 
 ### Built With
 [![Python][Python.org]][Python-url]
@@ -59,7 +61,7 @@ Furthermore, all participants in this study are said to live in Chicago hence wh
   - [Streamlit][Streamlit-url]
   - [Streamlit's SQLAlchemy][Streamlit-SQLAlchemy-url]
   - [Plotly][Plotly-url]
-3) Once you've completed the steps above, change your directory to the ***dashboard*** folder and run the command ``streamlit run fitbit_app.py``. This will start the dashboard and open it up on your local machine.
+3) Once you've completed the steps above, change your directory to the ***scripts*** folder and run the command ``streamlit run fitbit_app.py``. This will start the dashboard and open it up on your local machine. Alternatively, you can run ``streamlit run scripts/fitbit_app.py`` in the root folder.
 4) If you want to see the diagrams by themselves, navigate to the ***part1-4*** folder and run the command ``python main.py`` to see our visualizations from parts 1 to 4.
 
 ### Automatically
@@ -72,36 +74,9 @@ If you want to set up this dashboard yourself, please follow these steps:
 
 ## Usage
 
-### Folder: Dashboard
-
 This folder contains the visualizations and Streamlit code to display our FitBit dashboard. The *diagrams* folder holds Plotly charts containing certain charts pertaining to the page it is attached to (e.g. exercise diagrams show Plotly charts about exercise, health diagrams show Plotly charts about a user's health, etc.).
 
 The ``[page_name]_page.py`` files contain the pages the user can navigate to on the dashboard, and our ``fitbit_app.py`` file contains the global configuration for the dashboard.
-
-### Folder: Part1-4
-
-This folder contains the functions for each individual graph listed in the bullet points for parts 1 to 4 found in the minimal requirements on Canvas.1
-
-#### Part 1
-* Visualize distance travelled by users.
-* Visualize calories burnt per user.
-* Visualize frequency of workout per day of week.
-* Visualize relationship between the amount of steps taken and the amount of calories burnt.
-
-#### Part 2
-* View repository and README.
-
-#### Part 3
-* Verify correctness of hourly steps vs daily steps data.
-* Visualize sleep data over time for a user.
-* Visualize relationship between the amount of sleep and the number of active minutes the next day.
-* Visualize a given user's heart rate and intensity side-by-side, as well as their average heart rate and intensity.
-* Visualize the correlation of the rate of activity between temperature, precipitation, total distance and calories burned.
-
-#### Part 4
-* Compare how relationship between the amount of sleep and the number of active minutes changes on weekdays vs weekends.
-* Visualize relationship between the number of steps in a day and the average daily heart rate.
-* Numerically see the average daily heart rate for a given step range.
 
 ## Notes
 
