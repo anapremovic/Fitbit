@@ -26,11 +26,12 @@ def get_fitbit_db_instance() -> FitbitDatabase:
 
 st.set_page_config(
     layout="wide",
+    page_icon=os.path.join(project_root, "assets/favicon.png")
 )
 
-home_page = st.Page("app_pages/home_page.py", title="Home", icon="📌")
-exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise", icon="🏋️")
-health_page = st.Page("app_pages/health_page.py", title="Health", icon="❤️")
+home_page = st.Page("app_pages/home_page.py", title="Home")
+exercise_page = st.Page("app_pages/exercise_page.py", title="Exercise")
+health_page = st.Page("app_pages/health_page.py", title="Health")
 
 pg = st.navigation([
     home_page, 
