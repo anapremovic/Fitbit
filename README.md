@@ -8,7 +8,7 @@
         <ul><li><a href="#built-with">Built With</a></li></ul>
     </li>
     <li>
-		<a href="#installation">Installation</a>
+		<a href="#getting-started">Getting Started</a>
     </li>
     <li>
 		<a href="#project-structure">Project Structure</a>
@@ -42,9 +42,11 @@ The goal of our dashboard is to aid business analysts working for the manufactur
 [![Streamlit][Streamlit.io]][Streamlit-url]
 [![Plotly][Plotly.io]][Plotly-url]
 
-## Installation
+## Getting Started
 
-If you want to run this dashboard on your local device, please follow these steps:
+The recommended method is to access our dashboard directly: https://fitbit.streamlit.app/
+
+If you want to run the dashboard on your local device, please follow these steps:
 
 1) Download [Python][Python-url] using version 3.10 at the minimum
 2) This project uses a variety of Python libraries to run it. We recommend using [pip](https://packaging.python.org/en/latest/key_projects/#pip) to get these packages onto your computer. A pip package is installed in the format: ``pip install package_name``. Please install the following:
