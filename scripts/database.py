@@ -81,7 +81,7 @@ class FitbitDatabase:
 	    """
 
         df = self.connection.query(query, params={"id": user_id})
-        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"], format = "%m/%d/%Y %I:%M:%S %p")
 
         return df
 
@@ -116,7 +116,12 @@ class FitbitDatabase:
             FROM daily_activity
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df.rename(columns={"ActivityDate": "Date"}, inplace=True)
+        df.rename(columns={"Id": "UserId"}, inplace=True)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
 
     def get_active_and_sleep_hrs(self, day_filter: str = "") -> pd.DataFrame:
         query = """
@@ -182,30 +187,35 @@ class FitbitDatabase:
                 FROM hourly_steps
             )
             SELECT 
+                Id AS UserId,
+				substr(ActivityHour, 1, instr(ActivityHour, ' ') - 1) AS Date,
                 4 * AVG(StepTotal) AS AverageSteps,
                 CASE 
                     WHEN ActivityHour LIKE '%AM%'
                         THEN CASE 
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '0-4'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '4-8'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '8-12'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '24:00-4:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '4:00-8:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '8:00-12:00'
                         END
                     WHEN ActivityHour LIKE '%PM%'
                         THEN CASE
-                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12-16'
-                            WHEN Hour BETWEEN 4 AND 7 THEN '16-20'
-                            WHEN Hour BETWEEN 8 AND 11 THEN '20-24'
+                            WHEN (Hour = 12 OR Hour BETWEEN 1 AND 3) THEN '12:00-16:00'
+                            WHEN Hour BETWEEN 4 AND 7 THEN '16:00-20:00'
+                            WHEN Hour BETWEEN 8 AND 11 THEN '20:00-24:00'
                         END
                     ELSE 'N/A'
                 END AS HourGroup
             FROM transformed
-            GROUP BY HourGroup;
+            GROUP BY UserId, Date, HourGroup;
         """
-        
+
         df = self.connection.query(query)
-        hour_groups_ordered = ['0-4', '4-8', '8-12', '12-16', '16-20', '20-24']
-        df['HourGroup'] = pd.Categorical(df['HourGroup'], hour_groups_ordered)
-        return df.sort_values('HourGroup')
+
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        hour_groups_ordered = ["24:00-4:00", "4:00-8:00", "8:00-12:00", "12:00-16:00", "16:00-20:00", "20:00-24:00"]
+        df["HourGroup"] = pd.Categorical(df["HourGroup"], hour_groups_ordered)
+        return df.sort_values("HourGroup")
 
     def get_daily_calorie_distribution(self) -> pd.DataFrame:
         """Groups the hourly_calories table into 4-hour blocks and returns 
@@ -340,7 +350,10 @@ class FitbitDatabase:
                 daily_activity.ActivityDate = average_heart_rate.Date
         """
 
-        return self.connection.query(query)
+        df = self.connection.query(query)
+        df["Date"] = pd.to_datetime(df.loc[:, "Date"])
+
+        return df
 
     def collect_weight_data(self) -> pd.DataFrame:
         query = """SELECT 

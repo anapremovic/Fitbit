@@ -30,6 +30,7 @@ st.set_page_config(
 
 fitbit_db = get_fitbit_db_instance()
 st.session_state["fitbit-db"] = fitbit_db
+st.session_state["project-root"] = project_root
 st.session_state.setdefault("selected-user", "All")
 st.session_state.setdefault("selected-start-date", fitbit_db.min_date)
 st.session_state.setdefault("selected-end-date", fitbit_db.max_date)

@@ -1,17 +1,20 @@
+import datetime as datetime
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import statsmodels.formula.api as smf
+
+from scripts.dashboard.utils.util import Util
 from scripts.database import FitbitDatabase
-import sklearn.linear_model as sk
 
 class ExerciseDiagrams:
-    def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str):
+    def __init__(self, fitbit_db: FitbitDatabase, chicago_csv: str, user, start_date: datetime, end_date: datetime):
         self.fitbit_db = fitbit_db
-        
         self.chicago_data = pd.read_csv(chicago_csv)
-        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
+        self.chicago_data["Date"] = pd.to_datetime(self.chicago_data["Date"])
+        self.user = user
+        self.start_date = start_date
+        self.end_date = end_date
 
     def plot_distance_walked_density(self): # Part 1: generate_distance_walked_density_plot
         """
@@ -19,15 +22,18 @@ class ExerciseDiagrams:
         """
 
         data = self.fitbit_db.get_daily_activity()
-        users = pd.unique(data.loc[:,'Id'])
-        distances = [data.loc[data.loc[:, 'Id'] == user, 'TotalDistance'].sum() for user in users]
+
+        data = Util.filter_by_date_range(data, self.start_date, self.end_date)
+
+        users = pd.unique(data.loc[:,'UserId'])
+        distances = [data.loc[data.loc[:, 'UserId'] == user, 'TotalDistance'].sum() for user in users]
 
         fig = px.histogram(
             x=distances,
             nbins=30, 
             marginal='box', 
             histnorm='density',
-            title='Distribution of Distances Walked',
+            title="Distribution Of Distances Walked For All Users",
             labels={'x': 'Distance Walked (km)', 'y': 'Density'}
         )
         return fig
@@ -38,114 +44,114 @@ class ExerciseDiagrams:
         """
 
         data = self.fitbit_db.get_daily_activity()
-        data["ActivityDate"] = pd.to_datetime(data.loc[:, "ActivityDate"])
-        day_of_week_counts = data.loc[:, "ActivityDate"].dt.dayofweek.value_counts().sort_index()
+
+        data = Util.filter_by_date_range(data, self.start_date, self.end_date)
+        title = "Number Of Workouts Per Day Of Week Over All Users"
+        if self.user != "All":
+            data = Util.filter_by_user(data, self.user)
+            title = f"Number Of Workouts Per Day Of Week For User {self.user}"
+
+        day_of_week_counts = data.loc[:, "Date"].dt.dayofweek.value_counts().sort_index()
+        # ensure y has 7 elements even if date range is under 7 days
+        day_of_week_counts = day_of_week_counts.reindex(range(7), fill_value=0)
 
         fig = px.bar(
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
-            title='Total Number of Workouts Per Day of Week',
+            title=title,
             labels={'x': 'Day of the Week', 'y': 'Frequency'}
         )
+        Util.show_no_data_if_empty(data, "Date", fig)
         return fig
 
-    def plot_steps_to_calories_regression(self, user_id: int): # Part 1: generate_steps_to_calories_regression
+    def plot_steps_to_calories_regression(self): # Part 1: generate_steps_to_calories_regression
         data = self.fitbit_db.get_daily_activity()
-        user_entries = data[data['Id'] == user_id]
-        
-        least_squares_model = smf.ols(formula='Calories ~ TotalSteps + C(Id)', data=data).fit()
-        steps_coef = least_squares_model.params['TotalSteps']
-        base_intercept = least_squares_model.params['Intercept']
-        user_coef = least_squares_model.params.get(f'C(Id)[T.{user_id}]', 0)
 
-        regression_line = [base_intercept + user_coef + steps_coef * x for x in user_entries['TotalSteps']]
+        data = Util.filter_by_date_range(data, self.start_date, self.end_date)
+        title = f"Relation Between Daily Steps And Calories Burned For All Users"
+        if self.user != "All":
+            data = Util.filter_by_user(data, self.user)
+            title = f"Relation Between Daily Steps And Calories Burned For User {self.user}"
 
         fig = px.scatter(
-            x=user_entries['TotalSteps'], 
-            y=user_entries['Calories'], 
-            title=f'Scatter plot of Steps Taken vs. Calories Burned for ID: {user_id}',
-            labels={'x': 'Total Steps', 'y': 'Calories Burned'}
+            data,
+            x="TotalSteps",
+            y="Calories",
+            title=title,
+            labels={'TotalSteps': 'Total Steps', 'Calories': 'Calories Burned'},
+            trendline="ols"
         )
-        fig.add_trace(go.Scatter(x=user_entries['TotalSteps'], y=regression_line, mode='lines', name='Regression Line'))
+        Util.show_no_data_if_empty(data, "Calories", fig)
         return fig
 
     def plot_weather_correlation_for_chicago(self): # Part 3: display_weather_correlation_for_chicago
         """
         Displays weather data for the city of Chicago and creates relationships between weather variables and activity.
         """
-        self.chicago_data["datetime"] = pd.to_datetime(self.chicago_data["datetime"])
-        
-        daily_activity_db = self.fitbit_db.get_daily_activity()
-        daily_activity_db["ActivityDate"] = pd.to_datetime(daily_activity_db["ActivityDate"])
+        daily_activity = self.fitbit_db.get_daily_activity()
+
+        self.chicago_data = Util.filter_by_date_range(self.chicago_data, self.start_date, self.end_date)
+        daily_activity = Util.filter_by_date_range(daily_activity, self.start_date, self.end_date)
+        if self.user != "All":
+            daily_activity = Util.filter_by_user(daily_activity, self.user)
 
         # Aggregate TotalDistance and Calories per day
-        activity_agg = daily_activity_db.groupby("ActivityDate").agg(
-            TotalDistance=("TotalDistance", "sum"),
-            Calories=("Calories", "sum")
+        activity_agg = daily_activity.groupby("Date").agg(
+            TotalDistance=("TotalDistance", "mean"),
+            Calories=("Calories", "mean")
         ).reset_index()
 
         # Merge Fitbit and weather data
-        merged_data = activity_agg.merge(self.chicago_data, left_on="ActivityDate", right_on="datetime")
+        merged_data = activity_agg.merge(self.chicago_data, left_on="Date", right_on="Date")
 
-        # Function to create scatter plot with best-fit line and correlation
-        def scatter_with_fit(x, y, xlabel, ylabel, color):
+        # Function to create scatter plot with best-fit line
+        def scatter_with_fit(data, x, y, xlabel, ylabel):
             """
             Purpose: Helper function for plotting best-fit line
             """
-            
-            # Compute correlation
-            correlation = x.corr(y)  # Pearson correlation
+            if self.user == "All":
+                title = f"Relation Between {xlabel} <br> And {ylabel} For All Users"
+            else:
+                title = f"Relation Between {xlabel} <br> And {ylabel} For User {self.user}"
 
-            # Compute regression line
-            slope, intercept = np.polyfit(x, y, 1)
-            y_pred = slope * np.array(x) + intercept  # Predicted values
-
-            # Create figure
-            fig = go.Figure()
-
-            # Scatter plot
-            fig.add_trace(go.Scatter(
-                x=x, y=y, mode="markers", name="Data", marker=dict(color=color)
-            ))
-
-            # Best-fit line
-            fig.add_trace(go.Scatter(
-                x=x, y=y_pred, mode="lines", name="Best Fit Line", line=dict(color=color, dash="dash")
-            ))
+            fig = px.scatter(data, x=x, y=y, trendline="ols", title=title, opacity=0.5)
 
             # Update layout of graph
             fig.update_layout(
-                title=f"{ylabel} vs. {xlabel}",
                 xaxis_title=xlabel,
                 yaxis_title=ylabel
             )
 
-            return fig, correlation
+            return fig
 
         figs = {}
-        correlations = {}
 
-        figs["distance_vs_temp"], correlations["distance_vs_temp"] = scatter_with_fit(
-            merged_data["temp"], merged_data["TotalDistance"],
-            xlabel="Temperature (°C)", ylabel="Total Distance (km)", color="red"
+        figs["distance_vs_temp"] = scatter_with_fit(
+            data=merged_data, x="temp", y="TotalDistance",
+            xlabel="Temperature (°C)", ylabel="Total Distance (km)"
         )
 
-        figs["calories_vs_temp"], correlations["calories_vs_temp"] = scatter_with_fit(
-            merged_data["temp"], merged_data["Calories"],
-            xlabel="Temperature (°C)", ylabel="Calories Burned", color="orange"
+        figs["calories_vs_temp"] = scatter_with_fit(
+            data=merged_data, x="temp", y="Calories",
+            xlabel="Temperature (°C)", ylabel="Calories Burned"
         )
 
-        figs["distance_vs_precip"], correlations["distance_vs_precip"] = scatter_with_fit(
-            merged_data["precip"], merged_data["TotalDistance"],
-            xlabel="Precipitation (mm)", ylabel="Total Distance (km)", color="blue"
+        figs["distance_vs_precip"] = scatter_with_fit(
+            data=merged_data, x="precip", y="TotalDistance",
+            xlabel="Precipitation (mm)", ylabel="Total Distance (km)"
         )
 
-        figs["calories_vs_precip"], correlations["calories_vs_precip"] = scatter_with_fit(
-            merged_data["precip"], merged_data["Calories"],
-            xlabel="Precipitation (mm)", ylabel="Calories Burned", color="green"
+        figs["calories_vs_precip"] = scatter_with_fit(
+            data=merged_data, x="precip", y="Calories",
+            xlabel="Precipitation (mm)", ylabel="Calories Burned"
         )
 
-        return figs, correlations
+        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_temp"])
+        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_temp"])
+        Util.show_no_data_if_empty(merged_data, "TotalDistance", figs["distance_vs_precip"])
+        Util.show_no_data_if_empty(merged_data, "Calories", figs["calories_vs_precip"])
+
+        return figs
 
     def plot_daily_step_distribution_barplot(self): # Part 3: generate_daily_step_distribution_barplot
         """Divide a day into 6 4-hour blocks and compute the average amount of steps
@@ -153,89 +159,78 @@ class ExerciseDiagrams:
         
         step_data = self.fitbit_db.get_daily_step_distribution()
 
-        return px.bar(
+        step_data = Util.filter_by_date_range(step_data, self.start_date, self.end_date)
+        title = "Average Steps Taken Per 4-Hour Time Blocks For All Users"
+        if self.user != "All":
+            step_data = Util.filter_by_user(step_data, self.user)
+            title = f"Average Steps Taken Per 4-Hour Time Blocks For User {self.user}"
+        step_data = step_data.groupby("HourGroup", as_index=False, observed=False)["AverageSteps"].mean()  # Average over all dates
+
+        fig = px.bar(
             step_data,
             x="HourGroup",
             y="AverageSteps",
             color_discrete_sequence=["green"],
-            title="Average Number of Steps Taken per 4-Hour Time Block Across All Users",
-            labels={"HourGroup": "Time", "AverageSteps": "Steps Taken"}
+            title=title,
+            labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
+        Util.show_no_data_if_empty(step_data, "AverageSteps", fig)
+        return fig
 
-    def plot_steps_to_heart_rate_and_avg_heart_rate(self, min_steps: int, max_steps: int): # Part 4
+    def plot_steps_to_heart_rate_and_avg_heart_rate(self): # Part 4
         """
         Plots daily steps vs heart rate regression and computes average heart rate for given step range
         """
 
-        daily_steps_and_average_heart_rate_by_user = self.fitbit_db.get_daily_steps_and_average_heart_rate()
-        x, y, regression_line = self.fit_regression(
-            daily_steps_and_average_heart_rate_by_user, "TotalSteps", "AverageHeartRate"
-        )
-        avg_heart_rate = self.compute_avg_heart_rate(
-            daily_steps_and_average_heart_rate_by_user, min_steps, max_steps
-        )
+        daily_steps_and_average_heart_rate = self.fitbit_db.get_daily_steps_and_average_heart_rate()
 
-        # Scatter plot of Daily Steps vs Average Heart Rate
-        scatter_trace = go.Scatter(
-            x=x.flatten(),
-            y=y,
-            mode="markers",
-            marker=dict(color="green"),
-            name="Observations"
-        )
+        daily_steps_and_average_heart_rate = (
+            Util.filter_by_date_range(daily_steps_and_average_heart_rate, self.start_date, self.end_date))
+        regression_title = "Relation Between Daily Steps and Average Heart Rate For All Users"
+        average_plot_title = f"Average Heart Rate <br> For All Users"
+        if self.user != "All":
+            daily_steps_and_average_heart_rate = (
+                Util.filter_by_user(daily_steps_and_average_heart_rate, self.user))
+            regression_title = f"Relation Between Daily Steps and Average Heart Rate For User {self.user}"
+            average_plot_title = f"Average Heart Rate <br> For User {self.user}"
 
-        # Regression line
-        regression_trace = go.Scatter(
-            x=x.flatten(),
-            y=regression_line,
-            mode="lines",
-            line=dict(color="green"),
-            name="Regression Line"
-        )
+        avg_heart_rate = daily_steps_and_average_heart_rate["AverageHeartRate"].mean()
+
+        fig1 = px.scatter(daily_steps_and_average_heart_rate, x="TotalSteps", y="AverageHeartRate", trendline="ols",
+                          title=regression_title)
 
         # Figure for the scatter plot
-        fig1 = go.Figure([scatter_trace, regression_trace])
         fig1.update_layout(
-            title="Relation Between Daily Steps and Average Heart Rate",
+            title=regression_title,
             xaxis_title="Daily Steps",
             yaxis_title="Average Daily Heart Rate (bpm)",
             template="plotly_white"
         )
 
-        # Display Average Heart Rate for given step range
-        if not np.isnan(avg_heart_rate):
+        # Display Average Heart Rate
+        if np.isnan(avg_heart_rate):
             fig2 = go.Figure()
-            fig2.add_trace(
-                go.Indicator(
-                    mode="number",
-                    value=avg_heart_rate,
-                    title={
-                        "text": f"Average Heart Rate <br> for {min_steps} to {max_steps} steps",
-                        "font": {"size": 16}
-                    },
-                    number={"font": {"size": 36}, "suffix": " bpm"}
-                )
-            )
+        else:
+            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
+            fig2 = go.Figure(go.Scatter(
+                x=[0],
+                y=[0],
+                text=[avg_heart_rate],
+                mode='text',
+                textfont=dict(size=36),
+            ))
+        fig2.update_layout(
+            showlegend=False,
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            title={
+                "text": average_plot_title,
+                "font": {"size": 16}
+            },
+            title_y=0.95
+        )
+
+        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig1)
+        Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", fig2)
 
         return fig1, fig2
-    
-    @staticmethod
-    def fit_regression(data: pd.DataFrame, x_col: str, y_col: str):
-        """Helper function to fit a regression to plot."""
-        x = data.loc[:, [x_col]].values
-        y = data.loc[:, y_col].values
-        model = sk.LinearRegression()
-        model.fit(x, y)
-        regression_line = model.predict(x)
-
-        return x, y, regression_line
-
-
-    @staticmethod
-    def compute_avg_heart_rate(data: pd.DataFrame, min_steps: int, max_steps: int):
-        """Helper function to compute the average heart rate for users for given step range."""
-        filtered_data = data[
-            (data["TotalSteps"] >= min_steps) &
-            (data["TotalSteps"] <= max_steps)
-        ]
-        return filtered_data["AverageHeartRate"].mean()
