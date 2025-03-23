@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
+from scripts.utils.style import Colors, Fonts
 from scripts.utils.util import Util
 from scripts.database import FitbitDatabase
 
@@ -34,7 +35,8 @@ class ExerciseDiagrams:
             marginal="box",
             histnorm="density",
             title="Distribution Of Distances Walked For All Users",
-            labels={"x": "Distance Walked (km)", "y": "Density"}
+            labels={"x": "Distance Walked (km)", "y": "Density"},
+            color=Colors.PRIMARY_COLOR,
         )
 
         return fig
@@ -60,8 +62,11 @@ class ExerciseDiagrams:
             x=["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
             y=day_of_week_counts,
             title=title,
-            labels={"x": "Day of the Week", "y": "Frequency"}
+            labels={"x": "Day of the Week", "y": "Frequency"},
         )
+
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(xaxis=dict(tickangle=-45))
 
         Util.show_no_data_if_empty(daily_activity, "Date", fig)
         return fig
@@ -85,8 +90,10 @@ class ExerciseDiagrams:
             y="Calories",
             title=title,
             labels={"TotalSteps": "Total Steps", "Calories": "Calories Burned"},
-            trendline="ols"
+            trendline="ols",
+            opacity=0.6,
         )
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
         Util.show_no_data_if_empty(data, "Calories", fig)
         return fig
@@ -120,12 +127,14 @@ class ExerciseDiagrams:
             else:
                 title = f"Relation Between {x_label} <br> And {y_label} For User {self.user}"
 
-            fig = px.scatter(data, x=x, y=y, trendline="ols", title=title, opacity=0.5)
+            title = "Average "
+            fig = px.scatter(data, x=x, y=y, trendline="ols", title=title, opacity=0.6)
 
             fig.update_layout(
                 xaxis_title=x_label,
                 yaxis_title=y_label
             )
+            fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
             return fig
 
@@ -170,6 +179,9 @@ class ExerciseDiagrams:
             labels={"x": "Weather Condition", "y": "Frequency"}
         )
 
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(xaxis=dict(tickangle=-45))
+
         Util.show_no_data_if_empty(merged_data, "conditions", fig)
         return fig
 
@@ -197,6 +209,9 @@ class ExerciseDiagrams:
             labels={"HourGroup": "Time", "AverageSteps": "Average Steps Taken"}
         )
 
+        fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
+        fig.update_layout(xaxis=dict(tickangle=-45))
+
         Util.show_no_data_if_empty(step_data, "AverageSteps", fig)
         return fig
 
@@ -221,8 +236,14 @@ class ExerciseDiagrams:
 
         avg_heart_rate = daily_steps_and_average_heart_rate["AverageHeartRate"].mean()
 
-        graph = px.scatter(daily_steps_and_average_heart_rate, x="TotalSteps", y="AverageHeartRate", trendline="ols",
-                           title=regression_title)
+        graph = px.scatter(
+            daily_steps_and_average_heart_rate, 
+            x="TotalSteps", 
+            y="AverageHeartRate", 
+            trendline="ols",
+            title=regression_title,
+            opacity=0.6,
+        )
 
         graph.update_layout(
             title=regression_title,
@@ -230,11 +251,11 @@ class ExerciseDiagrams:
             yaxis_title="Average Daily Heart Rate (bpm)",
             template="plotly_white"
         )
+        graph.update_traces(marker_color=Colors.PRIMARY_COLOR)
 
         if np.isnan(avg_heart_rate):
             numerical = go.Figure()
         else:
-            avg_heart_rate = "{0:.2f}".format(avg_heart_rate) + " bpm"
             numerical = go.Figure(go.Scatter(
                 x=[0],
                 y=[0],
@@ -242,16 +263,21 @@ class ExerciseDiagrams:
                 mode='text',
                 textfont=dict(size=36),
             ))
-        numerical.update_layout(
-            showlegend=False,
-            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            title={
-                "text": average_plot_title,
-                "font": {"size": 16}
-            },
-            title_y=0.95
-        )
+            numerical = go.Figure(go.Indicator(
+                mode="number",
+                value=round(avg_heart_rate, 2),
+                number={"font": {"size": Fonts.LARGE_FONT_SIZE, "color": Colors.PRIMARY_COLOR}, "suffix": "bpm"}
+            ))
+            numerical.update_layout(
+                showlegend=False,
+                xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                title={
+                    "text": average_plot_title,
+                    "font": {"size": 16}
+                },
+                title_y=0.95,
+            )
 
         Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", graph)
         Util.show_no_data_if_empty(daily_steps_and_average_heart_rate, "AverageHeartRate", numerical)
