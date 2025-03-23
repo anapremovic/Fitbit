@@ -34,7 +34,8 @@ class HealthDiagrams:
             sleep_data,
             x="Date",
             y="SleepHours",
-            title="Sleep Duration Over Time",
+            title="Sleep Duration",
+            subtitle="Over Time",
             labels={"SleepHours": y_label},
             markers=True
         )
@@ -65,7 +66,8 @@ class HealthDiagrams:
             x="SedentaryHours",
             y="HoursSlept",
             trendline="ols",
-            title="Relation Between Daily Sedentary Time And Sleep Duration",
+            title="Sleep Duration",
+            subtitle="Relation With Daily Sedentary Time",
             labels={"SedentaryHours": "Sedentary Hours", "HoursSlept": "Hours Slept"},
             opacity=0.6
         )
@@ -96,7 +98,8 @@ class HealthDiagrams:
             x="TotalActiveHours",
             y="TotalSleepHours",
             trendline="ols",
-            title="Relation Between Daily Active Time And Sleep Duration",
+            title="Sleep Duration",
+            subtitle="Relation With Daily Active Time",
             labels={"TotalActiveHours": "Active Hours", "TotalSleepHours": "Hours Slept"},
             opacity=0.6
         )
@@ -128,7 +131,8 @@ class HealthDiagrams:
             sleep_data,
             x="HourGroup",
             y="HoursSlept",
-            title="Average Sleep Duration<br>Per 4-Hour Time Blocks",
+            title="Average Sleep Duration",
+            subtitle="Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "HoursSlept": "Average Hours Slept"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -162,7 +166,8 @@ class HealthDiagrams:
             daily_activity,
             x="Date",
             y="Calories",
-            title="Calories Burned Over Time",
+            title="Calories Burned",
+            subtitle="Over Time",
             labels={"Calories": y_label},
             markers=True
         )
@@ -193,7 +198,8 @@ class HealthDiagrams:
             calorie_data,
             x="HourGroup",
             y="AverageCalories",
-            title="Average Calories Burned<br>Per 4-Hour Time Blocks",
+            title="Average Calories Burned",
+            subtitle="Per 4-Hour Time Blocks",
             labels={"HourGroup": "Time", "AverageCalories": "Average Calories Burned"}
         )
         fig.update_traces(marker_color=Colors.PRIMARY_COLOR)
@@ -228,7 +234,8 @@ class HealthDiagrams:
             heart_rate_data,
             x="Date",
             y="HeartRate",
-            title="Heart Rate Over Time",
+            title="Heart Rate",
+            subtitle="Over Time",
             labels={"HeartRate": over_time_plot_y_label},
             markers=True
         )
@@ -299,7 +306,7 @@ class HealthDiagrams:
 
         fig = make_subplots(
             rows=1, cols=2,
-            subplot_titles=["Weight Over Time", "Steps Over Time"]
+            subplot_titles=["Weight", "Steps"]
         )
 
         # Line plot: Weight over time
